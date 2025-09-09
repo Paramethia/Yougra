@@ -211,12 +211,12 @@
 			animation: l19 1s infinite linear;
 		}
 		@keyframes l19{ 
-		16.67% {box-shadow:-60px 15px,-60px 15px,19px 15px}
-		33.33% {box-shadow:-60px 15px,  0px 15px,19px 15px}
-		40%,60%{box-shadow:-19px 15px,  0px 15px,19px 15px}
-		66.67% {box-shadow:-19px 15px,  0px 15px,60px 15px}
-		83.33% {box-shadow:-19px 15px, 60px 15px,60px 15px}
-		100%   {box-shadow: 60px 15px, 60px 15px,60px 15px}
+			16.67% {box-shadow:-60px 15px,-60px 15px,19px 15px}
+			33.33% {box-shadow:-60px 15px,  0px 15px,19px 15px}
+			40%,60%{box-shadow:-19px 15px,  0px 15px,19px 15px}
+			66.67% {box-shadow:-19px 15px,  0px 15px,60px 15px}
+			83.33% {box-shadow:-19px 15px, 60px 15px,60px 15px}
+			100%   {box-shadow: 60px 15px, 60px 15px,60px 15px}
 		}
 		
 		@keyframes l8-1 {
@@ -347,7 +347,7 @@
 		}
 
 		try {
-			const response = await fetch("http://localhost:5000/api/info", {
+			const response = await fetch("https://yte-back-end.onrender.com/api/info", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ url })
@@ -382,7 +382,7 @@
 
 				try {
 					// Ping the server to check it's ready
-					const check = await fetch( `http://localhost:5000/api/download?url=${encodeURIComponent(url)}&format=${format}`, { method: "HEAD" });
+					const check = await fetch( `https://yte-back-end.onrender.com/api/download?url=${encodeURIComponent(url)}&format=${format}`, { method: "HEAD" });
 
 					if (!check.ok) {
 						throw new Error("Server failed to prepare the download");
@@ -405,9 +405,8 @@
 			vidCon.style.display = "none";
 			setTimeout(() => { errMsg.innerText = "" }, 4000);
 		}
-
-
     }
   </script>
 </body>
 </html>
+
