@@ -389,7 +389,7 @@
 					}
 
 					// Trigger download via native browser stream
-					window.location.href = `http://localhost:5000/api/download?url=${encodeURIComponent(url)}&format=${format}`;
+					window.location.href = `https://yte-back-end.onrender.com/api/download?url=${encodeURIComponent(url)}&format=${format}`;
 
 					downloadBtn.disabled = false;
 					downloadBtn.style.filter = "brightness(100%)";
@@ -409,4 +409,5 @@
   </script>
 </body>
 </html>
+
 
