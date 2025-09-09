@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="Download youtube videos as audio or videos" />
+	<meta name="author" content="Kyrin" />
+	<title>YTE - YouTube Extractor</title>
+	<link rel="icon" href="YTE logo.png" />
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #181818;
+			color: #0f0f0f;
+			margin: 0;
+			padding: 0;
+			text-align: center;
+		}
+
+		header {
+			background-color: #202020;
+			padding: 1rem;
+			border-bottom: 2px solid #ff0000;
+		}
+
+		header img {
+			height: 37px;
+			width: 52px;
+			transform: translateY(7px)
+		}
+
+		header h1 {
+			display: inline-block;
+			width: 80px;
+			color: white;
+			margin: 0;
+		}
+
+		main {
+			padding: 2rem;
+		}
+		
+		h4 { color: lightgray }
+
+		input[type="text"] {
+			width: 60%;
+			max-width: 500px;
+			border: 1px solid #727272;
+			border-radius: 18px;
+			padding: 0.7rem 1.4rem;
+			background-color: #121212;
+			font-size: 1rem;
+			color: lightgray;
+		}
+		
+		input[type="text"]:focus {
+			outline: none;
+		}
+
+		#check-info {
+			padding: 0.5rem 1rem;
+			margin-left: 0.5rem;
+			background-color: #ff0000;
+			border: none;
+			border-radius: 8px;
+			font-size: 1rem;
+			color: #fff;
+			cursor: pointer;
+		}
+
+		#check-info:hover {
+			border-radius: 4px;
+			background-color: #cc0000;
+		}
+		
+		#err-msg {
+			font-size: 12px;
+			color: #c00;
+			font-weight: 600;
+		}
+
+		.video-info {
+			display: none;
+			position: relative;
+			max-width: 600px;
+			width: 100%;
+			margin: 0 auto;
+			background-color: #202020;
+			padding: 1rem;
+			border-radius: 8px;
+			text-align: left;
+		}
+
+		.loader {
+			width: 15px;
+			aspect-ratio: 1;
+			position: relative;
+			margin: 20px auto;
+		}
+		.loader::before, .loader::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			border-radius: 50%;
+			background: #000;
+		}
+		.loader::before {
+			box-shadow: -25px 0;
+			animation: l8-1 1s infinite linear;
+		}
+		.loader::after {
+			transform: rotate(0deg) translateX(25px);
+			animation: l8-2 1s infinite linear;
+		}
+
+		.v { display: none }
+
+		.video-info img {
+			width: 100%;
+			border-radius: 8px;
+		}
+	
+		#length {
+			position: relative;
+			top: -35px;
+			left: 9px;
+			border-radius: 5px;
+			padding: 5px;
+			background-color: #222;
+			color: lightgray;
+			font-size: 14px;
+			z-index: 2;
+
+		}
+
+		#d-option {
+			float: right;
+			margin-top: 2px;
+			border-radius: 50%;
+			padding: 2px 5px;
+			background-color: #2a2a2a;
+		}
+		#d-option:hover { cursor: pointer }
+		#d-option svg { margin-top: 2px }
+
+		.options {
+			display: none;
+			position: absolute;
+			bottom: 1.2cm;
+			right: 17px;
+			max-width: 350px;
+			border-radius: 9px;
+			padding: 8px;
+			background-color: #3f3f3f;
+			text-align: center;
+			color: lightgray;
+			z-index: 2;
+		}
+		.options p, .options div {
+			margin: 0;
+			padding: 5px 0;
+		}
+		.options div:hover, .options #vid-o {
+			cursor: pointer;
+			background-color: #5f5f5f;
+		}
+
+		.details {
+			margin-top: 1.5rem;
+			border-radius: 15px;
+			padding: 15px;
+			background-color: #282828;
+		}
+
+		.details h2 {
+			margin: 0;
+			font-size: 1.2rem;
+			color: white;
+		}
+		
+		.details p {
+			margin: 0.3rem 0;
+			color: #ccc;
+		}
+		
+		#download {
+			position: absolute;
+			bottom: 24px;
+			right: 27px;
+			height: 38px;
+			width: 96px;
+			border: none;
+			border-radius: 1.4rem;
+			padding: 0.7rem 1rem;
+			font-weight: 600;
+			color: #0f0f0f;
+		}
+		#download:hover {
+			cursor: pointer;
+			background-color: lightgray;
+		}
+
+		.d-loader {
+			width: 12px;
+			aspect-ratio: 1;
+			border-radius: 50%;
+			clip-path: inset(-45px);
+			box-shadow: -60px 15px,-60px 15px,-60px 15px;
+			transform: translateY(-15px);
+			animation: l19 1s infinite linear;
+		}
+		@keyframes l19{ 
+		16.67% {box-shadow:-60px 15px,-60px 15px,19px 15px}
+		33.33% {box-shadow:-60px 15px,  0px 15px,19px 15px}
+		40%,60%{box-shadow:-19px 15px,  0px 15px,19px 15px}
+		66.67% {box-shadow:-19px 15px,  0px 15px,60px 15px}
+		83.33% {box-shadow:-19px 15px, 60px 15px,60px 15px}
+		100%   {box-shadow: 60px 15px, 60px 15px,60px 15px}
+		}
+		
+		@keyframes l8-1 {
+			100%{transform: translateX(25px)}
+		}
+		@keyframes l8-2 {
+			100%{transform: rotate(-180deg) translateX(25px)}
+		}
+		
+		@media only screen and (max-width: 700px) {
+			.video-info { width: 89% }
+		}
+		
+		@media only screen and (max-width: 450px) {
+			input[type="text"] {
+				width: 90%;
+			}
+			#check-info {
+				display: block;
+				margin: 7px auto;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<img src="YTE logo.png" alt="YTE logo" /><h1>YTE</h1>
+	</header>
+	 <main>
+		<h4>Enter a YouTube video URL:</h4>
+		<input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=VIDEO_ID">
+		<button id="check-info" onclick="fetchVideo()">Find it</button>
+		<p id="err-msg"></p>
+		<br />
+		<div class="video-info">
+			<div class="loader"></div>
+			<div class="v">
+				<img id="thumbnail" src="" alt="Video Thumbnail" />
+				<span id="length"></span> <span id="d-option" onClick="toggleOptions()"><svg id="dots" width="25px" height="25px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M5.7 12.1143C4.82423 12.1143 4.11429 12.8242 4.11429 13.7C4.11429 14.5758 4.82423 15.2857 5.7 15.2857C6.57577 15.2857 7.28571 14.5758 7.28571 13.7C7.28571 12.8242 6.57577 12.1143 5.7 12.1143ZM2 13.7C2 11.6565 3.65655 10 5.7 10C7.74345 10 9.4 11.6565 9.4 13.7C9.4 15.7435 7.74345 17.4 5.7 17.4C3.65655 17.4 2 15.7435 2 13.7Z" fill="#ccc" fill-rule="evenodd" /><path clip-rule="evenodd" d="M22.7 12.1143C21.8242 12.1143 21.1143 12.8242 21.1143 13.7C21.1143 14.5758 21.8242 15.2857 22.7 15.2857C23.5758 15.2857 24.2857 14.5758 24.2857 13.7C24.2857 12.8242 23.5758 12.1143 22.7 12.1143ZM19 13.7C19 11.6565 20.6565 10 22.7 10C24.7435 10 26.4 11.6565 26.4 13.7C26.4 15.7435 24.7435 17.4 22.7 17.4C20.6565 17.4 19 15.7435 19 13.7Z" fill="#ccc" fill-rule="evenodd"/><path clip-rule="evenodd" d="M14.2 12.1143C13.3242 12.1143 12.6143 12.8242 12.6143 13.7C12.6143 14.5758 13.3242 15.2857 14.2 15.2857C15.0758 15.2857 15.7857 14.5758 15.7857 13.7C15.7857 12.8242 15.0758 12.1143 14.2 12.1143ZM10.5 13.7C10.5 11.6565 12.1565 10 14.2 10C16.2435 10 17.9 11.6565 17.9 13.7C17.9 15.7435 16.2435 17.4 14.2 17.4C12.1565 17.4 10.5 15.7435 10.5 13.7Z" fill="#ccc" fill-rule="evenodd"/></svg></span>
+				<div class="options">
+					<p><strong>Download it as...</strong></p>
+					<hr />
+					<div id="vid-o">Video</div>
+					<div id="aud-o">Audio</div>
+				</div>
+				<div class="details">
+					<h2 id="title"></h2>
+					<p id="video-author"></p>
+					<p id="posted"></p>
+					<p id="views"></p>
+					<p id="likes"></p>
+				</div>
+				<button id="download">Download</button>
+			</div>
+		</div>
+	</main>
+
+  <script>
+	const errMsg = document.getElementById("err-msg");
+	const vidCon = document.querySelector(".video-info");
+	const options = document.querySelector('.options');
+	const vidSet = document.getElementById('vid-o');
+	const audSet = document.getElementById('aud-o');
+  
+    function extractVideoId(url) {
+		const regex = /(?:v=|\.be\/)([a-zA-Z0-9_-]{11})/;
+		const match = url.match(regex);
+		return match ? match[1] : null;
+    }
+
+	let opened = false;
+	
+	document.addEventListener("click", event => {
+		if (opened && !options.contains(event.target) && event.target !== document.getElementById('d-option') && event.target !== document.getElementById('dots')) {
+			options.style.display = "none";
+			opened = false;
+		}
+	});
+	
+	function toggleOptions() {
+		opened = !opened;
+		opened ? options.style.display = 'block' : options.style.display = 'none'
+	}
+
+	let format = 'video';
+
+	vidSet.onmouseover = () => { vidSet.style.background = '#5f5f5f' }
+	vidSet.onmouseout = () => { if (format !== 'video') vidSet.style.background = '#3f3f3f' }
+	vidSet.onclick = () => {
+		if (format === 'audio')
+		format = 'video';
+		vidSet.style.background = '#5f5f5f';
+		audSet.style.background = '#3f3f3f';
+	}
+
+	audSet.onmouseover = () => { audSet.style.background = '#5f5f5f' }
+	audSet.onmouseout = () => { if (format !== 'audio')audSet.style.background = '#3f3f3f' }
+	audSet.onclick = () => {
+		if (format === 'video')
+		format = 'audio';
+		audSet.style.background = '#5f5f5f';
+		vidSet.style.background = '#3f3f3f';
+	}
+
+    async function fetchVideo() {
+		const url = document.getElementById("videoUrl").value;
+		
+		if (!url) {
+			errMsg.innerText = "Where's the url, dawg?";
+			setTimeout(() => { errMsg.innerText = "" }, 3000 );
+			return;
+		}
+		
+		const validUrl = extractVideoId(url);
+
+		if (!validUrl) {
+			errMsg.innerText = "That's not a valid YouTube URL";
+			setTimeout(() => { errMsg.innerText = "" }, 3500 );
+			return;
+		}
+
+		vidCon.style.display = "inline-block";
+
+		function formatTime(seconds) {
+			const mins = Math.floor(seconds / 60);
+			const secs = seconds % 60;
+			return `${mins}:${secs.toString().padStart(2, "0")}`;
+		}
+
+		try {
+			const response = await fetch("http://localhost:5000/api/info", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ url })
+			});
+
+			const data = await response.json();
+			if (data.error) {
+				errMsg.innerText = data.error;
+				setTimeout(() => { errMsg.innerText = "" }, 3000);
+				return;
+			}
+
+			const uploadDate = new Date(data.publishDate);
+			const views = new Intl.NumberFormat('fr-FR').format(data.viewCount);
+			const likes = new Intl.NumberFormat('fr-FR').format(data.likeCount);
+
+			document.querySelector(".loader").style.display = "none";
+			document.querySelector(".v").style.display = "block";
+			document.getElementById("thumbnail").src = data.thumbnail;
+			document.getElementById("length").innerHTML = formatTime(data.lengthSeconds);
+			if (data.contentSize !== "NaN") document.getElementById("vid-o").textContent(data.contentSize + "mb");
+			document.getElementById("title").innerText = data.title;
+			document.getElementById("video-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
+			document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${uploadDate}`;
+			document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
+			document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
+
+			const downloadBtn = document.getElementById("download");
+			downloadBtn.onclick = async () => {
+				downloadBtn.disabled = true;
+				downloadBtn.style.filter = "brightness(80%)";
+
+				try {
+					// Ping the server to check it's ready
+					const check = await fetch( `http://localhost:5000/api/download?url=${encodeURIComponent(url)}&format=${format}`, { method: "HEAD" });
+
+					if (!check.ok) {
+						throw new Error("Server failed to prepare the download");
+					}
+
+					// Trigger download via native browser stream
+					window.location.href = `http://localhost:5000/api/download?url=${encodeURIComponent(url)}&format=${format}`;
+
+					downloadBtn.disabled = false;
+					downloadBtn.style.filter = "brightness(100%)";
+				} catch (err) {
+					errMsg.innerText = "Download failed. Try again.";
+					downloadBtn.disabled = false;
+					downloadBtn.style.filter = "brightness(100%)";
+					setTimeout(() => { errMsg.innerText = "" }, 4000);
+				}
+			}
+		} catch (err) {
+			errMsg.innerText = "Error fetching video info";
+			vidCon.style.display = "none";
+			setTimeout(() => { errMsg.innerText = "" }, 4000);
+		}
+
+
+    }
+  </script>
+</body>
+</html>
