@@ -240,7 +240,7 @@
 				display: block;
 				margin: 7px auto;
 			}
-			.options { bottom: 2.8cm }
+			.options { bottom: 2.5cm }
 		}
 	</style>
 </head>
@@ -300,8 +300,8 @@
 	});
 	
 	function toggleOptions() {
-		opened = !opened;
 		opened ? options.style.display = 'block' : options.style.display = 'none'
+		opened = !opened;
 	}
 
 	let format = 'video';
@@ -398,6 +398,7 @@
 					downloadBtn.style.filter = "brightness(100%)";
 				} catch (err) {
 					errMsg.innerText = "Download failed. Try again.";
+					document.querySelector(".v").style.display = "none";
 					downloadBtn.disabled = false;
 					downloadBtn.style.filter = "brightness(100%)";
 					setTimeout(() => { errMsg.innerText = "" }, 4000);
@@ -412,6 +413,7 @@
   </script>
 </body>
 </html>
+
 
 
 
