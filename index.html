@@ -385,14 +385,6 @@
 				downloadBtn.style.filter = "brightness(80%)";
 
 				try {
-					// Ping the server to check it's ready
-					const check = await fetch( `https://yougra-server.up.railway.app/api/download?url=${encodeURIComponent(url)}&format=${format}`, { method: "HEAD" });
-
-					if (!check.ok) {
-						throw new Error("Server failed to prepare the download");
-					}
-
-					// Trigger download via native browser stream
 					window.location.href = `https://yougra-server.up.railway.app/api/download?url=${encodeURIComponent(url)}&format=${format}`;
 
 					downloadBtn.disabled = false;
@@ -414,6 +406,7 @@
   </script>
 </body>
 </html>
+
 
 
 
