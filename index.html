@@ -166,6 +166,29 @@
 			cursor: pointer;
 			background-color: #5f5f5f;
 		}
+		.options span {
+			padding: 2px;
+			font-size: 13px;
+			font-weight: 700;
+			border-bottom: 1px solid #f5353c;
+			border-top: 1px solid #f5353c;
+		}
+		#a-size { display: none }
+		.options select {
+			width: 70px;
+			max-height: 32px;
+			padding: 4px;
+			border: 2px inset #ee3333;
+			border-radius: 5px;
+			background-color: #3f3f3f;
+			text-align: center;
+			color: lightgray;
+		}
+		.options select:focus { outline: none }
+		.options select:hover { 
+			cursor: pointer;
+			border: 2px inset #cc0000;
+		}
 
 		.details {
 			position: relative;
@@ -264,8 +287,8 @@
 					<div class="options">
 						<p><strong>Download it as...</strong></p>
 						<hr />
-						<div id="vid-o">Video</div>
-						<div id="aud-o">Audio</div>
+						<div id="vid-o"></div>
+						<div id="aud-o"></div>
 					</div>
 					<h2 id="title"></h2>
 					<p id="video-author"></p>
@@ -314,6 +337,9 @@
 		format = 'video';
 		vidSet.style.background = '#5f5f5f';
 		audSet.style.background = '#3f3f3f';
+		document.getElementById("v-size").style.display = 'inline';
+		document.getElementById("a-size").style.display = 'none';
+		document.getElementById("qualities").style.display = 'inline-block';
 	}
 
 	audSet.onmouseover = () => { audSet.style.background = '#5f5f5f' }
@@ -323,13 +349,16 @@
 		format = 'audio';
 		audSet.style.background = '#5f5f5f';
 		vidSet.style.background = '#3f3f3f';
+		document.getElementById("v-size").style.display = 'none';
+		document.getElementById("a-size").style.display = 'inline';
+		document.getElementById("qualities").style.display = 'none';
 	}
 
     async function fetchVideo() {
 		const url = document.getElementById("videoUrl").value;
 		
 		if (!url) {
-			errMsg.innerText = "Where's the url, dawg?";
+			errMsg.innerText = "Where's the URL, dawg?";
 			setTimeout(() => { errMsg.innerText = "" }, 3000 );
 			return;
 		}
@@ -368,16 +397,45 @@
 			const views = new Intl.NumberFormat('fr-FR').format(data.viewCount);
 			const likes = new Intl.NumberFormat('fr-FR').format(data.likeCount);
 
+			const videoFormats = data.qualities.filter(vF => vF.type === 'videoonly' && vF.qualityLabel !== '144p');
+			const rVF = videoFormats.reverse();
+			const defaultVidO = rVF.length > 2 ? rVF[1] : rVF[0];
+			const audioFormats = data.qualities.filter(aF => aF.type === 'audioonly');
+			const selectedAudio = audioFormats.pop();
+
+			function fullSize(vS, aS) {
+				vS = Number(vS.replace("mb", ""));
+				aS = Number(aS.replace("mb", ""));
+				return Math.round(vS + aS)
+			}
+
 			document.querySelector(".loader").style.display = "none";
 			document.querySelector(".v").style.display = "block";
 			document.getElementById("thumbnail").src = data.thumbnail;
 			document.getElementById("length").innerHTML = formatTime(data.lengthSeconds);
-			if (data.contentSize !== null) document.getElementById("vid-o").textContent(data.contentSize + "mb");
+			document.getElementById("vid-o").innerHTML = `
+				<p>Video <span id="v-size">${fullSize(defaultVidO.size, selectedAudio.size)}mb</span></p>
+				<select id="qualities">
+					${ videoFormats.map((index) => { return `<option value="${index.qualityLabel}">${index.qualityLabel}</option>` })}
+				</select>
+			`;
+			document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${selectedAudio.size}</span></p>`;
 			document.getElementById("title").innerText = data.title;
 			document.getElementById("video-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
 			document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${uploadDate}`;
 			document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
 			document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
+
+			const qualities = document.getElementById("qualities");
+			
+			qualities.value = defaultVidO.qualityLabel;
+			let itag = defaultVidO.itag;
+
+			qualities.addEventListener('change', () => {
+				const currentVideo = videoFormats.find(q => q.qualityLabel === qualities.value);
+				document.getElementById("v-size").innerText = `${fullSize(currentVideo.size, selectedAudio.size)}mb`;
+				itag = currentVideo.itag;
+			});
 
 			const downloadBtn = document.getElementById("download");
 			downloadBtn.onclick = async () => {
@@ -385,13 +443,12 @@
 				downloadBtn.style.filter = "brightness(80%)";
 
 				try {
-					window.location.href = `https://yougra-server.up.railway.app/api/download?url=${encodeURIComponent(url)}&format=${format}`;
+					window.location.href = `http://localhost:5000/api/download?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
 
 					downloadBtn.disabled = false;
 					downloadBtn.style.filter = "brightness(100%)";
 				} catch (err) {
 					errMsg.innerText = "Download failed. Try again.";
-					document.querySelector(".v").style.display = "none";
 					downloadBtn.disabled = false;
 					downloadBtn.style.filter = "brightness(100%)";
 					setTimeout(() => { errMsg.innerText = "" }, 4000);
@@ -399,6 +456,7 @@
 			}
 		} catch (err) {
 			errMsg.innerText = "Error fetching video info";
+			document.querySelector(".v").style.display = "none";
 			vidCon.style.display = "none";
 			setTimeout(() => { errMsg.innerText = "" }, 4000);
 		}
@@ -406,6 +464,7 @@
   </script>
 </body>
 </html>
+
 
 
 
