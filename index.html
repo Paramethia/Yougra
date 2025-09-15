@@ -443,7 +443,7 @@
 				downloadBtn.style.filter = "brightness(80%)";
 
 				try {
-					window.location.href = `http://localhost:5000/api/download?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
+					window.location.href = `https://yougra-server.up.railway.app/api/download?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
 
 					downloadBtn.disabled = false;
 					downloadBtn.style.filter = "brightness(100%)";
@@ -464,6 +464,7 @@
   </script>
 </body>
 </html>
+
 
 
 
