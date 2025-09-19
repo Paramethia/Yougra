@@ -380,7 +380,7 @@
 		}
 
 		try {
-			const response = await fetch("http://34.175.116.190:80/api/info", {
+			const response = await fetch("https://yougra-server.up.railway.app/api/info", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ url })
@@ -443,7 +443,7 @@
 				downloadBtn.style.filter = "brightness(80%)";
 
 				try {
-					window.location.href = `http://34.175.116.190:88/api/download?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
+					window.location.href = `https://yougra-server.up.railway.app/api/download?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
 
 					downloadBtn.disabled = false;
 					downloadBtn.style.filter = "brightness(100%)";
@@ -464,6 +464,7 @@
   </script>
 </body>
 </html>
+
 
 
 
