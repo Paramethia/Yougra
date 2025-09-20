@@ -211,8 +211,8 @@
 		
 		#download {
 			position: absolute;
-			bottom: 24px;
-			right: 27px;
+			bottom: 8px;
+			right: 8px;
 			height: 38px;
 			width: 96px;
 			border: none;
@@ -225,6 +225,30 @@
 		#download:hover {
 			cursor: pointer;
 			background-color: lightgray;
+		}
+
+		#progress-txt {
+			font-size: 15px;
+			text-align: center;
+			color: lightgray;
+		}
+
+		.progress-bar {
+			display: none;
+			width: 85%;
+			height: 25px;
+			margin: 0 auto;
+			border-radius: 12px;
+			border: 1px solid #4c4c4c;
+			background-color: #202020;
+		}
+
+		.progress-bar .progress {
+			width: 17%;
+			height: 100%;
+			border-radius: 12px;
+			background-color: #f5353c;
+			opacity: 0.5;
 		}
 
 		.d-loader {
@@ -295,8 +319,10 @@
 					<p id="posted"></p>
 					<p id="views"></p>
 					<p id="likes"></p>
+					<button id="download">Download</button>
 				</div>
-				<button id="download">Download</button>
+				<p id="progress-txt"></p>
+				<div class="progress-bar"><div class="progress"></div></div>
 			</div>
 		</div>
 	</main>
@@ -373,6 +399,14 @@
 
 		vidCon.style.display = "inline-block";
 
+		if (format === 'audio') {
+			audSet.style.background = '#5f5f5f';
+			vidSet.style.background = '#3f3f3f';
+			document.getElementById("v-size").style.display = 'none';
+			document.getElementById("a-size").style.display = 'inline';
+			document.getElementById("qualities").style.display = 'none';
+		}
+
 		function formatTime(seconds) {
 			const mins = Math.floor(seconds / 60);
 			const secs = seconds % 60;
@@ -438,20 +472,82 @@
 			});
 
 			const downloadBtn = document.getElementById("download");
+			const progressText = document.getElementById("progress-txt");
+			const progress = document.querySelector(".progress");
 			downloadBtn.onclick = async () => {
 				downloadBtn.disabled = true;
 				downloadBtn.style.filter = "brightness(80%)";
+				progress.style.width = "0%";
 
 				try {
-					window.location.href = `https://yougra-server.up.railway.app/api/download?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
+					if (format === "audio") {
+						// Trigger download via native browser stream
+						window.location.href = `https://yougra-server.up.railway.app/api/download?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
+					} else if (format === "video") {
+						const ws = new WebSocket('ws://https://yougra-server.up.railway.app');
+						let downloadComplete = false;
 
-					downloadBtn.disabled = false;
-					downloadBtn.style.filter = "brightness(100%)";
+						ws.onopen = () => {
+							console.log('WebSocket connected.');
+							ws.send(JSON.stringify({ url, format, itag }));
+							downloadBtn.innerText = "0%";
+							progressText.innerText = "Wait for it...";
+							document.querySelector(".progress-bar").style.display = "block";
+						};
+
+						ws.onmessage = (event) => {
+							const message = JSON.parse(event.data);
+							
+							if (message.error) {
+								progressText.innerText = message.error;
+								downloadBtn.disabled = false;
+								downloadBtn.style.filter = "brightness(100%)";
+								setTimeout(() => { progressText.innerText = "" }, 4000);
+								ws.close();
+								return;
+							}
+
+							if (message.progress) {
+								downloadBtn.innerText = `${Math.floor(message.progress)}%`;
+								progress.style.width = `${message.progress}%`;
+								progressText.innerText = `${message.downloaded}mb / ${message.total}mb`;
+							}
+
+							if (message.status === 'complete') {
+								downloadComplete = true;
+								// Trigger the file download via a new request
+								window.location.href = `https://yougra-server.up.railway.app${message.path}`;
+								
+								// Reset UI after a short delay
+								setTimeout(() => {
+									downloadBtn.innerText = "Download";
+									downloadBtn.disabled = false;
+									downloadBtn.style.filter = "brightness(100%)";
+									document.querySelector(".progress-bar").style.display = "none";
+									progressText.innerText = "";
+								}, 500); // Give the browser a moment to start the file download
+								ws.close();
+							}
+						}
+
+						ws.onclose = () => {
+							console.log('WebSocket disconnected.');
+							if (!downloadComplete) {
+								downloadBtn.innerText = "Download";
+								downloadBtn.disabled = false;
+								downloadBtn.style.filter = "brightness(100%)";
+								document.querySelector(".progress-bar").style.display = "none";
+								progressText.innerText = "Download failed or cancelled.";
+								setTimeout(() => { progressText.innerText = "" }, 4000);
+							}
+						}
+					}
 				} catch (err) {
-					errMsg.innerText = "Download failed. Try again.";
+					progressText.innerText = "Download failed. Try again.";
+					setTimeout(() => { progressText.innerText = "" }, 4000);
+				} finally {
 					downloadBtn.disabled = false;
 					downloadBtn.style.filter = "brightness(100%)";
-					setTimeout(() => { errMsg.innerText = "" }, 4000);
 				}
 			}
 		} catch (err) {
@@ -464,6 +560,7 @@
   </script>
 </body>
 </html>
+
 
 
 
