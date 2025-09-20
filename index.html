@@ -484,7 +484,7 @@
 						// Trigger download via native browser stream
 						window.location.href = `https://yougra-server.up.railway.app/api/download-a?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
 					} else if (format === "video") {
-						const ws = new WebSocket('ws://https://yougra-server.up.railway.app');
+						const ws = new WebSocket('wss://yougra-server.up.railway.app');
 						let downloadComplete = false;
 
 						ws.onopen = () => {
@@ -560,6 +560,7 @@
   </script>
 </body>
 </html>
+
 
 
 
