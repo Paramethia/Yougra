@@ -414,7 +414,7 @@
 		}
 
 		try {
-			const response = await fetch("https://yougra-server.onrender.com/api/info", {
+			const response = await fetch("https://yougra-server.up.railway.app/api/info", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ url })
@@ -482,7 +482,7 @@
 				try {
 					if (format === "audio") {
 						// Trigger download via native browser stream
-						window.location.href = `https://yougra-server.up.railway.app/api/download-a?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
+						window.location.href = `https://yougra-server.onrender.com/api/download-a?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
 					} else if (format === "video") {
 						const ws = new WebSocket('wss://yougra-server.up.railway.app');
 						let downloadComplete = false;
@@ -560,6 +560,7 @@
   </script>
 </body>
 </html>
+
 
 
 
