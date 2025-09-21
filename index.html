@@ -510,7 +510,7 @@
 							if (message.progress) {
 								downloadBtn.innerText = `${Math.floor(message.progress)}%`;
 								progress.style.width = `${message.progress}%`;
-								progressText.innerText = `${message.downloaded}mb / ${message.total}mb`;
+								progressText.innerText = `Processsing - (${message.downloaded}mb / ${message.total}mb)`;
 							}
 
 							if (message.status === 'complete') {
@@ -537,7 +537,7 @@
 								downloadBtn.disabled = false;
 								downloadBtn.style.filter = "brightness(100%)";
 								document.querySelector(".progress-bar").style.display = "none";
-								progressText.innerText = "Download failed or cancelled.";
+								progressText.innerText = "Processing failed or cancelled.";
 								setTimeout(() => { progressText.innerText = "" }, 4000);
 							}
 						}
@@ -560,6 +560,7 @@
   </script>
 </body>
 </html>
+
 
 
 
