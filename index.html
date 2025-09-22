@@ -402,11 +402,11 @@
 			return;
 		}
 		
-		const validUrl = extractVideoId(url);
+		const validURL = extractVideoId(url);
 
-		if (!validUrl) {
-			errMsg.innerText = "That's not a valid YouTube URL";
-			setTimeout(() => { errMsg.innerText = "" }, 3500 );
+		if (!validURL) {
+			errMsg.innerText = url.includes("/shorts/") ? "Shorts are not supported just yet. Try a normal video" : "That's not a valid YouTube URL";
+			setTimeout(() => { errMsg.innerText = "" }, 4500 );
 			return;
 		}
 
