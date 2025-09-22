@@ -505,7 +505,7 @@
 						}, 4450)
 					} else if (format === "video") {
 						const ws = new WebSocket('wss://yougra-server.up.railway.app');
-						let processsed = false;
+						let processed = false;
 
 						ws.onopen = () => {
 							console.log('WebSocket connected.');
@@ -534,7 +534,7 @@
 							}
 
 							if (message.status === 'complete') {
-								processsed = true;
+							 	processed = true;
 								// Trigger the file download via a new request
 								window.location.href = `https://yougra-server.up.railway.app${message.path}`;
 								
