@@ -470,8 +470,6 @@
 	const bugReport = document.querySelector(".bug-report");
 	const errMsg = document.getElementById("err-msg");
 	const vidCon = document.querySelector(".video-info");
-	const optionsB = document.getElementById("d-options");
-	const options = document.querySelector(".options");
 	const vidSet = document.getElementById("vid-o");
 	const audSet = document.getElementById("aud-o");
 
@@ -639,6 +637,9 @@
 			document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${uploadDate}`;
 			document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
 			document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
+
+			const optionsB = document.getElementById("d-options");
+			const options = document.querySelector(".options");
 
 			let dOptionsOpened = false;
 
