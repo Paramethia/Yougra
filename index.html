@@ -761,6 +761,7 @@
 				} catch (err) {
 					progressText.innerText = "Download failed. Try again.";
 					setTimeout(() => { progressText.innerText = "" }, 4000);
+					console.log("Error occured while fetching video:", err);
 				}
 			}
 		} catch (err) {
