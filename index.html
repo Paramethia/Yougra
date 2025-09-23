@@ -440,7 +440,7 @@
 			<div class="loader"></div>
 			<div class="v">
 				<img id="thumbnail" src="" alt="Video Thumbnail" />
-				<span id="length"></span> <span id="d-option" onClick="toggleOptions()"><svg id="dots" width="25px" height="25px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M5.7 12.1143C4.82423 12.1143 4.11429 12.8242 4.11429 13.7C4.11429 14.5758 4.82423 15.2857 5.7 15.2857C6.57577 15.2857 7.28571 14.5758 7.28571 13.7C7.28571 12.8242 6.57577 12.1143 5.7 12.1143ZM2 13.7C2 11.6565 3.65655 10 5.7 10C7.74345 10 9.4 11.6565 9.4 13.7C9.4 15.7435 7.74345 17.4 5.7 17.4C3.65655 17.4 2 15.7435 2 13.7Z" fill="#ccc" fill-rule="evenodd" /><path clip-rule="evenodd" d="M22.7 12.1143C21.8242 12.1143 21.1143 12.8242 21.1143 13.7C21.1143 14.5758 21.8242 15.2857 22.7 15.2857C23.5758 15.2857 24.2857 14.5758 24.2857 13.7C24.2857 12.8242 23.5758 12.1143 22.7 12.1143ZM19 13.7C19 11.6565 20.6565 10 22.7 10C24.7435 10 26.4 11.6565 26.4 13.7C26.4 15.7435 24.7435 17.4 22.7 17.4C20.6565 17.4 19 15.7435 19 13.7Z" fill="#ccc" fill-rule="evenodd"/><path clip-rule="evenodd" d="M14.2 12.1143C13.3242 12.1143 12.6143 12.8242 12.6143 13.7C12.6143 14.5758 13.3242 15.2857 14.2 15.2857C15.0758 15.2857 15.7857 14.5758 15.7857 13.7C15.7857 12.8242 15.0758 12.1143 14.2 12.1143ZM10.5 13.7C10.5 11.6565 12.1565 10 14.2 10C16.2435 10 17.9 11.6565 17.9 13.7C17.9 15.7435 16.2435 17.4 14.2 17.4C12.1565 17.4 10.5 15.7435 10.5 13.7Z" fill="#ccc" fill-rule="evenodd"/></svg></span>
+				<span id="length"></span> <span id="d-options" onClick="toggleOptions()"><svg id="dots" width="25px" height="25px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M5.7 12.1143C4.82423 12.1143 4.11429 12.8242 4.11429 13.7C4.11429 14.5758 4.82423 15.2857 5.7 15.2857C6.57577 15.2857 7.28571 14.5758 7.28571 13.7C7.28571 12.8242 6.57577 12.1143 5.7 12.1143ZM2 13.7C2 11.6565 3.65655 10 5.7 10C7.74345 10 9.4 11.6565 9.4 13.7C9.4 15.7435 7.74345 17.4 5.7 17.4C3.65655 17.4 2 15.7435 2 13.7Z" fill="#ccc" fill-rule="evenodd" /><path clip-rule="evenodd" d="M22.7 12.1143C21.8242 12.1143 21.1143 12.8242 21.1143 13.7C21.1143 14.5758 21.8242 15.2857 22.7 15.2857C23.5758 15.2857 24.2857 14.5758 24.2857 13.7C24.2857 12.8242 23.5758 12.1143 22.7 12.1143ZM19 13.7C19 11.6565 20.6565 10 22.7 10C24.7435 10 26.4 11.6565 26.4 13.7C26.4 15.7435 24.7435 17.4 22.7 17.4C20.6565 17.4 19 15.7435 19 13.7Z" fill="#ccc" fill-rule="evenodd"/><path clip-rule="evenodd" d="M14.2 12.1143C13.3242 12.1143 12.6143 12.8242 12.6143 13.7C12.6143 14.5758 13.3242 15.2857 14.2 15.2857C15.0758 15.2857 15.7857 14.5758 15.7857 13.7C15.7857 12.8242 15.0758 12.1143 14.2 12.1143ZM10.5 13.7C10.5 11.6565 12.1565 10 14.2 10C16.2435 10 17.9 11.6565 17.9 13.7C17.9 15.7435 16.2435 17.4 14.2 17.4C12.1565 17.4 10.5 15.7435 10.5 13.7Z" fill="#ccc" fill-rule="evenodd"/></svg></span>
 				
 				<div class="details">
 					<div class="options">
@@ -469,6 +469,8 @@
 	const urlHelp = document.querySelector(".url-help");
 	const bugReport = document.querySelector(".bug-report");
 	const errMsg = document.getElementById("err-msg");
+	const optionsB = document.getElementById("d-options");
+	const options = document.querySelector(".options");
 	const vidCon = document.querySelector(".video-info");
 	const vidSet = document.getElementById("vid-o");
 	const audSet = document.getElementById("aud-o");
@@ -537,6 +539,37 @@
 		const match = url.match(regex);
 		return match ? match[1] : null;
     }
+
+	let dOptionsOpened = false;
+
+	document.addEventListener("click", event => {
+		if (dOptionsOpened && !options.contains(event.target) && event.target !== document.getElementById('d-option') && event.target !== document.getElementById('dots')) {
+			optionsB.style.background = '#2a2a2a';
+			options.style.display = 'none';
+			dOptionsOpened = false;
+		}
+	});
+
+	optionsB.onmouseover = () => { optionsB.style.background = '#3f3f3f' }
+	optionsB.onmouseout = () => { if (!dOptionsOpened) optionsB.style.background = '#2a2a2a'; }
+	optionsB.onclick = () => {
+		dOptionsOpened = !dOptionsOpened;
+		if (dOptionsOpened) { 
+			optionsB.style.background = '#3f3f3f';
+			options.style.display = 'block' 
+		} else {
+			optionsB.style.background = '#2a2a2a';
+			options.style.display = 'none'
+		}
+	}
+
+	if (format === 'audio') {
+		audSet.style.background = '#5f5f5f';
+		vidSet.style.background = '#3f3f3f';
+		document.getElementById("v-size").style.display = 'none';
+		document.getElementById("a-size").style.display = 'inline';
+		document.getElementById("qualities").style.display = 'none';
+	}
 
 	let format = 'video';
 
@@ -638,40 +671,6 @@
 			document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
 			document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
 
-			const optionsB = document.getElementById("d-options");
-			const options = document.querySelector(".options");
-
-			let dOptionsOpened = false;
-
-			document.addEventListener("click", event => {
-				if (dOptionsOpened && !options.contains(event.target) && event.target !== document.getElementById('d-option') && event.target !== document.getElementById('dots')) {
-					optionsB.style.background = '#2a2a2a';
-					options.style.display = 'none';
-					dOptionsOpened = false;
-				}
-			});
-
-			optionsB.onmouseover = () => { optionsB.style.background = '#3f3f3f' }
-			optionsB.onmouseout = () => { if (!dOptionsOpened) optionsB.style.background = '#2a2a2a'; }
-			optionsB.onclick = () => {
-				dOptionsOpened = !dOptionsOpened;
-				if (dOptionsOpened) { 
-					optionsB.style.background = '#3f3f3f';
-					options.style.display = 'block' 
-				} else {
-					optionsB.style.background = '#2a2a2a';
-					options.style.display = 'none'
-				}
-			}
-
-			if (format === 'audio') {
-				audSet.style.background = '#5f5f5f';
-				vidSet.style.background = '#3f3f3f';
-				document.getElementById("v-size").style.display = 'none';
-				document.getElementById("a-size").style.display = 'inline';
-				document.getElementById("qualities").style.display = 'none';
-			}
-
 			const qualities = document.getElementById("qualities");
 			
 			qualities.value = defaultVidO.qualityLabel;
@@ -762,7 +761,7 @@
 				} catch (err) {
 					progressText.innerText = "Download failed. Try again.";
 					setTimeout(() => { progressText.innerText = "" }, 4000);
-					console.log("Error occured while downloading:", err);
+					console.error("Error occured while downloading: \n", err);
 				}
 			}
 		} catch (err) {
@@ -770,7 +769,7 @@
 			document.querySelector(".v").style.display = "none";
 			vidCon.style.display = "none";
 			setTimeout(() => { errMsg.innerText = "" }, 4000);
-			console.log("Error occured while fetching video:", err);
+			console.error("Error occured while fetching video: \n", err);
 		} finally {
 			document.getElementById("check-info").disabled = false;
 		}
