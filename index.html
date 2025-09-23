@@ -761,7 +761,7 @@
 				} catch (err) {
 					progressText.innerText = "Download failed. Try again.";
 					setTimeout(() => { progressText.innerText = "" }, 4000);
-					console.log("Error occured while fetching video:", err);
+					console.log("Error occured while downloading:", err);
 				}
 			}
 		} catch (err) {
@@ -769,6 +769,7 @@
 			document.querySelector(".v").style.display = "none";
 			vidCon.style.display = "none";
 			setTimeout(() => { errMsg.innerText = "" }, 4000);
+			console.log("Error occured while fetching video:", err);
 		} finally {
 			document.getElementById("check-info").disabled = false;
 		}
