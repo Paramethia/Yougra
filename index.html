@@ -8,6 +8,7 @@
 	<meta name="author" content="Kyrin" />
 	<title>Yougra - YouTube Content Extractor</title>
 	<link rel="icon" href="Yougra logo.ico" />
+	<link rel="stylesheet"  type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 	<style>
 		body {
 			font-family: Arial, sans-serif;
@@ -17,24 +18,115 @@
 			padding: 0;
 			text-align: center;
 		}
-
-		header {
-			background-color: #202020;
-			padding: 1rem;
-			border-bottom: 2px solid #ff0000;
+		* {
+			-webkit-tap-highlight-color: transparent;
 		}
 
+		header {
+			display: flex;
+			justify-content: space-evenly;
+			border-bottom: 2px solid #ff0000;
+			padding: 1rem;
+			background-color: #202020;
+			color: white;
+		}
+		header .logo {
+			width: 189px;
+		}
 		header img {
 			height: 37px;
 			width: 52px;
-			transform: translateY(7px)
 		}
-
 		header h1 {
 			display: inline-block;
-			width: 80px;
 			color: white;
 			margin: 0;
+			transform: translateY(-7px)
+		}
+		header span {
+			border-top: 1px dashed #e55;
+			border-bottom: 1px dashed #e55;
+			border-radius: 16px;
+			padding: 0.5rem;
+			font-size: 1.2rem;
+		}
+		header span:hover {
+			cursor: pointer;
+			transition: 0.2s ease;
+			color: #ee5555;
+		}
+
+		.help {
+			visibility: hidden;
+			display: flex;
+			height: 90%;
+			width: 100%;
+			position: absolute;
+			bottom: 0;
+			z-index: 4;
+			justify-content: center;
+			align-items: center;
+			backdrop-filter: blur(4px);
+		}
+		#close-help {
+			float: right;
+			color: #e55;
+			opacity: 0.9;
+		}
+		.help #close-help:hover {
+			cursor: pointer;
+			color: #e77;
+		}
+
+		.help div {
+			max-width: 420px;
+			margin: 0 20px;
+			border-radius: 12px;
+			border: 2px solid #ee5555;
+			padding: 27px 17px;
+		}
+
+		.help div div {
+			max-height: 57px;
+			width: 95%;
+			margin: 0 auto;
+			overflow: hidden;
+			border: 2px dashed #ee7777;
+			padding: 4px 7px;
+			color: lightgray;
+		}
+		.help .url-help { margin-top: 30px }
+		.help .bug-report { margin-top: 11px }
+		.help div div {
+			cursor: pointer;
+		}
+		.help div div::-webkit-scrollbar {
+			width: 4px;
+		}
+		.help div div::-webkit-scrollbar-track {
+			border-radius: 4px;
+			background-color: rgba(238, 119, 119, 0.3);
+		}
+		.help div div::-webkit-scrollbar-thumb {
+			border-radius: 4px;
+			background-color: rgba(238, 119, 119, 0.5);
+		}
+		.help div div h3 {
+			color: #e77;
+		}
+		.help p {
+			color: #aaa;
+		}
+		.help img {
+			width: 80%;
+			opacity: 0.5;
+		}
+		.help a {
+			color: #e55;
+			text-decoration: underline dotted #e77;
+		}
+		.help a:hover {
+			color: #e77;
 		}
 
 		main {
@@ -73,7 +165,6 @@
 			font-size: 1rem;
 			color: #fff;
 			cursor: pointer;
-			-webkit-tap-highlight-color: transparent;
 		}
 
 		#check-info:hover {
@@ -85,6 +176,16 @@
 			font-size: 12px;
 			color: #c00;
 			font-weight: 600;
+		}
+
+		.d-loader {
+			width: 12px;
+			aspect-ratio: 1;
+			border-radius: 50%;
+			clip-path: inset(-45px);
+			box-shadow: -60px 15px,-60px 15px,-60px 15px;
+			transform: translateY(-15px);
+			animation: l19 1s infinite linear;
 		}
 
 		.video-info {
@@ -138,9 +239,10 @@
 			color: lightgray;
 			font-size: 14px;
 			z-index: 2;
+
 		}
 
-		#d-option {
+		#d-options {
 			float: right;
 			margin-top: 2px;
 			border-radius: 50%;
@@ -148,8 +250,8 @@
 			background-color: #2a2a2a;
 			-webkit-tap-highlight-color: transparent;
 		}
-		#d-option:hover { cursor: pointer }
-		#d-option svg { margin-top: 2px }
+		#d-options:hover { cursor: pointer }
+		#d-options svg { margin-top: 2px }
 
 		.options {
 			display: none;
@@ -220,13 +322,12 @@
 			bottom: 8px;
 			right: 8px;
 			height: 38px;
-			width: 96px;
+			width: 100px;
 			border: none;
 			border-radius: 1.4rem;
-			padding: 0.7rem 1rem;
+			text-align: center;
 			font-weight: 600;
 			color: #0f0f0f;
-			-webkit-tap-highlight-color: transparent;
 		}
 		#download:hover {
 			cursor: pointer;
@@ -257,22 +358,20 @@
 			opacity: 0.5;
 		}
 
-		.d-loader {
-			width: 12px;
-			aspect-ratio: 1;
-			border-radius: 50%;
-			clip-path: inset(-45px);
-			box-shadow: -60px 15px,-60px 15px,-60px 15px;
-			transform: translateY(-15px);
-			animation: l19 1s infinite linear;
+		@keyframes expand {
+			from { max-height: 57px } to { max-height: 592px; }
 		}
-		@keyframes l19{ 
-			16.67% {box-shadow:-60px 15px,-60px 15px,19px 15px}
-			33.33% {box-shadow:-60px 15px,  0px 15px,19px 15px}
-			40%,60%{box-shadow:-19px 15px,  0px 15px,19px 15px}
-			66.67% {box-shadow:-19px 15px,  0px 15px,60px 15px}
-			83.33% {box-shadow:-19px 15px, 60px 15px,60px 15px}
-			100%   {box-shadow: 60px 15px, 60px 15px,60px 15px}
+		@keyframes minimise {
+			from { max-height: 592px } to { max-height: 57px; }
+		}
+
+		@keyframes l19 { 
+			16.67% 	{ box-shadow:-60px 15px,-60px 15px,19px 15px }
+			33.33% 	{ box-shadow:-60px 15px,  0px 15px,19px 15px }
+			40%,60%	{ box-shadow:-19px 15px,  0px 15px,19px 15px }
+			66.67% 	{ box-shadow:-19px 15px,  0px 15px,60px 15px }
+			83.33% 	{ box-shadow:-19px 15px, 60px 15px,60px 15px }
+			100%   	{ box-shadow: 60px 15px, 60px 15px,60px 15px }
 		}
 		
 		@keyframes l8-1 {
@@ -287,11 +386,14 @@
 		}
 		
 		@media only screen and (max-width: 450px) {
-			#version {
-				transform: translate(7px, -8px)
+			header { 
+				justify-content: space-between 
 			}
-			input[type="text"] {
-				width: 90%;
+			#version { 
+				transform: translate(11px, -8px) 
+			}
+			input[type="text"] { 
+				width: 90% 
 			}
 			#check-info {
 				display: block;
@@ -302,10 +404,32 @@
 </head>
 <body>
 	<header>
-		<img src="Yougra logo.png" alt="YTE logo" /><h1>Yougra</h1>
+		<div class="logo"><img src="Yougra logo.png" alt="YTE logo" /><h1>Yougra</h1></div> <span id="help-nav">Help</span>
 	</header>
-	 <main>
-		<span id="version"> Beta 1.0 </span>
+	<div class="help">
+		<div>
+			<i id="close-help" class="fa-xl fa-solid fa-circle-xmark"></i>
+			<div class="url-help">
+				<h3>Don't know how to get a URL?</h3>
+
+				<h4>Option 1</h4>
+				<img src="Option 1.jpg" alt="Option 1 img"/>
+				<p>Go to the video you wanna download on YouTube, click the share icon, and choose to copy. There you go. Now you have the URL.</p>
+
+				<h4>Option 2</h4>
+				<img src="Option 2.jpg" alt="Option 2 img"/>
+				<p>While scrolling looking at a list of videos in YouTube, just click those 3 dots and you should see an option to share again.</p>
+			</div>
+			<div class="bug-report">
+				<h3>Noticed any bugs/glitches?</h3>
+
+				<h4>Tell me</h4>
+				<p>Remember that this website is still in beta/testing stage, so errors WILL happen eventually. Just tell me if you noticed anything odd (click it below): <br /> <a href="mailto:kyrinkompi@gmail.com">kyrinkompi@gmail.com</a></p>
+			</div>
+		</div>
+	</div>
+	<main>
+		<span id="version"> Beta 1.1 </span>
 		 
 		<h4>Enter a YouTube video URL:</h4>
 		<input type="text" id="vid-link" placeholder="https://www.youtube.com/watch?v=VIDEO_ID">
@@ -339,11 +463,76 @@
 	</main>
 
   <script>
+	const helpNav = document.getElementById("help-nav");
+	const helpCon = document.querySelector(".help");
+	const closeHelpB = document.getElementById("close-help");
+	const urlHelp = document.querySelector(".url-help");
+	const bugReport = document.querySelector(".bug-report");
 	const errMsg = document.getElementById("err-msg");
 	const vidCon = document.querySelector(".video-info");
-	const options = document.querySelector('.options');
-	const vidSet = document.getElementById('vid-o');
-	const audSet = document.getElementById('aud-o');
+	const optionsB = document.getElementById("d-options");
+	const options = document.querySelector(".options");
+	const vidSet = document.getElementById("vid-o");
+	const audSet = document.getElementById("aud-o");
+
+	let helpConOpened = false;
+
+	function closeHelp() {
+		helpNav.style.borderTop = '1px dashed #ee555';
+		helpNav.style.borderBottom = '1px dashed #ee555';
+		helpNav.style.borderRight = 'none';
+		helpNav.style.borderLeft = 'none';
+		helpCon.style.visibility = 'hidden';
+	}
+
+	helpNav.onclick = () => {
+		helpConOpened = !helpConOpened;
+
+		if (helpConOpened) {
+			helpNav.style.border = '1px dashed #e55';
+			helpCon.style.visibility = 'visible';
+		} else {
+			closeHelp();
+		}
+	}
+
+	closeHelpB.onclick = () => { 
+		helpConOpened = false;
+		closeHelp() 
+	}
+
+	containersOpened = [false, false];
+
+	[urlHelp, bugReport].forEach((con, index) => {
+		con.onmouseover = () => {
+			con.style.background = 'rgba(238, 119, 119, 0.1)';
+		}
+		con.onmouseout = () => {
+			if (!containersOpened[index]) con.style.background = 'none';
+		}
+		con.onclick = () => {
+			containersOpened[index] = !containersOpened[index];
+
+			[urlHelp, bugReport].forEach((conAgain, i) => {
+				if (i !== index && containersOpened[i]) {
+					containersOpened[i] = false;
+					conAgain.style.animation = 'minimise 1.2s ease forwards';
+					conAgain.style.background = 'none';
+					conAgain.style.overflow = 'hidden';
+					conAgain.scrollTop = 0;
+				}
+			});
+
+			if (containersOpened[index]) {
+				con.style.animation = 'expand 1.2s ease forwards';
+				con.style.overflow = 'auto';
+			} else {
+				con.style.animation = 'minimise 1.2s ease forwards';
+				con.style.overflow = 'hidden';
+				con.scrollTop = 0;
+			} 
+		} 
+	});
   
     function extractVideoId(url) {
 		const regex = /(?:v=|\.be\/)([a-zA-Z0-9_-]{11})/;
@@ -351,18 +540,27 @@
 		return match ? match[1] : null;
     }
 
-	let opened = false;
+	let dOptionsOpened = false;
 	
 	document.addEventListener("click", event => {
-		if (opened && !options.contains(event.target) && event.target !== document.getElementById('d-option') && event.target !== document.getElementById('dots')) {
-			options.style.display = "none";
-			opened = false;
+		if (dOptionsOpened && !options.contains(event.target) && event.target !== document.getElementById('d-option') && event.target !== document.getElementById('dots')) {
+			optionsB.style.background = '#2a2a2a';
+			options.style.display = 'none';
+			dOptionsOpened = false;
 		}
 	});
-	
-	function toggleOptions() {
-		opened = !opened;
-		opened ? options.style.display = 'block' : options.style.display = 'none';
+
+	optionsB.onmouseover = () => { optionsB.style.background = '#3f3f3f' }
+	optionsB.onmouseout = () => { if (!dOptionsOpened) optionsB.style.background = '#2a2a2a'; }
+	optionsB.onclick = () => {
+		dOptionsOpened = !dOptionsOpened;
+		if (dOptionsOpened) { 
+			optionsB.style.background = '#3f3f3f';
+			options.style.display = 'block' 
+		} else {
+			optionsB.style.background = '#2a2a2a';
+			options.style.display = 'none'
+		}
 	}
 
 	let format = 'video';
