@@ -566,8 +566,6 @@
 		document.getElementById("qualities").style.display = 'none';
 	}
 
-	const findB = document.getElementById("check-info");
-
     async function fetchVideo() {
 		const url = document.getElementById("vid-link").value;
 		
@@ -594,7 +592,7 @@
 		}
 
 		try {
-			findB.disabled = true;
+			document.getElementById("check-info").disabled = true;
 			
 			const response = await fetch("https://yougra-server.up.railway.app/api/info", {
 				method: "POST",
@@ -771,7 +769,7 @@
 			vidCon.style.display = "none";
 			setTimeout(() => { errMsg.innerText = "" }, 4000);
 		} finally {
-			findB.disabled = false;
+			document.getElementById("check-info").disabled = false;
 		}
     }
   </script>
