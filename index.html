@@ -359,26 +359,26 @@
 		}
 
 		@keyframes expand {
-			from { max-height: 57px } to { max-height: 592px; }
+			from { max-height: 57px } to { max-height: 420px; }
 		}
 		@keyframes minimise {
-			from { max-height: 592px } to { max-height: 57px; }
+			from { max-height: 420px } to { max-height: 57px; }
 		}
 
 		@keyframes l19 { 
-			16.67% 	{ box-shadow:-60px 15px,-60px 15px,19px 15px }
-			33.33% 	{ box-shadow:-60px 15px,  0px 15px,19px 15px }
-			40%,60%	{ box-shadow:-19px 15px,  0px 15px,19px 15px }
-			66.67% 	{ box-shadow:-19px 15px,  0px 15px,60px 15px }
-			83.33% 	{ box-shadow:-19px 15px, 60px 15px,60px 15px }
-			100%   	{ box-shadow: 60px 15px, 60px 15px,60px 15px }
+			16.67% { box-shadow: -60px 15px, -60px 15px, 19px 15px }
+			33.33% { box-shadow: -60px 15px,  0px 15px, 19px 15px }
+			40%,60%	{ box-shadow: -19px 15px,  0px 15px, 19px 15px }
+			66.67% { box-shadow: -19px 15px,  0px 15px, 60px 15px }
+			83.33% { box-shadow: -19px 15px, 60px 15px, 60px 15px }
+			100% { box-shadow: 60px 15px, 60px 15px, 60px 15px }
 		}
 		
 		@keyframes l8-1 {
-			100%{transform: translateX(25px)}
+			100% { transform: translateX(25px) }
 		}
 		@keyframes l8-2 {
-			100%{transform: rotate(-180deg) translateX(25px)}
+			100% { transform: rotate(-180deg) translateX(25px) }
 		}
 		
 		@media only screen and (max-width: 700px) {
@@ -540,29 +540,6 @@
 		return match ? match[1] : null;
     }
 
-	let dOptionsOpened = false;
-	
-	document.addEventListener("click", event => {
-		if (dOptionsOpened && !options.contains(event.target) && event.target !== document.getElementById('d-option') && event.target !== document.getElementById('dots')) {
-			optionsB.style.background = '#2a2a2a';
-			options.style.display = 'none';
-			dOptionsOpened = false;
-		}
-	});
-
-	optionsB.onmouseover = () => { optionsB.style.background = '#3f3f3f' }
-	optionsB.onmouseout = () => { if (!dOptionsOpened) optionsB.style.background = '#2a2a2a'; }
-	optionsB.onclick = () => {
-		dOptionsOpened = !dOptionsOpened;
-		if (dOptionsOpened) { 
-			optionsB.style.background = '#3f3f3f';
-			options.style.display = 'block' 
-		} else {
-			optionsB.style.background = '#2a2a2a';
-			options.style.display = 'none'
-		}
-	}
-
 	let format = 'video';
 
 	vidSet.onmouseover = () => { vidSet.style.background = '#5f5f5f' }
@@ -664,6 +641,29 @@
 			document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${uploadDate}`;
 			document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
 			document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
+
+			let dOptionsOpened = false;
+
+			document.addEventListener("click", event => {
+				if (dOptionsOpened && !options.contains(event.target) && event.target !== document.getElementById('d-option') && event.target !== document.getElementById('dots')) {
+					optionsB.style.background = '#2a2a2a';
+					options.style.display = 'none';
+					dOptionsOpened = false;
+				}
+			});
+
+			optionsB.onmouseover = () => { optionsB.style.background = '#3f3f3f' }
+			optionsB.onmouseout = () => { if (!dOptionsOpened) optionsB.style.background = '#2a2a2a'; }
+			optionsB.onclick = () => {
+				dOptionsOpened = !dOptionsOpened;
+				if (dOptionsOpened) { 
+					optionsB.style.background = '#3f3f3f';
+					options.style.display = 'block' 
+				} else {
+					optionsB.style.background = '#2a2a2a';
+					options.style.display = 'none'
+				}
+			}
 
 			if (format === 'audio') {
 				audSet.style.background = '#5f5f5f';
@@ -777,44 +777,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
