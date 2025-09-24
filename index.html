@@ -563,14 +563,6 @@
 		}
 	}
 
-	if (format === 'audio') {
-		audSet.style.background = '#5f5f5f';
-		vidSet.style.background = '#3f3f3f';
-		document.getElementById("v-size").style.display = 'none';
-		document.getElementById("a-size").style.display = 'inline';
-		document.getElementById("qualities").style.display = 'none';
-	}
-
 	let format = 'video';
 
 	vidSet.onmouseover = () => { vidSet.style.background = '#5f5f5f' }
@@ -670,6 +662,14 @@
 			document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${uploadDate}`;
 			document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
 			document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
+
+			if (format === 'audio') {
+				audSet.style.background = '#5f5f5f';
+				vidSet.style.background = '#3f3f3f';
+				document.getElementById("v-size").style.display = 'none';
+				document.getElementById("a-size").style.display = 'inline';
+				document.getElementById("qualities").style.display = 'none';
+			}
 
 			const qualities = document.getElementById("qualities");
 			
