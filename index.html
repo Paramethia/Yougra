@@ -534,11 +534,9 @@
 		} 
 	});
   
-    function extractVideoId(url) {
-		const regex = /(?:v=|\.be\/)([a-zA-Z0-9_-]{11})/;
-		const match = url.match(regex);
-		return match ? match[1] : null;
-    }
+    function validURL(url) {
+		return /^https?:\/\/(www\.)?youtube\.com\/watch\?v=/.test(url) || /^https?:\/\/youtu\.be\//.test(url) || /^https?:\/\/(www\.)?youtube\.com\/shorts\//.test(url);
+	}
 
 	let dOptionsOpened = false;
 
@@ -597,11 +595,9 @@
 			setTimeout(() => { errMsg.innerText = "" }, 3000 );
 			return;
 		}
-		
-		const validURL = extractVideoId(url);
 
-		if (!validURL) {
-			errMsg.innerText = url.includes("/shorts/") ? "Shorts are not supported just yet. Try a normal video" : "That's not a valid YouTube URL";
+		if (!validURL(url)) {
+			errMsg.innerText = "That's not a valid YouTube URL";
 			setTimeout(() => { errMsg.innerText = "" }, 4500 );
 			return;
 		}
