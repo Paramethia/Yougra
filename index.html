@@ -626,7 +626,6 @@
 				return;
 			}
 
-			const uploadDate = new Date(data.publishDate);
 			const views = new Intl.NumberFormat('fr-FR').format(data.viewCount);
 			const likes = new Intl.NumberFormat('fr-FR').format(data.likeCount);
 
@@ -655,7 +654,7 @@
 			document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${selectedAudio.size}</span></p>`;
 			document.getElementById("title").innerText = data.title;
 			document.getElementById("video-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
-			document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${uploadDate}`;
+			document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${data.publishDate}`;
 			document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
 			document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
 
