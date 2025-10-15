@@ -348,6 +348,7 @@
 			border-radius: 12px;
 			border: 1px solid #4c4c4c;
 			background-color: #202020;
+			overflow: hidden;
 		}
 
 		.progress-bar .progress {
@@ -613,7 +614,7 @@
 		try {
 			document.getElementById("check-info").disabled = true;
 			
-			const response = await fetch("https://yougra-server.up.railway.app/api/info", {
+			const response = await fetch("https://yougra-server.onrender.com/api/info", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ url })
@@ -631,7 +632,7 @@
 
 			const videoFormats = data.qualities.filter(vF => vF.type === 'videoonly' && vF.qualityLabel !== '144p');
 			const rVF = videoFormats.reverse();
-			const defaultVidO = rVF.length > 2 ? rVF[1] : rVF[0];
+			const defaultVidO = videoFormats.find(vid => vid.qualityLabel === "360p");
 			const audioFormats = data.qualities.filter(aF => aF.type === 'audioonly');
 			const selectedAudio = audioFormats.pop();
 
@@ -648,7 +649,7 @@
 			document.getElementById("vid-o").innerHTML = `
 				<p>Video <span id="v-size">${fullSize(defaultVidO.size, selectedAudio.size)}mb</span></p>
 				<select id="qualities">
-					${ videoFormats.map((index) => { return `<option value="${index.qualityLabel}">${index.qualityLabel}</option>` })}
+					${ videoFormats.map(vid => { return `<option value="${vid.qualityLabel}">${vid.qualityLabel}</option>` })}
 				</select>
 			`;
 			document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${selectedAudio.size}</span></p>`;
@@ -688,14 +689,14 @@
 				try {
 					if (format === "audio") {
 						// Trigger download via native browser stream
-						window.location.href = `https://yougra-server.up.railway.app/api/download-a?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
+						window.location.href = `https://yougra-server.onrender.com/api/download-a?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
 
 						setTimeout(() => {
 							downloadBtn.disabled = false;
 							downloadBtn.style.filter = "brightness(100%)";
 						}, 4450)
 					} else if (format === "video") {
-						const ws = new WebSocket('wss://yougra-server.up.railway.app');
+						const ws = new WebSocket('wss://yougra-server.onrender.com');
 						let processed = false;
 
 						ws.onopen = () => {
@@ -727,7 +728,7 @@
 							if (message.status === 'complete') {
 							 	processed = true;
 								// Trigger the file download via a new request
-								window.location.href = `https://yougra-server.up.railway.app${message.path}`;
+								window.location.href = `https://yougra-server.onrender.com${message.path}`;
 								
 								// Reset UI after a short delay
 								setTimeout(() => {
