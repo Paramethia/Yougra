@@ -689,7 +689,7 @@
 				try {
 					if (format === "audio") {
 						// Trigger download via native browser stream
-						window.location.href = `https://yougra-server.onrender.com/api/download-a?url=${encodeURIComponent(url)}&format=${format}&itag=${itag}`;
+						window.location.href = `https://yougra-server.onrender.com/api/download-a?url=${encodeURIComponent(url)}`;
 
 						setTimeout(() => {
 							downloadBtn.disabled = false;
@@ -701,7 +701,7 @@
 
 						ws.onopen = () => {
 							console.log('WebSocket connected.');
-							ws.send(JSON.stringify({ url, format, itag }));
+							ws.send(JSON.stringify({ url, itag }));
 							downloadBtn.innerText = "0%";
 							progressText.innerText = "Wait for it...";
 							document.querySelector(".progress-bar").style.display = "block";
