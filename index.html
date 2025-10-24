@@ -96,7 +96,7 @@
 			color: lightgray;
 		}
 		.help .url-help { margin-top: 30px }
-		.help .bug-report { margin-top: 11px }
+		.help .bug-report, .help .warning { margin-top: 11px }
 		.help div div {
 			cursor: pointer;
 		}
@@ -114,7 +114,7 @@
 		.help div div h3 {
 			color: #e77;
 		}
-		.help p {
+		.help p, .help h5 {
 			color: #aaa;
 		}
 		.help img {
@@ -427,13 +427,20 @@
 				<h4>Tell me</h4>
 				<p>Remember that this website is still in beta/testing stage, so errors WILL happen eventually. Just tell me if you noticed anything odd (click it below): <br /> <a href="mailto:kyrinkompi@gmail.com">kyrinkompi@gmail.com</a></p>
 			</div>
+			<div class="warning">
+				<h3>Warnings</h3>
+
+				<h5> Do not pause the download as it will most likely not be able to resume again (don't know why this happens yet). </h5>
+				<h5> Try not to download multiple videos at the same time if your internet is slow (it may cause errors)</h5>
+				<h5> For long videos, downloads may take a while to start now due to the server being a little slow currently cause I ain't paying for a faster server </h5>
+			</div>
 		</div>
 	</div>
 	<main>
-		<span id="version"> Beta 1.1 </span>
+		<span id="version"> Beta 1.2 </span>
 		 
 		<h4>Enter a YouTube video URL:</h4>
-		<input type="text" id="vid-link" placeholder="https://www.youtube.com/watch?v=VIDEO_ID">
+		<input type="text" id="vid-link" placeholder="https://youtu.be/videoId?si=sigCode">
 		<button id="check-info" onclick="fetchVideo()">Find it</button>
 		<p id="err-msg"></p>
 		<br />
@@ -469,6 +476,7 @@
 	const closeHelpB = document.getElementById("close-help");
 	const urlHelp = document.querySelector(".url-help");
 	const bugReport = document.querySelector(".bug-report");
+	const warning = document.querySelector(".warning");
 	const errMsg = document.getElementById("err-msg");
 	const optionsB = document.getElementById("d-options");
 	const options = document.querySelector(".options");
@@ -504,7 +512,7 @@
 
 	containersOpened = [false, false];
 
-	[urlHelp, bugReport].forEach((con, index) => {
+	[urlHelp, bugReport, warning].forEach((con, index) => {
 		con.onmouseover = () => {
 			con.style.background = 'rgba(238, 119, 119, 0.1)';
 		}
@@ -514,7 +522,7 @@
 		con.onclick = () => {
 			containersOpened[index] = !containersOpened[index];
 
-			[urlHelp, bugReport].forEach((conAgain, i) => {
+			[urlHelp, bugReport, warning].forEach((conAgain, i) => {
 				if (i !== index && containersOpened[i]) {
 					containersOpened[i] = false;
 					conAgain.style.animation = 'minimise 1.2s ease forwards';
@@ -536,7 +544,11 @@
 	});
   
     function validURL(url) {
-		return /^https?:\/\/(www\.)?youtube\.com\/watch\?v=/.test(url) || /^https?:\/\/youtu\.be\//.test(url) || /^https?:\/\/(www\.)?youtube\.com\/shorts\//.test(url);
+		return (
+			/^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/watch\?v=/.test(url) ||
+			/^https?:\/\/youtu\.be\//.test(url) ||
+			/^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/shorts\//.test(url)
+		);
 	}
 
 	let dOptionsOpened = false;
