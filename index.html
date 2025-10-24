@@ -432,7 +432,7 @@
 
 				<h5> Do not pause the download as it will most likely not be able to resume again (don't know why this happens yet). </h5>
 				<h5> Try not to download multiple videos at the same time if your internet is slow (it may cause errors)</h5>
-				<h5> For long videos, downloads may take a while to start now due to the server being a little slow currently cause I ain't paying for a faster server </h5>
+				<h5> For large videos, downloads may take a while to start now due to the server being a little slow currently 'cause I ain't paying for a faster server </h5>
 			</div>
 		</div>
 	</div>
@@ -471,6 +471,13 @@
 	</main>
 
   <script>
+	// Ping sever on page load to wake up Render server (doing this because of the free tier)
+	window.addEventListener("load", () => {
+		setTimeout(() => {
+			fetch("https://yougra-server.onrender.com/ping").then(() => console.log("Server warmed up")).catch(() => console.warn("Could not reach server (might still be waking up)"));
+		}, 1500);
+	});
+
 	const helpNav = document.getElementById("help-nav");
 	const helpCon = document.querySelector(".help");
 	const closeHelpB = document.getElementById("close-help");
