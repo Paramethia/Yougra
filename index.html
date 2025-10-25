@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta name="description" content="Download YouTube content as audio or videos" />
+	<meta name="description" content="Download YouTube content as audio or videos in any quality you desire." />
 	<meta name="author" content="Kyrin" />
 	<title>Yougra - YouTube Content Extractor</title>
 	<link rel="icon" href="Yougra logo.ico" />
@@ -741,7 +741,7 @@
 							if (message.progress) {
 								downloadBtn.innerText = `${Math.floor(message.progress)}%`;
 								progress.style.width = `${message.progress}%`;
-								progressText.innerText = message.downloaded === message.total ? "Done. Now wait for this slow server to start the download" : `${message.downloaded}mb / ${message.total}mb`;
+								progressText.innerText = message.downloaded === message.total ? "Done. Now wait for this slow server to start the download" : `Processsing - ${message.downloaded}mb / ${message.total}mb`;
 							}
 
 							if (message.status === 'complete') {
