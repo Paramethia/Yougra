@@ -741,7 +741,7 @@
 							if (message.progress) {
 								downloadBtn.innerText = `${Math.floor(message.progress)}%`;
 								progress.style.width = `${message.progress}%`;
-								progressText.innerText = `Processsing - (${message.downloaded}mb / ${message.total}mb)`;
+								progressText.innerText = message.downloaded === message.total ? "Done. Now wait for this slow server to start the download" : `${message.downloaded}mb / ${message.total}mb`;
 							}
 
 							if (message.status === 'complete') {
