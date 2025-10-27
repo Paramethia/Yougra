@@ -116,6 +116,7 @@
 		}
 		.help p, .help h5 {
 			color: #aaa;
+			font-size: 0.8rem;
 		}
 		.help img {
 			width: 80%;
@@ -432,12 +433,13 @@
 
 				<h5> Do not pause the download as it will most likely not be able to resume again (don't know why this happens yet). </h5>
 				<h5> Try not to download multiple videos at the same time if your internet is slow (it may cause errors)</h5>
-				<h5> For large videos, downloads may take a while to start now due to the server being a little slow currently 'cause I ain't paying for a faster server </h5>
+				<h5> You currently cannot download videos that are larger than 512MB because the free tier server I am hosting it on, only has max memory of 512MB. </h5>
+				<h5> Some videos may not be able to be fetched/downloaded. You can try reloading the page and retrying to see if it works. </h5>
 			</div>
 		</div>
 	</div>
 	<main>
-		<span id="version"> Beta 1.2 </span>
+		<span id="version"> Beta 1.3 </span>
 		 
 		<h4>Enter a YouTube video URL:</h4>
 		<input type="text" id="vid-link" placeholder="https://youtu.be/videoId?si=sigCode">
@@ -651,7 +653,7 @@
 
 			const videoFormats = data.qualities.filter(vF => vF.type === 'videoonly' && vF.qualityLabel !== '144p');
 			const rVF = videoFormats.reverse();
-			const defaultVidO = videoFormats.find(vid => vid.qualityLabel === "360p");
+			const defaultVidO = videoFormats.find(vid => vid.qualityLabel === "480p");
 			const audioFormats = data.qualities.filter(aF => aF.type === 'audioonly');
 			const selectedAudio = audioFormats.pop();
 
@@ -701,6 +703,12 @@
 			const progressText = document.getElementById("progress-txt");
 			const progress = document.querySelector(".progress");
 			downloadBtn.onclick = async () => {
+				const size = parseInt(document.getElementById("v-size").innerText);
+				if (size > 512) {
+					progressText.innerText = "Cannot download videos that are larger than 512MB right now. Because I'm poor."
+					return
+				}
+
 				downloadBtn.disabled = true;
 				downloadBtn.style.filter = "brightness(90%)";
 				progress.style.width = "0%";
@@ -741,7 +749,7 @@
 							if (message.progress) {
 								downloadBtn.innerText = `${Math.floor(message.progress)}%`;
 								progress.style.width = `${message.progress}%`;
-								progressText.innerText = message.downloaded === message.total ? "Done. Now wait for this slow server to start the download" : `Processsing - ${message.downloaded}mb / ${message.total}mb`;
+								progressText.innerText = message.downloaded === message.total ? "Done. Now wait a little more..." : `Processsing - ${message.downloaded}mb / ${message.total}mb`;
 							}
 
 							if (message.status === 'complete') {
