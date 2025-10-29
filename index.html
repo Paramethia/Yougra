@@ -476,7 +476,7 @@
 	// Ping sever on page load to wake up Render server (doing this because of the free tier)
 	window.addEventListener("load", () => {
 		setTimeout(() => {
-			fetch("https://yougra-server.onrender.com/ping").then(() => console.log("Server warmed up")).catch(() => console.warn("Could not reach server (might still be waking up)"));
+			fetch("https://api.yougra.site/ping").then(() => console.log("Server warmed up")).catch(() => console.warn("Could not reach server (might still be waking up)"));
 		}, 1500);
 	});
 
@@ -799,4 +799,5 @@
     }
   </script>
 </body>
+
 </html>
