@@ -227,7 +227,7 @@ async function fetchVideo() {
         const progressText = document.getElementById("progress-txt");
         const progress = document.querySelector(".progress");
         downloadBtn.onclick = async () => {
-            const size = paresInt(document.getElementById("v-size"));
+            const size = paresInt(document.getElementById("v-size").innerText);
             if (size >= 5000) {
                 progressText.innerText = "Woahhh you can't download a video that's 5GB or larger just yet. Try lower quality";
                 return
