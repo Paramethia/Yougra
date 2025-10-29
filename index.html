@@ -635,7 +635,7 @@
 		try {
 			document.getElementById("check-info").disabled = true;
 			
-			const response = await fetch("https://yougra-server.onrender.com/api/info", {
+			const response = await fetch("https://api.yougra.site/api/info", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ url })
@@ -801,3 +801,4 @@
 </body>
 
 </html>
+
