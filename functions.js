@@ -177,7 +177,8 @@ async function fetchVideo() {
         const likes = new Intl.NumberFormat('fr-FR').format(data.likeCount);
 
         const videoFormats = data.qualities.filter(vF => vF.type === 'videoonly' && vF.qualityLabel !== '144p');
-        const defaultVidO = videoFormats.find(vid => vid.qualityLabel === "480p");
+        videoFormats.reverse();
+        const defaultVidO = videoFormats.find(vid => vid.qualityLabel === "480p") || videoFormats.find(vid => vid.qualityLabel === "360p");
         const audioFormats = data.qualities.filter(aF => aF.type === 'audioonly');
         const selectedAudio = audioFormats.pop();
 
@@ -227,13 +228,11 @@ async function fetchVideo() {
         const progressText = document.getElementById("progress-txt");
         const progress = document.querySelector(".progress");
         downloadBtn.onclick = async () => {
-            /*
             const size = paresInt(document.getElementById("v-size").innerText);
             if (size >= 5000) {
                 progressText.innerText = "Woahhh you can't download a video that's 5GB or larger just yet. Try lower quality";
                 return
             }
-            */
 
             downloadBtn.disabled = true;
             downloadBtn.style.filter = "brightness(90%)";
