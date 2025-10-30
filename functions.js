@@ -274,7 +274,7 @@ async function fetchVideo() {
                         if (message.progress) {
                             downloadBtn.innerText = `${Math.floor(message.progress)}%`;
                             progress.style.width = `${message.progress}%`;
-                            progressText.innerText = message.downloaded === message.total ? "Done. Now a little more..." : `Processsing - ${message.downloaded}mb / ${message.total}mb`;
+                            progressText.innerText = message.downloaded === message.total ? "Merging..." : `Collecting ${message.collecting} - ${message.downloaded}mb / ${message.total}mb`;
                         }
 
                         if (message.status === 'complete') {
