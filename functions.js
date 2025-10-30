@@ -261,6 +261,7 @@ async function fetchVideo() {
 
                     ws.onmessage = (event) => {
                         const message = JSON.parse(event.data);
+                        console.log(message);
                         
                         if (message.error) {
                             progressText.innerText = message.error;
