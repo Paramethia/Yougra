@@ -160,7 +160,7 @@ async function fetchVideo() {
     try {
         document.getElementById("check-info").disabled = true;
         
-        const response = await fetch("https://api.yougra.site/api/info", {
+        const response = await fetch("https://api.yougra.site/get-info", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url })
@@ -235,7 +235,7 @@ async function fetchVideo() {
             try {
                 if (format === "audio") {
                     // Trigger download via native browser stream
-                    window.location.href = `https://api.yougra.site/api/download-a?url=${encodeURIComponent(url)}`;
+                    window.location.href = `https://api.yougra.site/download-a?url=${encodeURIComponent(url)}`;
 
                     setTimeout(() => {
                         downloadBtn.disabled = false;
