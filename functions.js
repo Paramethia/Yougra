@@ -263,7 +263,7 @@ async function fetchVideo() {
                         const message = JSON.parse(event.data);
                         
                         if (message.error) {
-                            progressText.innerText = message.error;
+                            progressText.innerText = "Processing failed. Try with a different video.";
                             downloadBtn.disabled = false;
                             downloadBtn.style.filter = "brightness(100%)";
                             setTimeout(() => { progressText.innerText = "" }, 4000);
@@ -301,8 +301,8 @@ async function fetchVideo() {
                             downloadBtn.disabled = false;
                             downloadBtn.style.filter = "brightness(100%)";
                             document.querySelector(".progress-bar").style.display = "none";
-                            progressText.innerText = "Processing failed or cancelled.";
-                            setTimeout(() => { progressText.innerText = "" }, 4000);
+                            progressText.innerText = message.error;
+                            setTimeout(() => { progressText.innerText = "" }, 8700);
                         }
                     }
                 }
