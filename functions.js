@@ -134,6 +134,10 @@ audSet.onclick = () => {
     document.getElementById("qualities").style.display = 'none';
 }
 
+window.addEventListener('keydown', (event) => {
+    if (event.key === "Enter") fetchVideo();
+})
+
 async function fetchVideo() {
     const url = document.getElementById("vid-link").value;
     
