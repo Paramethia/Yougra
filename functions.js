@@ -280,7 +280,7 @@ async function fetchVideo() {
                             downloadBtn.innerText = `${Math.floor(message.progress)}%`;
                             progress.style.backgroundColor = '#f5353c';
                             progress.style.width = `${message.progress}%`;
-                            progressText.innerText = message.downloaded === message.total ? "About to merge..." : `Collecting ${message.collecting} - ${message.downloaded}mb / ${message.total}mb`;
+                            progressText.innerText = message.downloaded === message.total ? "Merging..." : `Collecting ${message.collecting} - ${message.downloaded}mb / ${message.total}mb`;
                         }
 
                         if (message.merging) {
