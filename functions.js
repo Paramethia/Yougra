@@ -281,6 +281,12 @@ async function fetchVideo() {
                             progressText.innerText = message.downloaded === message.total ? "Merging..." : `Collecting ${message.collecting} - ${message.downloaded}mb / ${message.total}mb`;
                         }
 
+                        if (message.merging) {
+                            downloadBtn.innerText = `Wait`;
+                            progress.style.width = `${Math.round(message.progress)}%`;
+                            
+                        }
+
                         if (message.status === 'complete') {
                             processed = true;
                             // Trigger the file download via a new request
