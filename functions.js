@@ -254,6 +254,7 @@ async function fetchVideo() {
 
                     const ws = new WebSocket('wss://api.yougra.site');
                     let processed = false;
+                    let stayAwake;
 
                     ws.onopen = () => {
                         console.log('WebSocket connected.');
@@ -261,6 +262,11 @@ async function fetchVideo() {
                         downloadBtn.innerText = "0%";
                         progressText.innerText = "Wait for it...";
                         document.querySelector(".progress-bar").style.display = "block";
+                        stayAwake = setInterval(() => {
+                            if (ws.readyState === WebSocket.OPEN) {
+                                ws.send(JSON.stringify({ ping: true }));
+                            }
+                        }, 8000);
                     };
 
                     ws.onmessage = (event) => {
@@ -308,6 +314,7 @@ async function fetchVideo() {
 
                     ws.onclose = () => {
                         console.log('WebSocket disconnected.');
+                        clearInterval(stayAwake);
                         if (!processed) {
                             downloadBtn.innerText = "Download";
                             downloadBtn.disabled = false;
