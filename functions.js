@@ -305,7 +305,7 @@ async function fetchVideo() {
                             downloadBtn.disabled = false;
                             downloadBtn.style.filter = "brightness(100%)";
                             document.querySelector(".progress-bar").style.display = "none";
-                            progressText.innerText = message.error;
+                            progressText.innerText = "Error occured while merging";
                             setTimeout(() => { progressText.innerText = "" }, 8700);
                         }
                     }
