@@ -277,14 +277,15 @@ async function fetchVideo() {
 
                         if (message.progress) {
                             downloadBtn.innerText = `${Math.floor(message.progress)}%`;
+                            progress.style.backgroundColor = '#f5353c';
                             progress.style.width = `${message.progress}%`;
                             progressText.innerText = message.downloaded === message.total ? "Merging..." : `Collecting ${message.collecting} - ${message.downloaded}mb / ${message.total}mb`;
                         }
 
                         if (message.merging) {
                             downloadBtn.innerText = `Wait`;
+                            progress.style.backgroundColor = '#e55';
                             progress.style.width = `${Math.round(message.progress)}%`;
-                            
                         }
 
                         if (message.status === 'complete') {
