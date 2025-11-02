@@ -283,8 +283,8 @@ async function fetchVideo() {
                         }
 
                         if (message.merging) {
-                            downloadBtn.innerText = `Wait`;
-                            progressText.innerText = "Merging...";
+                            downloadBtn.innerText = "Wait";
+                            progressText.innerText = `Merging - ${Math.round(message.progress)}$`;
                             progress.style.backgroundColor = '#e55';
                             progress.style.width = `${Math.round(message.progress)}%`;
                         }
