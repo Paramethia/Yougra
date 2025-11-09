@@ -1,7 +1,7 @@
 // Ping sever on page load to wake up Render server (doing this because of the free tier)
 window.addEventListener("load", () => {
     setTimeout(() => {
-        fetch("https://api.yougra.site/ping").then(() => console.log("Server warmed up")).catch(() => console.warn("Could not reach server (might still be waking up)"));
+        fetch("https://yougra-server.onrender.com/ping").then(() => console.log("Server warmed up")).catch(() => console.warn("Could not reach server (might still be waking up)"));
     }, 1500);
 });
 
@@ -164,7 +164,7 @@ async function fetchVideo() {
     try {
         document.getElementById("check-info").disabled = true;
         
-        const response = await fetch("https://api.yougra.site/get-info", {
+        const response = await fetch("https://yougra-server.onrender.com/get-info", { //https://api.yougra.site
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url })
@@ -239,7 +239,7 @@ async function fetchVideo() {
             try {
                 if (format === "audio") {
                     // Trigger download via native browser stream
-                    window.location.href = `https://api.yougra.site/download-a?url=${encodeURIComponent(url)}`;
+                    window.location.href = `https://yougra-server.onrender.com/download-a?url=${encodeURIComponent(url)}`; //https://api.yougra.site
 
                     setTimeout(() => {
                         downloadBtn.disabled = false;
@@ -247,14 +247,13 @@ async function fetchVideo() {
                     }, 4450)
                 } else if (format === "video") {
                     const size = parseInt(document.getElementById("v-size").innerText);
-                    if (size >= 5000) {
-                        progressText.innerText = "Woahhh you can't download a video that's 5GB or larger just yet. Try lower quality";
+                    if (size >= 500) {
+                        progressText.innerText = "Can't download a video larger than 500mb currently. Because I'm poor. Try lower quality";
                         return
                     }
 
-                    const ws = new WebSocket('wss://api.yougra.site');
+                    const ws = new WebSocket('wss://yougra-server.onrender.com'); //api.yougra.site
                     let processed = false;
-                    let stayAwake;
 
                     ws.onopen = () => {
                         console.log('WebSocket connected.');
