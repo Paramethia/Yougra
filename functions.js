@@ -292,7 +292,7 @@ async function fetchVideo() {
                         if (message.status === 'complete') {
                             processed = true;
                             // Trigger the file download via a new request
-                            window.location.href = `https://api.yougra.site${message.path}`;
+                            window.location.href = `https://yougra-server.onrender.com${message.path}`; //https://api.yougra.site
                             
                             // Reset UI after a short delay
                             setTimeout(() => {
