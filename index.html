@@ -4,18 +4,26 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta name="description" content="Download YouTube content as audio or videos in any quality you desire." />
+	<meta name="description" content="Yougra is a free YouTube content downloader that lets you convert YouTube videos to MP3 or MP4 in any quality." />
+	<meta name="keywords" content="youtube downloader, youtube to mp3, youtube to mp4, free youtube downloader, youtube music downloader, video downloader" />
 	<meta name="author" content="Kyrin" />
+	<meta name="robots" content="index, follow" />
 	<title>Yougra - YouTube Content Extractor</title>
+	<meta property="og:title" content="Yougra – Free YouTube Content Downloader" />
+	<meta property="og:description" content="Download YouTube videos as mp4 or mp3 for free in any quality." />
+	<meta property="og:image" content="https://yougra.site/images/Yougra_logo_192x192.png" />
+	<meta property="og:url" content="https://yougra.site" />
+	<meta property="og:type" content="website" />
 	<link rel="icon" href="Yougra.ico" />
 	<link rel="manifest" href="/manifest.json">
 	<link rel="apple-touch-icon" href="/images/Yougra_logo_192x192.png">
+	<link rel="canonical" href="https://yougra.site/" />
 	<link rel="stylesheet"  type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 	<link rel="stylesheet" type="text/css" href="./styles.css" />
 </head>
 <body>
 	<header>
-		<div class="logo"><img src="./images/Yougra logo.png" alt="YTE logo" /><h1>Yougra</h1></div> <span id="help-nav">Help</span>
+		<div class="logo"><img src="./images/Yougra logo.png" alt="Yougra logo" /><h1>Yougra</h1></div> <span id="help-nav">Help</span>
 	</header>
 	<div class="help">
 		<div>
@@ -24,11 +32,11 @@
 				<h3>Don't know how to get a URL?</h3>
 
 				<h4>Option 1</h4>
-				<img src="./images/Option 1.jpg" alt="Option 1 img"/>
+				<img src="./images/Option 1.jpg" loading="lazy" alt="How to copy a YouTube video URL – Option 1 tutorial"/>
 				<p>Go to the video you wanna download on YouTube, click the share icon, and choose to copy. There you go. Now you have the URL.</p>
 
 				<h4>Option 2</h4>
-				<img src="./images/Option 2.jpg" alt="Option 2 img"/>
+				<img src="./images/Option 2.jpg" loading="lazy" alt="How to copy a YouTube video URL – Option 2 tutorial"/>
 				<p>While scrolling looking at a list of videos in YouTube, just click those 3 dots and you should see an option to share again.</p>
 			</div>
 			<div class="bug-report">
@@ -50,14 +58,14 @@
 		<span id="version"> Beta 1.4 </span>
 		 
 		<h4>Enter a YouTube video URL:</h4>
-		<input type="text" id="vid-link" placeholder="https://youtu.be/videoId?si=sigCode">
-		<button id="check-info" onclick="fetchVideo()">Find it</button>
+		<input type="text" id="vid-link" placeholder="https://www.youtube.com/watch?v=eDWhbQGMPtU">
+		<button id="check-info" aria-label="Find YouTube video information" onclick="fetchVideo()">Find it</button>
 		<p id="err-msg"></p>
 		<br />
 		<div class="video-info">
 			<div class="loader"></div>
 			<div class="v">
-				<img id="thumbnail" src="" alt="Video Thumbnail" />
+				<img id="thumbnail" src="" alt="YouTube video thumbnail preview" />
 				<span id="length"></span> <span id="d-options" onClick="toggleOptions()"><svg id="dots" width="25px" height="25px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M5.7 12.1143C4.82423 12.1143 4.11429 12.8242 4.11429 13.7C4.11429 14.5758 4.82423 15.2857 5.7 15.2857C6.57577 15.2857 7.28571 14.5758 7.28571 13.7C7.28571 12.8242 6.57577 12.1143 5.7 12.1143ZM2 13.7C2 11.6565 3.65655 10 5.7 10C7.74345 10 9.4 11.6565 9.4 13.7C9.4 15.7435 7.74345 17.4 5.7 17.4C3.65655 17.4 2 15.7435 2 13.7Z" fill="#ccc" fill-rule="evenodd" /><path clip-rule="evenodd" d="M22.7 12.1143C21.8242 12.1143 21.1143 12.8242 21.1143 13.7C21.1143 14.5758 21.8242 15.2857 22.7 15.2857C23.5758 15.2857 24.2857 14.5758 24.2857 13.7C24.2857 12.8242 23.5758 12.1143 22.7 12.1143ZM19 13.7C19 11.6565 20.6565 10 22.7 10C24.7435 10 26.4 11.6565 26.4 13.7C26.4 15.7435 24.7435 17.4 22.7 17.4C20.6565 17.4 19 15.7435 19 13.7Z" fill="#ccc" fill-rule="evenodd"/><path clip-rule="evenodd" d="M14.2 12.1143C13.3242 12.1143 12.6143 12.8242 12.6143 13.7C12.6143 14.5758 13.3242 15.2857 14.2 15.2857C15.0758 15.2857 15.7857 14.5758 15.7857 13.7C15.7857 12.8242 15.0758 12.1143 14.2 12.1143ZM10.5 13.7C10.5 11.6565 12.1565 10 14.2 10C16.2435 10 17.9 11.6565 17.9 13.7C17.9 15.7435 16.2435 17.4 14.2 17.4C12.1565 17.4 10.5 15.7435 10.5 13.7Z" fill="#ccc" fill-rule="evenodd"/></svg></span>
 				
 				<div class="details">
@@ -80,6 +88,17 @@
 		</div>
 	</main>
 	<script src="./functions.js"></script>
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebApplication",
+			"name": "Yougra",
+			"url": "https://yougra.site",
+			"description": "Free YouTube downloader for MP3 and MP4.",
+			"applicationCategory": "Multimedia",
+			"operatingSystem": "All"
+		}
+	</script>
 </body>
 </html>
 
