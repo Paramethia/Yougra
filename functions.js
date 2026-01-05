@@ -159,7 +159,7 @@ async function search() {
     searchB.innerText = "Searching...";
     searchB.disabled = true;
 
-    const response = await fetch("http://localhost:4480/search", {
+    const response = await fetch("https://api.yougra.site/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input: searchInput.value })
