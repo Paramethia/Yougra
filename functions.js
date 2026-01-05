@@ -116,10 +116,8 @@ process.onclick = () => {
 
 searchO.style.backgroundColor = searchCon.style.display !== "none" ? "rgba(238, 119, 119, 0.4)" : "rgba(238, 119, 119, 0.2)";
 
-//searchO.onmouseover = () => { if (searchCon.style.display === "block") searchO.style.backgroundColor = "rgba(238, 119, 119, 0.3)" }
 searchO.onmouseout = () => { if (searchCon.style.display === "none") searchO.style.backgroundColor = "rgba(238, 119, 119, 0.2)" }
 
-//urlO.onmouseover = () => { if (urlCon.style.display === "block") urlO.style.backgroundColor = "rgba(238, 119, 119, 0.3)" }
 urlO.onmouseout = () => { if (urlCon.style.display  === "none") urlO.style.backgroundColor = "rgba(238, 119, 119, 0.2)" }
 
 searchO.onclick = () => { searchMode() }
@@ -311,7 +309,7 @@ async function fetchVideo() {
     try {
         document.getElementById("check-info").disabled = true;
         
-        const response = await fetch("https://api.yougra.site/get-info", { //https://api.yougra.site
+        const response = await fetch("https://api.yougra.site/get-info", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url })
@@ -404,7 +402,7 @@ async function fetchVideo() {
 
                     const size = parseInt(document.getElementById("v-size").innerText);
                     if (size > 5000) {
-                        progressText.innerText = "Can't download a video larger than 500mb currently. Because I'm poor. Try lower quality";
+                        progressText.innerText = "You can't download a video larger than 5GB with processing.";
                         return
                     }
 
