@@ -23,67 +23,81 @@
 </head>
 <body>
 	<header>
-		<div class="logo"><img src="./images/Yougra logo.png" alt="Yougra logo" /><h1>Yougra</h1></div> <span id="help-nav">Help</span>
+		<div id="logo"><img src="./images/Yougra logo.png" alt="Yougra logo" /><h1>Yougra</h1></div> <span id="setttings-nav"><i class="fa-solid fa-gear"></i><</span>
 	</header>
-	<div class="help">
+	<div id="settings">
 		<div>
-			<i id="close-help" class="fa-xl fa-solid fa-circle-xmark"></i>
-			<div class="url-help">
-				<h3>Don't know how to get a URL?</h3>
+			<i id="close-settings" class="fa-xl fa-solid fa-circle-xmark"></i>
+			<div id="d-method">
+				<h3>Choose your download method</h3>
 
-				<h4>Option 1</h4>
-				<img src="./images/Option 1.jpg" loading="lazy" alt="How to copy a YouTube video URL – Option 1 tutorial"/>
-				<p>Go to the video you wanna download on YouTube, click the share icon, and choose to copy. There you go. Now you have the URL.</p>
+				<h4 id="immediate">Immediate</h4>
+				<p>This ensures that every <strong>video</strong> you download always start immediate without processing. Keep in mind that the file may show up as corrupted for some devices.</p>
 
-				<h4>Option 2</h4>
-				<img src="./images/Option 2.jpg" loading="lazy" alt="How to copy a YouTube video URL – Option 2 tutorial"/>
-				<p>While scrolling looking at a list of videos in YouTube, just click those 3 dots and you should see an option to share again.</p>
+				<h4 id="process">Process</h4>
+				<p>This ensures that the video works on any device and is also seekable by having a process of downloading and merging it first on the server, then the download will start. Not recommended for large downloads if you are inpatient as it will take a long time before it starts the download. There is also a max file size requirement (5GB) for downloading videos for this option.</p>
 			</div>
-			<div class="bug-report">
+			<div id="bug-report">
 				<h3>Noticed any bugs/glitches?</h3>
 
 				<h4>Tell me</h4>
 				<p>Remember that this website is still in beta/testing stage, so errors WILL happen eventually. Just tell me if you noticed anything odd (click it below): <br /> <a href="mailto:kyrinkompi@gmail.com">kyrinkompi@gmail.com</a></p>
 			</div>
-			<div class="warning">
+			<div id="warning">
 				<h3>Warnings</h3>
 
-				<h5> Do not pause the download as it will most likely not be able to resume again (don't know why this happens yet). </h5>
-				<h5> Try not to download multiple videos at the same time if your internet is slow (it may cause errors)</h5>
-				<h5> You probably noticed that merging takes a bit of a while sometimes. Well yeah... that happens. Try lower quality videos if you don't like waiting around. </h5>
+				<h5> Do not pause the download as it will most likely not be able to resume again </h5>
+				<h5> Try not to download multiple videos at the same time if your internet is slow (it may cause errors) </h5>
+				<h5> Merging will take a long time for large videos when choosing the process download method. How long it takes depends on large the file is </h5>
 			</div>
 		</div>
 	</div>
 	<main>
-		<span id="version"> Beta 1.4 </span>
+		<span id="version"> Beta 1.5 </span>
+
+		<div id="modes">
+			<span id="search-o">Search</span>
+			<span id="url-o">Use link</span>
+		</div>
+
+		<div id="search-mode">
+			<h4>Search YouTube video:</h4>
+			<input type="text" id="search-val" placeholder="Enter video title or creator name" />
+			<button id="search" onclick="search()">Search</button>
+			<p id="search-err-msg"></p>
+
+			<div id="search-results"><div id="vids"></div></div>
+		</div>
 		 
-		<h4>Enter a YouTube video URL:</h4>
-		<input type="text" id="vid-link" placeholder="https://www.youtube.com/watch?v=eDWhbQGMPtU">
-		<button id="check-info" aria-label="Find YouTube video information" onclick="fetchVideo()">Find it</button>
-		<p id="err-msg"></p>
-		<br />
-		<div class="video-info">
-			<div class="loader"></div>
-			<div class="v">
-				<img id="thumbnail" src="" alt="YouTube video thumbnail preview" />
-				<span id="length"></span> <span id="d-options" onClick="toggleOptions()"><svg id="dots" width="25px" height="25px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M5.7 12.1143C4.82423 12.1143 4.11429 12.8242 4.11429 13.7C4.11429 14.5758 4.82423 15.2857 5.7 15.2857C6.57577 15.2857 7.28571 14.5758 7.28571 13.7C7.28571 12.8242 6.57577 12.1143 5.7 12.1143ZM2 13.7C2 11.6565 3.65655 10 5.7 10C7.74345 10 9.4 11.6565 9.4 13.7C9.4 15.7435 7.74345 17.4 5.7 17.4C3.65655 17.4 2 15.7435 2 13.7Z" fill="#ccc" fill-rule="evenodd" /><path clip-rule="evenodd" d="M22.7 12.1143C21.8242 12.1143 21.1143 12.8242 21.1143 13.7C21.1143 14.5758 21.8242 15.2857 22.7 15.2857C23.5758 15.2857 24.2857 14.5758 24.2857 13.7C24.2857 12.8242 23.5758 12.1143 22.7 12.1143ZM19 13.7C19 11.6565 20.6565 10 22.7 10C24.7435 10 26.4 11.6565 26.4 13.7C26.4 15.7435 24.7435 17.4 22.7 17.4C20.6565 17.4 19 15.7435 19 13.7Z" fill="#ccc" fill-rule="evenodd"/><path clip-rule="evenodd" d="M14.2 12.1143C13.3242 12.1143 12.6143 12.8242 12.6143 13.7C12.6143 14.5758 13.3242 15.2857 14.2 15.2857C15.0758 15.2857 15.7857 14.5758 15.7857 13.7C15.7857 12.8242 15.0758 12.1143 14.2 12.1143ZM10.5 13.7C10.5 11.6565 12.1565 10 14.2 10C16.2435 10 17.9 11.6565 17.9 13.7C17.9 15.7435 16.2435 17.4 14.2 17.4C12.1565 17.4 10.5 15.7435 10.5 13.7Z" fill="#ccc" fill-rule="evenodd"/></svg></span>
-				
-				<div class="details">
-					<div class="options">
-						<p><strong>Download it as...</strong></p>
-						<hr />
-						<div id="vid-o"></div>
-						<div id="aud-o"></div>
+		<div id="url-mode">
+			<h4>Enter a YouTube video URL:</h4>
+			<input type="text" id="vid-link" placeholder="https://youtube.com/watch?v=SvwfkTmyHFU">
+			<button id="check-info" aria-label="Find YouTube video information" onclick="fetchVideo()">Find it</button>
+			<p id="err-msg"></p>
+			<br />
+			<div id="video-info">
+				<div id="loader"></div>
+				<div id="v">
+					<img id="thumbnail" src="" alt="YouTube video thumbnail preview" />
+					<span id="length"></span> <span id="d-options" onClick="toggleOptions()"><svg id="dots" width="25px" height="25px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M5.7 12.1143C4.82423 12.1143 4.11429 12.8242 4.11429 13.7C4.11429 14.5758 4.82423 15.2857 5.7 15.2857C6.57577 15.2857 7.28571 14.5758 7.28571 13.7C7.28571 12.8242 6.57577 12.1143 5.7 12.1143ZM2 13.7C2 11.6565 3.65655 10 5.7 10C7.74345 10 9.4 11.6565 9.4 13.7C9.4 15.7435 7.74345 17.4 5.7 17.4C3.65655 17.4 2 15.7435 2 13.7Z" fill="#ccc" fill-rule="evenodd" /><path clip-rule="evenodd" d="M22.7 12.1143C21.8242 12.1143 21.1143 12.8242 21.1143 13.7C21.1143 14.5758 21.8242 15.2857 22.7 15.2857C23.5758 15.2857 24.2857 14.5758 24.2857 13.7C24.2857 12.8242 23.5758 12.1143 22.7 12.1143ZM19 13.7C19 11.6565 20.6565 10 22.7 10C24.7435 10 26.4 11.6565 26.4 13.7C26.4 15.7435 24.7435 17.4 22.7 17.4C20.6565 17.4 19 15.7435 19 13.7Z" fill="#ccc" fill-rule="evenodd"/><path clip-rule="evenodd" d="M14.2 12.1143C13.3242 12.1143 12.6143 12.8242 12.6143 13.7C12.6143 14.5758 13.3242 15.2857 14.2 15.2857C15.0758 15.2857 15.7857 14.5758 15.7857 13.7C15.7857 12.8242 15.0758 12.1143 14.2 12.1143ZM10.5 13.7C10.5 11.6565 12.1565 10 14.2 10C16.2435 10 17.9 11.6565 17.9 13.7C17.9 15.7435 16.2435 17.4 14.2 17.4C12.1565 17.4 10.5 15.7435 10.5 13.7Z" fill="#ccc" fill-rule="evenodd"/></svg></span>
+					
+					<div id="details">
+						<div id="options">
+							<p><strong>Download it as...</strong></p>
+							<hr />
+							<div id="vid-o"></div>
+							<div id="aud-o"></div>
+						</div>
+						<h2 id="title"></h2>
+						<p id="video-author"></p>
+						<p id="posted"></p>
+						<p id="views"></p>
+						<p id="likes"></p>
+						<button id="download">Download</button>
 					</div>
-					<h2 id="title"></h2>
-					<p id="video-author"></p>
-					<p id="posted"></p>
-					<p id="views"></p>
-					<p id="likes"></p>
-					<button id="download">Download</button>
+					<p id="progress-txt"></p>
+					<div id="progress-bar"><div id="progress"></div></div>
 				</div>
-				<p id="progress-txt"></p>
-				<div class="progress-bar"><div class="progress"></div></div>
 			</div>
 		</div>
 	</main>
