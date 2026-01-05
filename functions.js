@@ -406,7 +406,7 @@ async function fetchVideo() {
                         return
                     }
 
-                    const ws = new WebSocket('wss://yougra-server.onrender.com'); //api.yougra.site
+                    const ws = new WebSocket('wss://api.yougra.site');
                     let processed = false;
 
                     ws.onopen = () => {
@@ -446,7 +446,7 @@ async function fetchVideo() {
                         if (message.status === 'complete') {
                             processed = true;
                             // Trigger the file download via a new request
-                            window.location.href = `https://api.yougra.site${message.path}`; //https://api.yougra.site
+                            window.location.href = `https://api.yougra.site${message.path}`;
                             
                             // Reset UI after a short delay
                             setTimeout(() => {
