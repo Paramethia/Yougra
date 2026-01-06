@@ -251,7 +251,7 @@ input[type="text"]:focus {
 .video #duration {
     position: absolute;
     bottom: 7px;
-    left: 11px;
+    left: 5px;
 }
 
 .video h4, .video h6 { margin: 0 }
@@ -464,15 +464,11 @@ input[type="text"]:focus {
 }
 
 @media only screen and (max-width: 450px) {
-    header { 
-        justify-content: space-between 
-    }
-    #version { 
-        transform: translate(11px, -8px) 
-    }
-    input[type="text"] { 
-        width: 90% 
-    }
+    header { justify-content: space-between }
+
+    #version { transform: translate(11px, -8px) }
+
+    input[type="text"] { width: 90% }
 
     #check-info {
         display: block;
