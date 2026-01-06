@@ -221,7 +221,6 @@ input[type="text"]:focus {
 }
 
 .video {
-    position: relative;
     margin-top: 4px;
     border-top: 2px solid #404040;
     border-bottom: 2px solid #404040;
@@ -251,7 +250,7 @@ input[type="text"]:focus {
 }
 .video #duration {
     position: absolute;
-    top: 3.8cm;
+    bottom: 7px;
     left: 11px;
 }
 
@@ -483,5 +482,4 @@ input[type="text"]:focus {
     #search { margin-top: 12px }
 
     .video { margin-top: 5px }
-    .video #duration { top: 3.2cm }
 }
