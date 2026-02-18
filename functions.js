@@ -289,14 +289,14 @@ async function fetchVideo() {
     const url = document.getElementById("vid-link").value;
     
     if (!url) {
-        errMsg.innerText = "Where's the URL, dawg?";
-        setTimeout(() => { errMsg.innerText = "" }, 3000 );
+        urlErr.innerText = "Where's the URL, dawg?";
+        setTimeout(() => { urlErr.innerText = "" }, 3000 );
         return;
     }
 
     if (!validURL(url)) {
-        errMsg.innerText = "That's not a valid YouTube URL";
-        setTimeout(() => { errMsg.innerText = "" }, 4500 );
+        urlErr.innerText = "That's not a valid YouTube URL";
+        setTimeout(() => { urlErr.innerText = "" }, 4500 );
         return;
     }
 

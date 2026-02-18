@@ -282,13 +282,14 @@ input[type="text"]:focus {
     aspect-ratio: 1;
     position: relative;
     margin: 20px auto;
+    color: #555;
 }
 #loader::before, #loader::after {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: #000;
+    background-color: #555;
 }
 #loader::before {
     box-shadow: -25px 0;
