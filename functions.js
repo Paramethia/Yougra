@@ -245,15 +245,16 @@ document.addEventListener("click", event => {
 });
 
 optionsB.onmouseover = () => { optionsB.style.background = '#3f3f3f' }
-optionsB.onmouseout = () => { if (!dOptionsOpened) optionsB.style.background = '#2a2a2a'; }
-optionsB.onclick = () => {
+optionsB.onmouseout = () => { if (!dOptionsOpened) optionsB.style.background = '#2a2a2a' }
+
+function toggleDownloadOptions() {
     dOptionsOpened = !dOptionsOpened;
     if (dOptionsOpened) { 
         optionsB.style.background = '#3f3f3f';
-        options.style.display = 'block' 
+        options.style.display = 'block';
     } else {
         optionsB.style.background = '#2a2a2a';
-        options.style.display = 'none'
+        options.style.display = 'none';
     }
 }
 
@@ -391,14 +392,14 @@ async function fetchVideo() {
                     setTimeout(() => {
                         downloadBtn.disabled = false;
                         downloadBtn.style.filter = "brightness(100%)";
-                    }, 4450)
+                    }, 10000)
                 } else if (format === "video") {
                     if (method === "fast") {
                         window.location.href = `https://api.yougra.site/fast-download?url=${encodeURIComponent(url)}&itag=${itag}`;
                         setTimeout(() => {
                             downloadBtn.disabled = false;
                             downloadBtn.style.filter = "brightness(100%)";
-                        }, 4450);
+                        }, 15000);
                         return
                     }
 

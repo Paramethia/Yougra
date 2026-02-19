@@ -320,7 +320,7 @@ input[type="text"]:focus {
     padding: 2px 5px;
     background-color: #2a2a2a;
     -webkit-tap-highlight-color: transparent;
-    animation: border-light-up 1.2s linear 1.5s;
+    animation: border-light-up 0.7s linear 1.5s 3;
 }
 #d-options:hover { cursor: pointer }
 #d-options svg { margin-top: 2px }
