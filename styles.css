@@ -256,6 +256,7 @@ input[type="text"]:focus {
 }
 
 .video h4, .video h6 { margin: 0 }
+.video h4:hover { color: #777 }
 
 .video h6 { 
     display: inline-block;
@@ -276,6 +277,21 @@ input[type="text"]:focus {
     padding: 4px 7px;
 }
 .video .share:hover { background: #505050 }
+
+#title-tp {
+    visibility: hidden;
+    position: fixed;
+    background: #505050;
+    color: lightgray;
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* URL section styling */
 
 #loader {
     width: 15px;
@@ -432,6 +448,8 @@ input[type="text"]:focus {
     opacity: 0.5;
 }
 
+/* Animations */
+
 @keyframes expand {
     from { max-height: 57px } to { max-height: 420px; }
 }
@@ -464,6 +482,8 @@ input[type="text"]:focus {
 
     #video-info { width: 89% }
 }
+
+/* Phone portrait view styling */
 
 @media only screen and (max-width: 450px) {
     header { justify-content: space-between }
