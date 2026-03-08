@@ -18,9 +18,10 @@ const urlO = document.getElementById("url-o");
 const searchCon = document.getElementById("search-mode");
 const urlCon = document.getElementById("url-mode");
 
-const optionsB = document.getElementById("d-options");
 const searchErr = document.getElementById("search-err-msg");
 const urlErr = document.getElementById("url-err-msg");
+const selection = document.getElementById("selection-tp");
+const optionsB = document.getElementById("d-options");
 const options = document.getElementById("options");
 const vidCon = document.getElementById("video-info");
 const vidSet = document.getElementById("vid-o");
@@ -147,6 +148,8 @@ function urlMode() {
 const searchB = document.getElementById("search");
 const searchInput = document.getElementById("search-val");
 
+let tries = 0;
+
 async function search() {
     if (!searchInput.value) {
         searchErr.innerText = "Type something!!";
@@ -161,7 +164,20 @@ async function search() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input: searchInput.value })
-    });
+    }).catch(() => {
+        searchB.innerText = "Search";
+        searchB.disabled = false;
+        tries++;
+        switch (tries) {
+            case 1: searchErr.innerText = "Could not search. Try again?"; break;
+            case 2: searchErr.innerText = "Maybe it's your internet?"; break;
+            case 3: searchErr.innerText = "Or it could be something wrong going on with the app"; break;
+            case 4: searchErr.innerText = "Did you even try to reload?"; break;
+            default: searchErr.innerText = "Just try again later, man"; break;
+        }
+        setTimeout(() => { searchErr.innerText = "" }, tries === 3 ? 5000 : 4000 );
+        return
+    });;
 
     searchB.innerText = "Search";
     searchB.disabled = false;
@@ -381,13 +397,23 @@ async function fetchVideo() {
         document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
         document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
 
-        if (format === 'audio') {
-            audSet.style.background = '#5f5f5f';
+        selection.innerText = `Selected ${format}`;
+        selection.style.visibility = "visible";
+        selection.style.animation = "appear 2s linear";
+
+        if (format === 'audio' || data.song) {
+            selection.innerText = "Selected audio";
+            audSet.style.background = '#5d5d5d';
             vidSet.style.background = '#3f3f3f';
             document.getElementById("v-size").style.display = 'none';
             document.getElementById("a-size").style.display = 'inline';
             document.getElementById("qualities").style.display = 'none';
         }
+
+        setTimeout(() => { 
+            selection.style.animation = "disappear 1s linear forwards";
+            setTimeout(() => { selection.style.visibility = "hidden" }, 1100 );
+        }, 4400);
 
         const qualities = document.getElementById("qualities");
         
