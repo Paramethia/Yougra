@@ -401,7 +401,8 @@ async function fetchVideo() {
         selection.style.visibility = "visible";
         selection.style.animation = "appear 2s linear";
 
-        if (format === 'audio' || data.song) {
+        if (data.song) format = "audio"
+        if (format === 'audio') {
             selection.innerText = "Selected audio";
             audSet.style.background = '#5d5d5d';
             vidSet.style.background = '#3f3f3f';
