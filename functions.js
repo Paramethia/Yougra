@@ -5,6 +5,7 @@ window.addEventListener("load", () => {
     }, 1500);
 });
 
+// === Setings overlay elements ===
 const settingsNav = document.getElementById("settings-nav");
 const settings = document.getElementById("settings");
 const closeSettings = document.getElementById("close-settings");
@@ -13,21 +14,37 @@ const bugReport = document.getElementById("bug-report");
 const warning = document.getElementById("warning");
 const immediate = document.getElementById("immediate");
 const process = document.getElementById("process");
+
+// === Modes elements ===
 const searchO = document.getElementById("search-o");
 const urlO = document.getElementById("url-o");
 const searchCon = document.getElementById("search-mode");
 const urlCon = document.getElementById("url-mode");
 
+// === Search elements ===
+const searchB = document.getElementById("search");
 const searchErr = document.getElementById("search-err-msg");
+const searchResults = document.getElementById("search-results");
+const vidsCon = document.getElementById("vids");
+const titleTooltip = document.getElementById("title-tp");
+
+// === URL elements ===
+    // Video elements
+const findInfo = document.getElementById("find-info");
 const urlErr = document.getElementById("url-err-msg");
-const selection = document.getElementById("selection-tp");
+const selection = document.getElementById("selection-msg");
+const vidCon = document.getElementById("video-info");
 const optionsB = document.getElementById("d-options");
 const options = document.getElementById("options");
-const vidCon = document.getElementById("video-info");
 const vidSet = document.getElementById("vid-o");
 const audSet = document.getElementById("aud-o");
 
-// Settings overlay UI functions
+    // Playlist elements
+const findPlaylist = document.getElementById("find-list");
+const playlistErr = document.getElementById("playlist-err-msg");
+const playCon = document.getElementById("playlist-info");
+
+// === Settings overlay UI functions ===
 
 let settingsOpened = false;
 
@@ -37,6 +54,7 @@ function closeSet() {
     settingsNav.style.borderRight = 'none';
     settingsNav.style.borderLeft = 'none';
     settings.style.visibility = 'hidden';
+    document.body.style.overflow = 'auto';
 }
 
 settingsNav.onclick = () => {
@@ -45,6 +63,7 @@ settingsNav.onclick = () => {
     if (settingsOpened) {
         settingsNav.style.border = '1px dashed #e55';
         settings.style.visibility = 'visible';
+        document.body.style.overflow = 'hidden';
     } else {
         closeSet();
     }
@@ -113,7 +132,7 @@ process.onclick = () => {
     }
 }
 
-// Search and Use link state code
+// === Search and Use link mode code ===
 
 searchO.style.backgroundColor = searchCon.style.display !== "none" ? "rgba(238, 119, 119, 0.4)" : "rgba(238, 119, 119, 0.2)";
 
@@ -140,18 +159,18 @@ function urlMode() {
     urlCon.style.display = 'block';
     searchCon.style.display = 'none';
     removeKeyEvents();
-    window.addEventListener("keydown", urlFindKey);
+    window.addEventListener("keydown", videoFindKey);
+    window.addEventListener("keydown", playlistFindKey);
 }
 
-// Search function
+// === Search function ===
 
-const searchB = document.getElementById("search");
-const searchInput = document.getElementById("search-val");
-
-let tries = 0;
+let searchTries = 0;
 
 async function search() {
-    if (!searchInput.value) {
+    const searchInput = document.getElementById("search-val").value;
+
+    if (!searchInput) {
         searchErr.innerText = "Type something!!";
         setTimeout(() => { searchErr.innerText = "" }, 3400 );
         return
@@ -163,19 +182,19 @@ async function search() {
     const response = await fetch("https://api.yougra.site/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: searchInput.value })
+        body: JSON.stringify({ input: searchInput })
     }).catch(() => {
         searchB.innerText = "Search";
         searchB.disabled = false;
-        tries++;
-        switch (tries) {
+        searchTries++;
+        switch (searchTries) {
             case 1: searchErr.innerText = "Could not search. Try again?"; break;
             case 2: searchErr.innerText = "Maybe it's your internet?"; break;
-            case 3: searchErr.innerText = "Or it could be something wrong going on with the app"; break;
+            case 3: searchErr.innerText = "There might be something wrong going on with the app"; break;
             case 4: searchErr.innerText = "Did you even try to reload?"; break;
             default: searchErr.innerText = "Just try again later, man"; break;
         }
-        setTimeout(() => { searchErr.innerText = "" }, tries === 3 ? 5000 : 4000 );
+        setTimeout(() => { searchErr.innerText = "" }, searchTries === 3 ? 5000 : 4000 );
         return
     });;
 
@@ -189,9 +208,6 @@ async function search() {
         setTimeout(() => { searchErr.innerText = "" }, 5200 );
         return
     }
-
-    const searchResults = document.getElementById("search-results");
-    const vidsCon = document.getElementById("vids");
 
     videos.forEach(video => {
         const image = new Image();
@@ -236,11 +252,7 @@ async function search() {
             titleTooltip.style.left = `${e.clientX - 17}px`;
             titleTooltip.style.visibility = "visible";
         })
-    });
-    vTitles.forEach(title => {
-        title.addEventListener("mouseleave", () => {
-            titleTooltip.style.visibility = "hidden";
-        })
+        title.addEventListener("mouseleave", () => titleTooltip.style.visibility = "hidden" )
     });
 
     const shareButtons = document.querySelectorAll(".share");
@@ -257,14 +269,15 @@ async function search() {
 
 function removeKeyEvents() {
     window.removeEventListener("keydown", searchKey);
-    window.removeEventListener("keydkown", urlFindKey);
+    window.removeEventListener("keydkown", videoFindKey);
+    window.removeEventListener("keydown", playlistFindKey);
 }
 
 function searchKey(event) { if (event.key === "Enter") search() }
 
 window.addEventListener("keydown", searchKey);
  
-// URL functions
+// === URL functions ===
 
 function validURL(url) {
     return (
@@ -324,11 +337,13 @@ audSet.onclick = () => {
     document.getElementById("qualities").style.display = 'none';
 }
 
-function urlFindKey(event) { if (event.key === "Enter") fetchVideo() }
+function videoFindKey(event) { if (event.key === "Enter") fetchVideo() }
+
+let fvTries = 0;
 
 async function fetchVideo() {
     const url = document.getElementById("vid-link").value;
-    
+
     if (!url) {
         urlErr.innerText = "Where's the URL, dawg?";
         setTimeout(() => { urlErr.innerText = "" }, 3000 );
@@ -350,7 +365,7 @@ async function fetchVideo() {
     }
 
     try {
-        document.getElementById("check-info").disabled = true;
+        findInfo.disabled = true;
         
         const response = await fetch("https://api.yougra.site/get-info", {
             method: "POST",
@@ -359,11 +374,6 @@ async function fetchVideo() {
         });
 
         const data = await response.json();
-        if (data.error) {
-            errMsg.innerText = data.error;
-            setTimeout(() => { errMsg.innerText = "" }, 3000);
-            return;
-        }
 
         const views = new Intl.NumberFormat('fr-FR').format(data.viewCount);
         const likes = new Intl.NumberFormat('fr-FR').format(data.likeCount);
@@ -380,9 +390,9 @@ async function fetchVideo() {
             return Math.round(vS + aS)
         }
 
-        document.getElementById("loader").style.display = "none";
+        document.getElementById("loader-1").style.display = "none";
         document.getElementById("v").style.display = "block";
-        document.getElementById("thumbnail").src = data.thumbnail;
+        document.getElementById("v-thumbnail").src = data.thumbnail;
         document.getElementById("length").innerHTML = formatTime(data.lengthSeconds);
         document.getElementById("vid-o").innerHTML = `
             <p>Video <span id="v-size">${fullSize(defaultVidO.size, selectedAudio.size)}mb</span></p>
@@ -391,7 +401,7 @@ async function fetchVideo() {
             </select>
         `;
         document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${selectedAudio.size}</span></p>`;
-        document.getElementById("title").innerText = data.title;
+        document.getElementById("v-title").innerText = data.title;
         document.getElementById("video-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
         document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${data.publishDate}`;
         document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
@@ -483,18 +493,18 @@ async function fetchVideo() {
                             return;
                         }
 
-                        if (message.progress) {
-                            downloadBtn.innerText = `${Math.floor(message.progress)}%`;
+                        if (message.status === "downloading") {
+                            downloadBtn.innerText = `${Math.floor(message.progress) || 0}%`;
                             progress.style.backgroundColor = '#f5353c';
                             progress.style.width = `${message.progress}%`;
-                            progressText.innerText = message.downloaded === message.total ? "Merging..." : `Collecting ${message.collecting} - ${message.downloaded}mb / ${message.total}mb`;
+                            progressText.innerText = `Collecting ${message.fType} - ${message.downloaded || 0}mb / ${message.total}mb`;
                         }
 
-                        if (message.merging) {
+                        if (message.status === "merging") {
                             downloadBtn.innerText = "Wait";
-                            progressText.innerText = `Merging - ${Math.round(message.progress)}%`;
+                            progressText.innerText = `Merging...`;
                             progress.style.backgroundColor = '#e55';
-                            progress.style.width = `${Math.round(message.progress)}%`;
+                            progress.style.width = `${Math.round(message.progress) || 0}%`;
                         }
 
                         if (message.status === 'complete') {
@@ -533,12 +543,112 @@ async function fetchVideo() {
             }
         }
     } catch (err) {
-        errMsg.innerText = "Error fetching video info";
         document.getElementById("v").style.display = "none";
         vidCon.style.display = "none";
-        setTimeout(() => { errMsg.innerText = "" }, 7000);
+        fvTries++;
+        switch (fvTries) {
+            case 1: urlErr.innerText = "Could not fetch video. Try again?"; break;
+            case 2: urlErr.innerText = "Maybe it's your internet?"; break;
+            case 3: urlErr.innerText = "There might be something wrong going on with the app"; break;
+            case 4: urlErr.innerText = "Did you even try to reload?"; break;
+            default: urlErr.innerText = "Just try again later, man"; break;
+        }
+        setTimeout(() => { urlErr.innerText = "" }, fvTries === 3 ? 5000 : 4000);
         console.error("Error occured while fetching video: \n", err);
     } finally {
-        document.getElementById("check-info").disabled = false;
+        findInfo.disabled = false;
+    }
+}
+
+function playlistFindKey(event) { if (event.key === "Enter") fetchPlaylist() }
+
+let fpTries = 0;
+
+async function fetchPlaylist() {
+    const url = document.getElementById("playlist-url").value;
+
+    if (!url) {
+        playlistErr.innerText = "Where's the URL, dawg?";
+        setTimeout(() => { playlistErr.innerText = "" }, 3400 );
+        return
+    }
+
+    if (!url.includes("playlist?") || !url.includes("list=")) {
+        playlistErr.innerText = "That's not a valid YouTube playlist URL";
+        setTimeout(() => { playlistErr.innerText = "" }, 4000 );
+        return;
+    }
+
+    playCon.style.display = "block";
+
+    try {
+        findPlaylist.disabled = true;
+
+        const response = await fetch("https://api.yougra.site/playlist", { 
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url }) 
+        })
+
+        const rData = await response.json();
+        console.log(rData);
+
+        document.getElementById("loader-2").style.display = "none";
+        document.getElementById("p").style.display = "block";
+        document.getElementById("p-thumbnail").src = rData.thumbnail;
+        document.getElementById("p-title").innerText = rData.title;
+        document.getElementById("p-author").innerHTML = `<strong>By ~</strong> ${rData.author}`;
+        document.getElementById("a-amount").innerHTML = `<strong>Audio ~</strong> ${rData.songs.length}`;
+        document.getElementById("songs").innerHTML = rData.songs.map(song => {
+            return `
+                <div class="song">
+                    <span id="s-name" class="s-name">${song.title < 25 ? song.title : song.title.slice(0, 24) + "..."}</span>
+                    <span id="s-author">${song.author}</span>
+                    <span id="s-duration">${song.duration}</span>
+                </div>
+            `
+        }).join("");
+
+        const songCons = document.querySelectorAll(".song");
+        const songNames = document.querySelectorAll('.s-name');
+
+        songCons.forEach((song, index) => {
+            song.onclick = () => {
+                if (song.style.backgroundColor !== "rgba(238, 85, 85, 0.4)") {
+                    const songId = rData.songs[index].id;
+                    song.style.backgroundColor = "rgba(238, 85, 85, 0.4)";
+                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${"https://youtube.com/watch?v=" + songId}&album=${rData.title}&thumbnail=${rData.thumbnail}`;
+                    window.location.href = audioDownloadURL;
+                    setTimeout(() => {
+                        song.style.backgroundColor = "rgb(48, 48, 48, 0.7)";
+                    }, 10000);
+                }
+            }
+        });
+
+        songNames.forEach((title, index) => {
+            title.addEventListener("mousemove", (e) => {
+                titleTooltip.innerText = rData.songs[index].title;
+                titleTooltip.style.top = `${e.clientY - 35}px`;
+                titleTooltip.style.left = `${e.clientX - 17}px`;
+                titleTooltip.style.visibility = "visible";
+            })
+            title.addEventListener("mouseleave", () => titleTooltip.style.visibility = "hidden" )
+        });
+    } catch (error) {
+        playCon.style.display = "none";
+        document.getElementById("p").style.display = "none";
+        fpTries++;
+        switch (fpTries) {
+            case 1: playlistErr.innerText = "Could not fetch video. Try again?"; break;
+            case 2: playlistErr.innerText = "Maybe it's your internet?"; break;
+            case 3: playlistErr.innerText = "There might be something wrong going on with the app"; break;
+            case 4: playlistErr.innerText = "Did you even try to reload?"; break;
+            default: playlistErr.innerText = "Just try again later, man"; break;
+        }
+        setTimeout(() => { urlErr.innerText = "" }, fpTries === 3 ? 5000 : 4000);
+        console.error("Error occured while fetching playlist:", error);
+    } finally {
+        findPlaylist.disabled = false;
     }
 }
