@@ -641,8 +641,9 @@ async function fetchPlaylist() {
         switch (fpTries) {
             case 1: playlistErr.innerText = "Could not fetch video. Try again?"; break;
             case 2: playlistErr.innerText = "Maybe it's your internet?"; break;
-            case 3: playlistErr.innerText = "There might be something wrong going on with the app"; break;
-            case 4: playlistErr.innerText = "Did you even try to reload?"; break;
+            case 3: playlistErr.innerText = "Make sure the playlist is not private"; break;
+            case 4: playlistErr.innerText = "There might be something wrong going on with the app"; break;
+            case 5: playlistErr.innerText = "Did you even try to reload?"; break;
             default: playlistErr.innerText = "Just try again later, man"; break;
         }
         setTimeout(() => { urlErr.innerText = "" }, fpTries === 3 ? 5000 : 4000);

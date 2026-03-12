@@ -188,7 +188,7 @@ input[type="text"]:focus {
     cursor: pointer;
 }
 
-#find-info:hover {
+#search:hover, #find-info:hover, #find-list:hover {
     border-radius: 4px;
     background-color: #cc0000;
 }
