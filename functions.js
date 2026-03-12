@@ -591,7 +591,6 @@ async function fetchPlaylist() {
         })
 
         const rData = await response.json();
-        console.log(rData);
 
         document.getElementById("loader-2").style.display = "none";
         document.getElementById("p").style.display = "block";
@@ -615,9 +614,9 @@ async function fetchPlaylist() {
         songCons.forEach((song, index) => {
             song.onclick = () => {
                 if (song.style.backgroundColor !== "rgba(238, 85, 85, 0.4)") {
-                    const songId = rData.songs[index].id;
+                    const songURL = rData.songs[index].url;
                     song.style.backgroundColor = "rgba(238, 85, 85, 0.4)";
-                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${"https://youtube.com/watch?v=" + songId}&album=${rData.title}&thumbnail=${rData.thumbnail}`;
+                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&thumbnail=${rData.thumbnail}`;
                     window.location.href = audioDownloadURL;
                     setTimeout(() => {
                         song.style.backgroundColor = "rgb(48, 48, 48, 0.7)";
