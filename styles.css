@@ -522,7 +522,7 @@ input[type="text"]:focus {
 
 .song #s-name:hover { color: #888 }
 
-progress {
+.progress {
     height: 100%;
     position: absolute;
     top: 0;
