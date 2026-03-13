@@ -9,9 +9,7 @@ window.addEventListener("load", () => {
 const settingsNav = document.getElementById("settings-nav");
 const settings = document.getElementById("settings");
 const closeSettings = document.getElementById("close-settings");
-const dMethod = document.getElementById("d-method");
-const bugReport = document.getElementById("bug-report");
-const warning = document.getElementById("warning");
+const sets = document.querySelectorAll(".sets");
 const immediate = document.getElementById("immediate");
 const process = document.getElementById("process");
 
@@ -76,7 +74,7 @@ closeSettings.onclick = () => {
 
 containersOpened = [false, false];
 
-[dMethod, bugReport, warning].forEach((con, index) => {
+sets.forEach((con, index) => {
     con.onmouseover = () => {
         con.style.background = 'rgba(238, 119, 119, 0.1)';
     }
@@ -86,7 +84,7 @@ containersOpened = [false, false];
     con.onclick = () => {
         containersOpened[index] = !containersOpened[index];
 
-        [dMethod, bugReport, warning].forEach((conAgain, i) => {
+        sets.forEach((conAgain, i) => {
             if (i !== index && containersOpened[i]) {
                 containersOpened[i] = false;
                 conAgain.style.animation = 'minimise 1.2s ease forwards';

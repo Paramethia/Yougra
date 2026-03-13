@@ -50,7 +50,7 @@ header span:hover {
     color: #ee5555;
 }
 
-/* Help overlay styling */
+/* Settings overlay styling */
 
 #settings {
     visibility: hidden;
@@ -91,13 +91,12 @@ header span:hover {
     border: 2px dashed #ee7777;
     padding: 4px 7px;
     color: lightgray;
-}
-
-#settings #d-method { margin-top: 30px }
-#settings #bug-report, #settings #warning { margin-top: 11px }
-#settings div div {
     cursor: pointer;
 }
+
+#settings #url-help { margin-top: 30px }
+#settings #d-method, #settings #bug-report, #settings #warning { margin-top: 11px }
+
 #settings div div::-webkit-scrollbar {
     width: 4px;
 }
@@ -116,6 +115,11 @@ header span:hover {
     color: #aaa;
     font-size: 0.8rem;
 }
+#settings img {
+    width: 80%;
+    opacity: 0.5;
+}
+
 #immediate, #process {
     display: inline-block;
     width: 140px;
@@ -520,10 +524,10 @@ input[type="text"]:focus {
 /* Animations */
 
 @keyframes expand {
-    from { max-height: 57px } to { max-height: 420px; }
+    from { max-height: 57px } to { max-height: 420px }
 }
 @keyframes minimise {
-    from { max-height: 420px } to { max-height: 57px; }
+    from { max-height: 420px } to { max-height: 57px }
 }
 
 @keyframes border-light-up { 
@@ -604,6 +608,8 @@ input[type="text"]:focus {
         height: auto;
         transform: translateY(0);
     }
+
+    @keyframes expand { from { max-height: 57px } to { max-height: 320px } }
 }
 
 /* Smaller phones portrait view styling */
@@ -614,4 +620,6 @@ input[type="text"]:focus {
     #p-title { font-size: 14px }
     #p-author { font-size: 11px }
     #a-amount { font-size: 9px }
+
+    @keyframes expand { from { max-height: 57px } to { max-height: 270px } }
 }
