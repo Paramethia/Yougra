@@ -558,6 +558,14 @@ async function fetchVideo() {
     }
 }
 
+const pora = document.getElementById("p-or-a");
+
+setInterval(() => {
+    pora.innerText === "playlist" ? pora.innerText = "album" : pora.innerText = "playlist"
+    pora.style.animation = "appear 0.5s linear";
+    setTimeout(() => { pora.style.animation = "" }, 1000 )
+}, 10000 )
+
 function playlistFindKey(event) { if (event.key === "Enter") fetchPlaylist() }
 
 let fpTries = 0;
@@ -598,27 +606,40 @@ async function fetchPlaylist() {
         document.getElementById("a-amount").innerHTML = `<strong>Audio ~</strong> ${rData.songs.length}`;
         document.getElementById("songs").innerHTML = rData.songs.map(song => {
             return `
+                <div id="s">
+                <div class="progress"></div>
                 <div class="song">
-                    <span id="s-name" class="s-name">${song.title < 25 ? song.title : song.title.slice(0, 24) + "..."}</span>
+                    <span id="s-name" class="s-name">${song.title.length < 25 ? song.title : song.title.slice(0, 24) + "..."}</span>
                     <span id="s-author">${song.author}</span>
                     <span id="s-duration">${song.duration}</span>
+                </div>
                 </div>
             `
         }).join("");
 
         const songCons = document.querySelectorAll(".song");
         const songNames = document.querySelectorAll('.s-name');
+        const songProgress = document.querySelectorAll(".progress");
+        let timer;
 
         songCons.forEach((song, index) => {
             song.onclick = () => {
-                if (song.style.backgroundColor !== "rgba(238, 85, 85, 0.4)") {
+                if (songProgress[index].style.display !== "block") {
                     const songURL = rData.songs[index].url;
-                    song.style.backgroundColor = "rgba(238, 85, 85, 0.4)";
+                    songProgress[index].style.display = "block";
                     const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&thumbnail=${rData.thumbnail}`;
                     window.location.href = audioDownloadURL;
-                    setTimeout(() => {
-                        song.style.backgroundColor = "rgb(48, 48, 48, 0.7)";
-                    }, 10000);
+                    let seconds = 0;
+                    timer = setInterval(() => {
+                        if (seconds === 10) {
+                            songProgress[index].style.width = "0";
+                            songProgress[index].style.display = "none";
+                            clearInterval(timer);
+                            return
+                        }
+                        seconds++
+                        songProgress[index].style.width = `${seconds * 10}%`;
+                    }, 1000);
                 }
             }
         });
