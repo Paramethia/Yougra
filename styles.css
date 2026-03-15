@@ -197,7 +197,7 @@ input[type="text"]:focus {
     background-color: #cc0000;
 }
 
-#search-err-msg, #url-err-msg, #playlist-err-msg {
+#search-err-msg, #video-err-msg, #playlist-err-msg {
     font-size: 12px;
     color: #c00;
     font-weight: 600;
