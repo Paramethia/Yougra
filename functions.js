@@ -628,7 +628,7 @@ async function fetchPlaylist() {
                     songProgress[index].style.display = "block";
                     const songURL = rData.songs[index].url;
                     const track = { index: index + 1, total: rData.songs.length }
-                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&thumbnail=${rData.thumbnail}&track=${track}`;
+                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&thumbnail=${rData.thumbnail}&track=${JSON.stringify(track)}`;
                     window.location.href = audioDownloadURL;
                     let seconds = 0;
                     timer = setInterval(() => {
