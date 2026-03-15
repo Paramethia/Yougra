@@ -15,9 +15,9 @@ const process = document.getElementById("process");
 
 // === Modes elements ===
 const searchO = document.getElementById("search-o");
-const urlO = document.getElementById("url-o");
+const urlO = document.getElementById("link-o");
 const searchCon = document.getElementById("search-mode");
-const urlCon = document.getElementById("url-mode");
+const urlCon = document.getElementById("link-mode");
 
 // === Search elements ===
 const searchB = document.getElementById("search");
@@ -29,7 +29,7 @@ const titleTooltip = document.getElementById("title-tp");
 // === URL elements ===
     // Video elements
 const findInfo = document.getElementById("find-info");
-const urlErr = document.getElementById("url-err-msg");
+const videoErr = document.getElementById("video-err-msg");
 const selection = document.getElementById("selection-msg");
 const vidCon = document.getElementById("video-info");
 const optionsB = document.getElementById("d-options");
@@ -343,14 +343,14 @@ async function fetchVideo() {
     const url = document.getElementById("vid-link").value;
 
     if (!url) {
-        urlErr.innerText = "Where's the URL, dawg?";
-        setTimeout(() => { urlErr.innerText = "" }, 3000 );
+        videoErr.innerText = "Where's the link, dawg?";
+        setTimeout(() => { videoErr.innerText = "" }, 3000 );
         return;
     }
 
     if (!validURL(url)) {
-        urlErr.innerText = "That's not a valid YouTube URL";
-        setTimeout(() => { urlErr.innerText = "" }, 4500 );
+        videoErr.innerText = "That's not a valid YouTube link";
+        setTimeout(() => { videoErr.innerText = "" }, 4500 );
         return;
     }
 
@@ -545,13 +545,13 @@ async function fetchVideo() {
         vidCon.style.display = "none";
         fvTries++;
         switch (fvTries) {
-            case 1: urlErr.innerText = "Could not fetch video. Try again?"; break;
-            case 2: urlErr.innerText = "Maybe it's your internet?"; break;
-            case 3: urlErr.innerText = "There might be something wrong going on with the app"; break;
-            case 4: urlErr.innerText = "Did you even try to reload?"; break;
-            default: urlErr.innerText = "Just try again later, man"; break;
+            case 1: videoErr.innerText = "Could not fetch video. Try again?"; break;
+            case 2: videoErr.innerText = "Maybe it's your internet?"; break;
+            case 3: videoErr.innerText = "There might be something wrong going on with the app"; break;
+            case 4: videoErr.innerText = "Did you even try to reload?"; break;
+            default: videoErr.innerText = "Just try again later, man"; break;
         }
-        setTimeout(() => { urlErr.innerText = "" }, fvTries === 3 ? 5000 : 4000);
+        setTimeout(() => { videoErr.innerText = "" }, fvTries === 3 ? 5000 : 4000);
         console.error("Error occured while fetching video: \n", err);
     } finally {
         findInfo.disabled = false;
@@ -571,16 +571,16 @@ function playlistFindKey(event) { if (event.key === "Enter") fetchPlaylist() }
 let fpTries = 0;
 
 async function fetchPlaylist() {
-    const url = document.getElementById("playlist-url").value;
+    const url = document.getElementById("playlist-link").value;
 
     if (!url) {
-        playlistErr.innerText = "Where's the URL, dawg?";
+        playlistErr.innerText = "Where's the link, dawg?";
         setTimeout(() => { playlistErr.innerText = "" }, 3400 );
         return
     }
 
     if (!url.includes("playlist?") || !url.includes("list=")) {
-        playlistErr.innerText = "That's not a valid YouTube playlist URL";
+        playlistErr.innerText = "That's not a valid YouTube playlist link";
         setTimeout(() => { playlistErr.innerText = "" }, 4000 );
         return;
     }
@@ -625,9 +625,10 @@ async function fetchPlaylist() {
         songCons.forEach((song, index) => {
             song.onclick = () => {
                 if (songProgress[index].style.display !== "block") {
-                    const songURL = rData.songs[index].url;
                     songProgress[index].style.display = "block";
-                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&thumbnail=${rData.thumbnail}`;
+                    const songURL = rData.songs[index].url;
+                    const track = { index: index + 1, total: rData.songs.length }
+                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&thumbnail=${rData.thumbnail}&track=${track}`;
                     window.location.href = audioDownloadURL;
                     let seconds = 0;
                     timer = setInterval(() => {
@@ -658,14 +659,14 @@ async function fetchPlaylist() {
         document.getElementById("p").style.display = "none";
         fpTries++;
         switch (fpTries) {
-            case 1: playlistErr.innerText = "Could not fetch video. Try again?"; break;
+            case 1: playlistErr.innerText = "Could not fetch playlist. Try again?"; break;
             case 2: playlistErr.innerText = "Maybe it's your internet?"; break;
             case 3: playlistErr.innerText = "Make sure the playlist is not private"; break;
             case 4: playlistErr.innerText = "There might be something wrong going on with the app"; break;
             case 5: playlistErr.innerText = "Did you even try to reload?"; break;
             default: playlistErr.innerText = "Just try again later, man"; break;
         }
-        setTimeout(() => { urlErr.innerText = "" }, fpTries === 3 ? 5000 : 4000);
+        setTimeout(() => { playlistErr.innerText = "" }, fpTries === 3 ? 5000 : 4000);
         console.error("Error occured while fetching playlist:", error);
     } finally {
         findPlaylist.disabled = false;

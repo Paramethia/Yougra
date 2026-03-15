@@ -94,7 +94,7 @@ header span:hover {
     cursor: pointer;
 }
 
-#settings #url-help { margin-top: 30px }
+#settings #link-help { margin-top: 30px }
 #settings #d-method, #settings #bug-report, #settings #warning { margin-top: 11px }
 
 #settings div div::-webkit-scrollbar {
@@ -166,7 +166,7 @@ h4 { color: lightgray }
     color: #e33;
 }
 
-#url-mode { display: none }
+#link-mode { display: none }
 
 input[type="text"] {
     width: 60%;
@@ -202,6 +202,17 @@ input[type="text"]:focus {
     color: #c00;
     font-weight: 600;
 }
+
+#info {
+    max-width: 600px;
+    margin: 17px auto;
+    text-align: left;
+}
+
+#info h4 { margin: 15px 0 }
+#info h4, #info p { color: #9f9f9f; }
+
+#info p { font-size: 0.8rem }
 
 #video-info, #search-results, #playlist-info {
     display: none;

@@ -29,16 +29,16 @@
 	<div id="settings">
 		<div>
 			<i id="close-settings" class="fa-xl fa-solid fa-circle-xmark"></i>
-			<div class="sets" id="url-help">
-				<h3>How to get a playlist URL?</h3>
+			<div class="sets" id="link-help">
+				<h3>How to get an album link?</h3>
 
 				<h4>Mobile</h4>
 				<img src="./images/Mobile help.jpeg" alt="Mobile help"/>
-				<p>Go to the album you wanna download on YouTube music, tap the share icon, and choose to copy. There you go. Now you have the URL.</p>
+				<p>Go to the album you wanna download on YouTube music, tap the share icon, and choose to copy. There you go. Now you have the link.</p>
 
 				<h4>Computer</h4>
 				<img src="./images/PC help.jpeg" alt="PC help"/>
-				<p>While scrolling looking at a list of albums on YouTube music on PC, just click those 3 dots and you should see an option to share and copy the URL.</p>
+				<p>While scrolling looking at a list of albums on YouTube music on PC, just click those 3 dots and you should see an option to share and copy the link.</p>
 			</div>
 			<div class="sets" id="d-method">
 				<h3>Download method</h3>
@@ -65,11 +65,11 @@
 		</div>
 	</div>
 	<main>
-		<span id="version"> Beta 1.6.2 </span>
+		<span id="version"> Beta 1.6.3 </span>
 
 		<div id="modes">
 			<span id="search-o">Search</span>
-			<span id="url-o">Use link</span>
+			<span id="link-o">Use link</span>
 		</div>
 
 		<div id="search-mode">
@@ -81,15 +81,24 @@
 			<div id="search-results">
 				<div id="vids"></div>
 			</div>
+
+			<br />
+			<div id="info">
+				<h4>What is Yougra about?</h4>
+				<p>This is a a web app you can use to download videos, music videos, songs etc. Simply search for what you want above, and click the video that you want to download as either video or audio. There will be options that you can choose for video quality once you have clicked the video you want to download.</p>
+				<h4>Help</h4>
+				<p>Aside from searching for what you want, you can directly add the exact youtube video/song link in the "Use link" section that you should see right above the search bar on the right. In this section, you will also find that you can put in youtube playlist or album links. These are only downloadable as audio though. You can find out how to get a playlist link in settings at the top right (the gear icon).</p>
+				<p>Speaking of settings, you will find download methods there for <strong>videos</strong>. There will be an "Immediate" and "Processs" method. By default, it will be set to process method. You can switch anytime. These 2 methods will be explained in the settings.</p>
+			</div>
 		</div>
 		<div id="title-tp"></div>
 		 
-		<div id="url-mode">
+		<div id="link-mode">
 			<div id="v-info">
-				<h4>Enter a YouTube video/song URL:</h4>
+				<h4>Enter a YouTube video/song link:</h4>
 				<input type="text" id="vid-link" placeholder="https://youtube.com/watch?v=SvwfkTmyHFU">
 				<button id="find-info" aria-label="Find YouTube video" onclick="fetchVideo()">Find it</button>
-				<p id="url-err-msg"></p>
+				<p id="video-err-msg"></p>
 				<br />
 				<div id="video-info">
 					<div id="loader-1" class="loader"></div>
@@ -120,8 +129,8 @@
 			</div>
 			<hr id ="hl" color="#e55" />
 			<div id="playlist">
-				<h4>Enter a YouTube <span id="p-or-a">playlist</span> URL:</h4>
-				<input type="text" id="playlist-url" placeholder="https://www.youtube.com/playlist?list=PLQwL0_xxmc6zA0fnVvP8Vpy6gb3R96ZoQ">
+				<h4>Enter a YouTube <span id="p-or-a">playlist</span> link:</h4>
+				<input type="text" id="playlist-link" placeholder="https://www.youtube.com/playlist?list=PLQwL0_xxmc6zA0fnVvP8Vpy6gb3R96ZoQ">
 				<button id="find-list" aria-label="Find YouTube playlist" onclick="fetchPlaylist()">Find it</button>
 				<p id="playlist-err-msg"></p>
 				
