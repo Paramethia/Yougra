@@ -409,14 +409,21 @@ async function fetchVideo() {
         selection.style.visibility = "visible";
         selection.style.animation = "appear 2s linear";
 
-        if (data.song) format = "audio"
+        format = data.song ? "audio" : "video";
+        selection.innerText = `Selected ${format}`;
+
         if (format === 'audio') {
-            selection.innerText = "Selected audio";
             audSet.style.background = '#5d5d5d';
             vidSet.style.background = '#3f3f3f';
             document.getElementById("v-size").style.display = 'none';
             document.getElementById("a-size").style.display = 'inline';
             document.getElementById("qualities").style.display = 'none';
+        } else {
+            vidSet.style.background = '#5d5d5d';
+            audSet.style.background = '#3f3f3f';
+            document.getElementById("v-size").style.display = 'inline';
+            document.getElementById("a-size").style.display = 'none';
+            document.getElementById("qualities").style.display = 'inline-block';
         }
 
         setTimeout(() => { 
@@ -628,7 +635,7 @@ async function fetchPlaylist() {
                     songProgress[index].style.display = "block";
                     const songURL = rData.songs[index].url;
                     const track = { index: index + 1, total: rData.songs.length }
-                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&thumbnail=${rData.thumbnail}&track=${JSON.stringify(track)}`;
+                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&aArtist=${rData.author}&thumbnail=${rData.thumbnail}&track=${JSON.stringify(track)}`;
                     window.location.href = audioDownloadURL;
                     let seconds = 0;
                     timer = setInterval(() => {
