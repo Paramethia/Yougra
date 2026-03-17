@@ -220,7 +220,7 @@ async function search() {
                     <img src="${video.thumbnail}" />
                     <span id="duration">${video.duration}</span>
                 </div>
-                <h4 class="v-title">${video.title.length < 29 ? video.title : video.title.slice(0, 28) + "..."}</h4>
+                <h4 class="v-title">${video.title.length < 29 ? video.title : video.title.slice(0, 28).trimEnd() + "..."}</h4>
                 <h6>${video.author}</h6> <font color="#909090">|</font> <span id="views">${video.views}</span>
                 <span class="share"><svg width="17" height="17" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="#aaa"><g id="Layer_2" data-name="Layer 2"><g id="invisible_box" data-name="invisible box"><rect width="48" height="48" fill="none"/></g><g id="Q3_icons" data-name="Q3 icons"><path d="M31.2,14.2,41,24.1l-9.8,9.8V26.8L27,27c-6.8.3-12,1-16.1,2.4,3.6-3.8,9.3-6.8,16.7-7.5l3.6-.3V14.2M28.3,6a1.2,1.2,0,0,0-1.1,1.3V17.9C12,19.4,2.2,29.8,2,40.3c0,.6.2,1,.6,1s.7-.3,1.1-1.1c2.4-5.4,7.8-8.5,23.5-9.2v9.7A1.2,1.2,0,0,0,28.3,42a.9.9,0,0,0,.8-.4L45.6,25.1a1.5,1.5,0,0,0,0-2L29.1,6.4a.9.9,0,0,0-.8-.4Z"/></g></g></svg></span>
             </div>
@@ -605,10 +605,24 @@ async function fetchPlaylist() {
 
         const rData = await response.json();
 
+        if (!rData.songs.length) {
+            console.warn("No songs were served. Retrying request...");
+            findPlaylist.disabled = false;
+            fetchPlaylist();
+            return
+        }
+
+        let maxText = 65;
+        if (screen.width <= 450 || window.innerWidth <= 450) {
+            maxText = 30
+        } else if (screen.width <= 790 || window.innerWidth <= 790) {
+            maxText = 37
+        } else if (screen.width <= 1070 || window.innerWidth <= 1070) maxText = 45
+
         document.getElementById("loader-2").style.display = "none";
         document.getElementById("p").style.display = "block";
         document.getElementById("p-thumbnail").src = rData.thumbnail;
-        document.getElementById("p-title").innerText = rData.title;
+        document.getElementById("p-title").innerText = rData.title.length > maxText ? rData.title.slice(0, maxText).trimEnd() + "..." : rData.title;
         document.getElementById("p-author").innerHTML = `<strong>By ~</strong> ${rData.author}`;
         document.getElementById("a-amount").innerHTML = `<strong>Audio ~</strong> ${rData.songs.length}`;
         document.getElementById("songs").innerHTML = rData.songs.map(song => {
@@ -616,7 +630,7 @@ async function fetchPlaylist() {
                 <div id="s">
                 <div class="progress"></div>
                 <div class="song">
-                    <span id="s-name" class="s-name">${song.title.length < 25 ? song.title : song.title.slice(0, 24) + "..."}</span>
+                    <span id="s-name" class="s-name">${song.title.length < 25 ? song.title : song.title.slice(0, 24).trimEnd() + "..."}</span>
                     <span id="s-author">${song.author}</span>
                     <span id="s-duration">${song.duration}</span>
                 </div>
@@ -627,21 +641,26 @@ async function fetchPlaylist() {
         const songCons = document.querySelectorAll(".song");
         const songNames = document.querySelectorAll('.s-name');
         const songProgress = document.querySelectorAll(".progress");
-        let timer;
+        const onGoingDownloads = [];
+        for (let i = 0; i < rData.songs.length; i++) {
+            onGoingDownloads.push('');
+        }
 
         songCons.forEach((song, index) => {
             song.onclick = () => {
-                if (songProgress[index].style.display !== "block") {
+                if (!onGoingDownloads.includes("going")) {
                     songProgress[index].style.display = "block";
                     const songURL = rData.songs[index].url;
                     const track = { index: index + 1, total: rData.songs.length }
                     const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&aArtist=${rData.author}&thumbnail=${rData.thumbnail}&track=${JSON.stringify(track)}`;
                     window.location.href = audioDownloadURL;
+                    onGoingDownloads[index] = "going";
                     let seconds = 0;
-                    timer = setInterval(() => {
+                    const timer = setInterval(() => {
                         if (seconds === 10) {
                             songProgress[index].style.width = "0";
                             songProgress[index].style.display = "none";
+                            onGoingDownloads[index] = "";
                             clearInterval(timer);
                             return
                         }
