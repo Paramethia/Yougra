@@ -356,7 +356,7 @@ input[type="text"]:focus {
     left: 9px;
 }
 
-#d-options {
+#v-d-options-b, #p-d-options-b {
     float: right;
     margin-top: 2px;
     border-radius: 50%;
@@ -366,7 +366,7 @@ input[type="text"]:focus {
     cursor: pointer;
     animation: border-light-up 0.7s linear 1.5s 3;
 }
-#d-options svg { margin-top: 2px }
+#v-d-options-b svg, #p-d-options-b svg { margin-top: 3px }
 
 #selection-msg {
     float: right;
@@ -379,8 +379,7 @@ input[type="text"]:focus {
     color: #ccc;
 }
 
-#options {
-    display: none;
+#v-d-options {
     position: absolute;
     top: 0;
     right: 0;
@@ -392,16 +391,16 @@ input[type="text"]:focus {
     color: lightgray;
     z-index: 2;
 }
-#options p, #options #vid-o, #options #aud-o {
+#v-d-options p, #v-d-options #vid-o, #v-d-options #aud-o {
     margin: 0;
     padding: 5px 0;
 }
-#options #vid-o:hover, #options #aud-o:hover { 
+#v-d-options #vid-o:hover, #v-d-options #aud-o:hover { 
     cursor: pointer;
     background-color: #5d5d5d;
 }
-#options #vid-o { background-color: #5d5d5d }
-#options span {
+#v-d-options #vid-o { background-color: #5d5d5d }
+#v-d-options span {
     padding: 2px;
     font-size: 13px;
     font-weight: 700;
@@ -409,7 +408,7 @@ input[type="text"]:focus {
     border-top: 1px solid #f5353c;
 }
 #a-size { display: none }
-#options select {
+#v-d-options select {
     width: 70px;
     max-height: 32px;
     padding: 4px;
@@ -419,8 +418,8 @@ input[type="text"]:focus {
     text-align: center;
     color: lightgray;
 }
-#options select:focus { outline: none }
-#options select:hover { 
+#v-d-options select:focus { outline: none }
+#v-d-options select:hover { 
     cursor: pointer;
     border: 2px inset #cc0000;
 }
@@ -444,7 +443,7 @@ input[type="text"]:focus {
     color: #ccc;
 }
 
-#download {
+#download, #download-all {
     position: absolute;
     bottom: 8px;
     right: 8px;
@@ -456,7 +455,7 @@ input[type="text"]:focus {
     font-weight: 600;
     color: #0f0f0f;
 }
-#download:hover {
+#download:hover, #download-all:hover {
     cursor: pointer;
     background-color: lightgray;
 }
@@ -506,13 +505,45 @@ input[type="text"]:focus {
     color: lightgray;
 }
 
-#p { display: none }
+#p { 
+    display: none;
+    position: relative;
+}
 
 #p-title, #p-author, #a-amount { margin: 5px 0 }
 #p-author { font-size: 13px }
 #a-amount { font-size: 11px }
 
+#p-d-options-b { border: 1px solid #555 }
+#p-d-options {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    max-width: 350px;
+    border-radius: 9px;
+    padding: 8px;
+    background-color: #3f3f3f;
+    Z-index: 2;
+}
+#p-d-options p {
+    font-size: 14px;
+    color: lightgray;
+    margin: 0;
+    padding: 5px 0;
+}
+#p-d-options button {
+    position: static;
+}
+
 #s { position: relative }
+#s-number { 
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #e55;
+}
 .song {
     display: flex;
     justify-content: space-between;

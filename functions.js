@@ -32,8 +32,8 @@ const findInfo = document.getElementById("find-info");
 const videoErr = document.getElementById("video-err-msg");
 const selection = document.getElementById("selection-msg");
 const vidCon = document.getElementById("video-info");
-const optionsB = document.getElementById("d-options");
-const options = document.getElementById("options");
+const vdOptionsB = document.getElementById("v-d-options-b");
+const vdOptions = document.getElementById("v-d-options");
 const vidSet = document.getElementById("vid-o");
 const audSet = document.getElementById("aud-o");
 
@@ -41,6 +41,8 @@ const audSet = document.getElementById("aud-o");
 const findPlaylist = document.getElementById("find-list");
 const playlistErr = document.getElementById("playlist-err-msg");
 const playCon = document.getElementById("playlist-info");
+const pdOptionsB = document.getElementById("p-d-options-b");
+const pdOptions = document.getElementById("p-d-options");
 
 // === Settings overlay UI functions ===
 
@@ -161,7 +163,7 @@ function urlMode() {
     window.addEventListener("keydown", playlistFindKey);
 }
 
-// === Search function ===
+// === Search section functions ===
 
 let searchTries = 0;
 
@@ -275,7 +277,7 @@ function searchKey(event) { if (event.key === "Enter") search() }
 
 window.addEventListener("keydown", searchKey);
  
-// === URL functions ===
+// === Link section functions ===
 
 function validURL(url) {
     return (
@@ -285,27 +287,40 @@ function validURL(url) {
     );
 }
 
-let dOptionsOpened = false;
+vdOptions.style.display = "none";
+pdOptions.style.display = "none";
 
 document.addEventListener("click", event => {
-    if (dOptionsOpened && !options.contains(event.target) && event.target !== document.getElementById('d-option') && event.target !== document.getElementById('dots')) {
-        optionsB.style.background = '#2a2a2a';
-        options.style.display = 'none';
-        dOptionsOpened = false;
+    if (vdOptions.style.display === "block" && !vdOptions.contains(event.target) && event.target !== vdOptionsB && event.target !== document.getElementById('dots')) {
+        vdOptionsB.style.background = '#2a2a2a';
+        vdOptions.style.display = 'none';
+    } else if (pdOptions.style.display === "block" && !pdOptions.contains(event.target) && event.target !== pdOptionsB && event.target !== document.getElementById('dots')) {
+        pdOptionsB.style.background = '#2a2a2a';
+        pdOptions.style.display = 'none';
     }
 });
 
-optionsB.onmouseover = () => { optionsB.style.background = '#3f3f3f' }
-optionsB.onmouseout = () => { if (!dOptionsOpened) optionsB.style.background = '#2a2a2a' }
+vdOptionsB.onmouseover = () => { vdOptionsB.style.background = '#3f3f3f' }
+vdOptionsB.onmouseout = () => { if (vdOptions.style.display !== "block") vdOptionsB.style.background = '#2a2a2a' }
+pdOptionsB.onmouseover = () => { pdOptionsB.style.background = '#3f3f3f' }
+pdOptionsB.onmouseout = () => { if (pdOptions.style.display !== "block") pdOptionsB.style.background = '#2a2a2a' }
 
-function toggleDownloadOptions() {
-    dOptionsOpened = !dOptionsOpened;
-    if (dOptionsOpened) { 
-        optionsB.style.background = '#3f3f3f';
-        options.style.display = 'block';
+function toggleVdownloadOptions() {
+    if (vdOptions.style.display === "none") { 
+        vdOptionsB.style.background = '#3f3f3f';
+        setTimeout(() => { vdOptions.style.display = 'block' }, 250);
     } else {
-        optionsB.style.background = '#2a2a2a';
-        options.style.display = 'none';
+        vdOptionsB.style.background = '#2a2a2a';
+        vdOptions.style.display = 'none';
+    }
+}
+function togglePdownloadOptions() {
+    if (pdOptions.style.display === "none") { 
+        pdOptionsB.style.background = '#3f3f3f';
+        setTimeout(() => { pdOptions.style.display = 'block' }, 250); 
+    } else {
+        pdOptionsB.style.background = '#2a2a2a';
+        pdOptions.style.display = 'none';
     }
 }
 
@@ -447,7 +462,7 @@ async function fetchVideo() {
         const progress = document.getElementById("progress");
         downloadBtn.onclick = async () => {
             downloadBtn.disabled = true;
-            downloadBtn.style.filter = "brightness(90%)";
+            downloadBtn.style.filter = "brightness(80%)";
             progress.style.width = "0%";
 
             try {
@@ -458,7 +473,7 @@ async function fetchVideo() {
                     setTimeout(() => {
                         downloadBtn.disabled = false;
                         downloadBtn.style.filter = "brightness(100%)";
-                    }, 10000)
+                    }, 10000 + parseFloat(selectedAudio.size) * 1000)
                 } else if (format === "video") {
                     if (method === "fast") {
                         window.location.href = `https://api.yougra.site/fast-download?url=${encodeURIComponent(url)}&itag=${itag}`;
@@ -625,10 +640,11 @@ async function fetchPlaylist() {
         document.getElementById("p-title").innerText = rData.title.length > maxText ? rData.title.slice(0, maxText).trimEnd() + "..." : rData.title;
         document.getElementById("p-author").innerHTML = `<strong>By ~</strong> ${rData.author}`;
         document.getElementById("a-amount").innerHTML = `<strong>Audio ~</strong> ${rData.songs.length}`;
-        document.getElementById("songs").innerHTML = rData.songs.map(song => {
+        document.getElementById("songs").innerHTML = rData.songs.map((song, index) => {
             return `
                 <div id="s">
                 <div class="progress"></div>
+                <span id="s-number">${index + 1}</span>
                 <div class="song">
                     <span id="s-name" class="s-name">${song.title.length < 25 ? song.title : song.title.slice(0, 24).trimEnd() + "..."}</span>
                     <span id="s-author">${song.author}</span>
@@ -680,6 +696,25 @@ async function fetchPlaylist() {
             })
             title.addEventListener("mouseleave", () => titleTooltip.style.visibility = "hidden" )
         });
+
+        const downloadBtn = document.getElementById("download-all");
+
+        downloadBtn.onclick = function downloadRecurringly() {
+            downloadBtn.disabled = true;
+            downloadBtn.style.filter = "brightness(80%)";
+            let currentSong = 0;
+            songCons[currentSong].onclick();
+            const downloads = setInterval(() => {
+                if (currentSong === rData.songs.length - 1) {
+                    downloadBtn.disabled = false;
+                    downloadBtn.style.filter = "brightness(100%)";
+                    clearInterval(downloads);
+                    return
+                }
+                currentSong++;
+                songCons[currentSong].onclick();
+            }, 12000)
+        }
     } catch (error) {
         playCon.style.display = "none";
         document.getElementById("p").style.display = "none";
