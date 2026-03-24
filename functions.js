@@ -287,6 +287,8 @@ function validURL(url) {
     );
 }
 
+let pdo = false;
+
 vdOptions.style.display = "none";
 pdOptions.style.display = "none";
 
@@ -294,9 +296,8 @@ document.addEventListener("click", event => {
     if (vdOptions.style.display === "block" && !vdOptions.contains(event.target) && event.target !== vdOptionsB && event.target !== document.getElementById('dots')) {
         vdOptionsB.style.background = '#2a2a2a';
         vdOptions.style.display = 'none';
-    } else if (pdOptions.style.display === "block" && !pdOptions.contains(event.target) && event.target !== pdOptionsB && event.target !== document.getElementById('dots')) {
-        pdOptionsB.style.background = '#2a2a2a';
-        pdOptions.style.display = 'none';
+    } else if (pdo && !pdOptions.contains(event.target) && event.target !== pdOptionsB && event.target !== document.getElementById('dots')) {
+        togglePdownloadOptions();
     }
 });
 
@@ -308,7 +309,7 @@ pdOptionsB.onmouseout = () => { if (pdOptions.style.display !== "block") pdOptio
 function toggleVdownloadOptions() {
     if (vdOptions.style.display === "none") { 
         vdOptionsB.style.background = '#3f3f3f';
-        setTimeout(() => { vdOptions.style.display = 'block' }, 250);
+        vdOptions.style.display = 'block';
     } else {
         vdOptionsB.style.background = '#2a2a2a';
         vdOptions.style.display = 'none';
@@ -317,10 +318,12 @@ function toggleVdownloadOptions() {
 function togglePdownloadOptions() {
     if (pdOptions.style.display === "none") { 
         pdOptionsB.style.background = '#3f3f3f';
-        setTimeout(() => { pdOptions.style.display = 'block' }, 250); 
+        pdOptions.style.display = 'block';
+        setTimeout(() => { pdo = true }, 150);
     } else {
         pdOptionsB.style.background = '#2a2a2a';
         pdOptions.style.display = 'none';
+        pdo = false;
     }
 }
 
@@ -668,7 +671,7 @@ async function fetchPlaylist() {
                     songProgress[index].style.display = "block";
                     const songURL = rData.songs[index].url;
                     const track = { index: index + 1, total: rData.songs.length }
-                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&aArtist=${rData.author}&thumbnail=${rData.thumbnail}&track=${JSON.stringify(track)}`;
+                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&aArtist=${rData.author}&thumbnail=${rData.thumbnail.replaceAll("&", "^")}&track=${JSON.stringify(track)}`;
                     window.location.href = audioDownloadURL;
                     onGoingDownloads[index] = "going";
                     let seconds = 0;
