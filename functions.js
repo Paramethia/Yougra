@@ -418,7 +418,7 @@ async function fetchVideo() {
         `;
         document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${selectedAudio.size}</span></p>`;
         document.getElementById("v-title").innerText = data.title;
-        document.getElementById("video-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
+        document.getElementById("v-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
         document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${data.publishDate}`;
         document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
         document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
@@ -670,8 +670,14 @@ async function fetchPlaylist() {
                 if (!onGoingDownloads.includes("going")) {
                     songProgress[index].style.display = "block";
                     const songURL = rData.songs[index].url;
-                    const track = { index: index + 1, total: rData.songs.length }
-                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&album=${rData.title}&aArtist=${rData.author}&thumbnail=${rData.thumbnail.replaceAll("&", "^")}&track=${JSON.stringify(track)}`;
+                    const songArtist = rData.songs[index].author;
+                    const album = {
+                        title: rData.title,
+                        artist: rData.author,
+                        coverImage: rData.thumbnail.replaceAll("&", "^"),
+                        tracks: { index: index + 1, total: rData.songs.length }
+                    }
+                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&sArtist=${songArtist}&playlist=${JSON.stringify(album)}`;
                     window.location.href = audioDownloadURL;
                     onGoingDownloads[index] = "going";
                     let seconds = 0;
