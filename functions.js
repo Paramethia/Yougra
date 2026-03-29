@@ -218,7 +218,7 @@ async function search() {
     vidsCon.innerHTML = videos.map((video) => { 
         return `
             <div class="video">
-                <div style="position: relative">
+                <div style="max-height: 175px; position: relative">
                     <img src="${video.thumbnail}" />
                     <span id="duration">${video.duration}</span>
                 </div>
@@ -647,7 +647,7 @@ async function fetchPlaylist() {
             return `
                 <div id="s">
                 <div class="progress"></div>
-                <span id="s-number">${index + 1}</span>
+                <span class="s-number">${index + 1}</span>
                 <div class="song">
                     <span id="s-name" class="s-name">${song.title.length < 25 ? song.title : song.title.slice(0, 24).trimEnd() + "..."}</span>
                     <span id="s-author">${song.author}</span>
@@ -658,6 +658,7 @@ async function fetchPlaylist() {
         }).join("");
 
         const songCons = document.querySelectorAll(".song");
+        const songIndexes = document.querySelectorAll(".s-number");
         const songNames = document.querySelectorAll('.s-name');
         const songProgress = document.querySelectorAll(".progress");
         const onGoingDownloads = [];
@@ -665,24 +666,25 @@ async function fetchPlaylist() {
             onGoingDownloads.push('');
         }
 
-        songCons.forEach((song, index) => {
-            song.onclick = () => {
+        songCons.forEach((songEl, index) => {
+            songEl.onclick = () => {
                 if (!onGoingDownloads.includes("going")) {
                     songProgress[index].style.display = "block";
-                    const songURL = rData.songs[index].url;
-                    const songArtist = rData.songs[index].author;
+                    const song = rData.songs[index];
                     const album = {
                         title: rData.title,
                         artist: rData.author,
                         coverImage: rData.thumbnail.replaceAll("&", "^"),
                         tracks: { index: index + 1, total: rData.songs.length }
                     }
-                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${songURL}&sArtist=${songArtist}&playlist=${JSON.stringify(album)}`;
+                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${song.url}&sArtist=${song.author}&playlist=${JSON.stringify(album)}`;
                     window.location.href = audioDownloadURL;
                     onGoingDownloads[index] = "going";
+                    songIndexes[index].style.color = "#e55";
                     let seconds = 0;
+                    const totalSeconds = 10 + parseInt(song.duration[0]);
                     const timer = setInterval(() => {
-                        if (seconds === 10) {
+                        if (seconds >= totalSeconds) {
                             songProgress[index].style.width = "0";
                             songProgress[index].style.display = "none";
                             onGoingDownloads[index] = "";
@@ -690,7 +692,7 @@ async function fetchPlaylist() {
                             return
                         }
                         seconds++
-                        songProgress[index].style.width = `${seconds * 10}%`;
+                        songProgress[index].style.width = `${Math.round(seconds / totalSeconds * 100)}%`;
                     }, 1000);
                 }
             }
@@ -722,7 +724,7 @@ async function fetchPlaylist() {
                 }
                 currentSong++;
                 songCons[currentSong].onclick();
-            }, 12000)
+            }, 20000)
         }
     } catch (error) {
         playCon.style.display = "none";

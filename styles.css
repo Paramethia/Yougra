@@ -256,7 +256,7 @@ input[type="text"]:focus {
 }
 .video:hover { 
     transition: 0.5s; 
-    background-color: #303030 
+    background-color: rgba(238, 85, 85, 0.2);
 }
 
 .video img { 
@@ -537,13 +537,13 @@ input[type="text"]:focus {
 }
 
 #s { position: relative }
-#s-number { 
+.s-number { 
     position: absolute;
     top: 5px;
     left: 5px;
     font-size: 0.6rem;
     font-weight: 700;
-    color: #e55;
+    color: lightgray;
 }
 .song {
     display: flex;
