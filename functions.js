@@ -218,7 +218,7 @@ async function search() {
     vidsCon.innerHTML = videos.map((video) => { 
         return `
             <div class="video">
-                <div style="max-height: 175px; position: relative">
+                <div style="min-height: 150px; min-width: 200px; position: relative; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
                     <img src="${video.thumbnail}" />
                     <span id="duration">${video.duration}</span>
                 </div>

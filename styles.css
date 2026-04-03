@@ -262,6 +262,7 @@ input[type="text"]:focus {
 .video img { 
     width: 100%;
     border-radius: 5px;
+    margin-top: 3px;
 }
 
 #duration, #length {
