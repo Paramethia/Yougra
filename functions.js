@@ -13,6 +13,14 @@ const sets = document.querySelectorAll(".sets");
 const immediate = document.getElementById("immediate");
 const process = document.getElementById("process");
 
+// === Error overlay elements ===
+
+const errorOverlay = document.getElementById("error");
+const closeError = document.getElementById("close-error");
+const errorTitle = document.getElementById("err-title");
+const errorMsg = document.getElementById("err-msg");
+
+
 // === Modes elements ===
 const searchO = document.getElementById("search-o");
 const urlO = document.getElementById("link-o");
@@ -130,6 +138,16 @@ process.onclick = () => {
         method = "process";
         localStorage.setItem("method", method);
     }
+}
+
+// === Error overlay UI functions ===
+
+closeError.onclick = () => { errorOverlay.style.visibility = 'hidden' }
+
+function showError(eT = "Server error", eM = "Something is wrong with the server :(") {
+    errorOverlay.style.visibility = "visible";
+    errorTitle.innerText = eT;
+    errorMsg.innerText = eM;
 }
 
 // === Search and Use link mode code ===
@@ -375,8 +393,12 @@ async function fetchVideo() {
     vidCon.style.display = "inline-block";
 
     function formatTime(seconds) {
-        const mins = Math.floor(seconds / 60);
+        const hours = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
         const secs = seconds % 60;
+
+        if (hours) return `${hours}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+
         return `${mins}:${secs.toString().padStart(2, "0")}`;
     }
 
@@ -390,6 +412,10 @@ async function fetchVideo() {
         });
 
         const data = await response.json();
+        if (data.errorTitle && data.errorMessage) {
+            showError(data.errorTitle, data.errorMessage)
+            return
+        }
 
         const views = new Intl.NumberFormat('fr-FR').format(data.viewCount);
         const likes = new Intl.NumberFormat('fr-FR').format(data.likeCount);
@@ -470,8 +496,27 @@ async function fetchVideo() {
 
             try {
                 if (format === "audio") {
-                    // Trigger download via native browser stream
-                    window.location.href = `https://api.yougra.site/download-a?url=${encodeURIComponent(url)}`;
+                    // Trigger download via native browser stream & an ancor tag
+                    const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(url)}`);
+
+                    if (!res.ok) {
+                        const resJ = await res.json();
+                        downloadBtn.disabled = false;
+                        downloadBtn.style.filter = "brightness(100%)";
+                        showError(resJ.errorTitle, resJ.errorMessage);
+                        return
+                    }
+                    const blob = await res.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+
+                    const a = document.createElement("a");
+                    a.href = downloadUrl;
+                    a.download = `${data.title}.mp3`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+
+                    window.URL.revokeObjectURL(downloadUrl);
 
                     setTimeout(() => {
                         downloadBtn.disabled = false;
@@ -480,6 +525,7 @@ async function fetchVideo() {
                 } else if (format === "video") {
                     if (method === "fast") {
                         window.location.href = `https://api.yougra.site/fast-download?url=${encodeURIComponent(url)}&itag=${itag}`;
+
                         setTimeout(() => {
                             downloadBtn.disabled = false;
                             downloadBtn.style.filter = "brightness(100%)";
@@ -489,6 +535,8 @@ async function fetchVideo() {
 
                     const size = parseInt(document.getElementById("v-size").innerText);
                     if (size > 5000) {
+                        downloadBtn.disabled = false;
+                        downloadBtn.style.filter = "brightness(100%)";
                         progressText.innerText = "You can't download a video larger than 5GB with processing.";
                         return
                     }
@@ -507,8 +555,8 @@ async function fetchVideo() {
                     ws.onmessage = (event) => {
                         const message = JSON.parse(event.data);
                         
-                        if (message.error) {
-                            progressText.innerText = "Processing failed. Try with a different video.";
+                        if (message.errorTitle && message.errorMessage) {
+                            showError(message.errorTitle, message.errorMessage);
                             downloadBtn.disabled = false;
                             downloadBtn.style.filter = "brightness(100%)";
                             setTimeout(() => { progressText.innerText = "" }, 4000);
@@ -622,6 +670,10 @@ async function fetchPlaylist() {
         })
 
         const rData = await response.json();
+        if (rData.errorTitle && rData.errorMessage) {
+            showError(rData.errorTitle, rData.errorMessage)
+            return
+        }
 
         if (!rData.songs.length) {
             console.warn("No songs were served. Retrying request...");
@@ -667,22 +719,41 @@ async function fetchPlaylist() {
         }
 
         songCons.forEach((songEl, index) => {
-            songEl.onclick = () => {
+            songEl.onclick = async () => {
                 if (!onGoingDownloads.includes("going")) {
                     songProgress[index].style.display = "block";
                     const song = rData.songs[index];
                     const album = {
-                        title: rData.title,
+                        title: encodeURIComponent(rData.title),
                         artist: rData.author,
-                        coverImage: rData.thumbnail.replaceAll("&", "^"),
+                        coverImage: encodeURIComponent(rData.thumbnail),
                         tracks: { index: index + 1, total: rData.songs.length }
                     }
-                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${song.url}&sArtist=${song.author}&playlist=${JSON.stringify(album)}`;
-                    window.location.href = audioDownloadURL;
+                    const audioDownloadURL = `https://api.yougra.site/download-a?url=${encodeURIComponent(song.url)}&sArtist=${song.author}&playlist=${JSON.stringify(album)}`;
+                    const res = await fetch(audioDownloadURL);
+                    if (!res.ok) {
+                        const resJ = await res.json();
+                        downloadBtn.disabled = false;
+                        downloadBtn.style.filter = "brightness(100%)";
+                        showError(resJ.errorTitle, resJ.errorMessage);
+                        return
+                    }
+                    const blob = await res.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+
+                    const a = document.createElement("a");
+                    a.href = downloadUrl;
+                    a.download = `${song.title}.mp3`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+
+                    window.URL.revokeObjectURL(downloadUrl);
                     onGoingDownloads[index] = "going";
                     songIndexes[index].style.color = "#e55";
                     let seconds = 0;
-                    const totalSeconds = 10 + parseInt(song.duration[0]);
+                    const extraSecond = song.duration.slice(-2) > 30 ? 1 : 0;
+                    const totalSeconds = 10 + parseInt(song.duration[0]) + extraSecond;
                     const timer = setInterval(() => {
                         if (seconds >= totalSeconds) {
                             songProgress[index].style.width = "0";

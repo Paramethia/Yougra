@@ -156,6 +156,52 @@ main {
     cursor: pointer;
 }
 
+/* Error overlay styling */
+
+#error {
+    visibility: hidden;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 2cm;
+    z-index: 3;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    background-color: rgba(24, 24, 24, 0.8);
+}
+#error div {
+    min-width: 300px;
+    max-width: 420px;
+    margin: 0 20px;
+    border-radius: 12px;
+    border: 2px solid #aaa;
+    padding: 27px 17px;
+    background-color: rgba(170, 170, 170, 0.2);
+    color: #ccc;
+}
+
+#close-error {
+    float: right;
+    color: #aaa;
+    opacity: 0.9;
+}
+#error #close-error:hover {
+    cursor: pointer;
+    color: #ccc;
+}
+
+#error p {
+    border-radius: 10px;
+    padding: 4px;
+    background-color: rgb(238, 85, 85, 0.2);
+}
+#error a {
+    color: #aaa;
+}
+#error a:hover { text-decoration: underline dotted }
+
 /* Search section styling */
 
 h4 { color: lightgray }
@@ -182,6 +228,13 @@ input[type="text"]:focus {
     outline: none;
     caret-color: #aaa;
 }
+input[type="text"]:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #121212 inset !important;
+    border: 1px solid #e55 !important;
+    -webkit-text-fill-color: #aaa !important;
+    transition: border 0.5s ease-in-out 0s;
+}
+
 #search, #find-info, #find-list {
     padding: 0.5rem 1rem;
     margin-left: 0.5rem;
@@ -192,7 +245,6 @@ input[type="text"]:focus {
     color: #ddd;
     cursor: pointer;
 }
-
 #search:hover, #find-info:hover, #find-list:hover {
     border-radius: 4px;
     background-color: #cc0000;
