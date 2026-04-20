@@ -542,7 +542,7 @@ async function fetchVideo() {
                         const featureKeywords = /(feat\.?|ft\.?|featuring)/i;
 
                         return title
-                        .replace(/[^\w\s\-\(\)\[\]\&\.\+\!\%\#\@\_\=\'\,\;]/g, "")
+                        .replace(/[^\w\s\-\(\)\[\]\&\.\+\!\%\#\$\@\_\=\'\,\;]/g, "")
                         .replace(/\(([^)]*)\)/g, (match, inner) => {
                             if (featureKeywords.test(inner)) return match
                             return promoKeywords.test(inner) ? "" : match
@@ -769,16 +769,20 @@ async function fetchPlaylist() {
         const songIndexes = document.querySelectorAll(".s-number");
         const songNames = document.querySelectorAll('.s-name');
         const songProgress = document.querySelectorAll(".progress");
+        let songDownloading = false;
 
         songCons.forEach((songEl, index) => {
             songEl.onclick = async () => {
-                await downloadSong(rData.songs[index], index, rData, songProgress, songIndexes);
+                if (!songDownloading) {
+                    await downloadSong(rData.songs[index], index, rData, songProgress, songIndexes);
 
-                // reset after done
-                setTimeout(() => {
-                    songProgress[index].style.width = "0";
-                    songProgress[index].style.display = "none";
-                }, 500);
+                    // reset after done
+                    setTimeout(() => {
+                        songDownloading = false;
+                        songProgress[index].style.width = "0";
+                        songProgress[index].style.display = "none";
+                    }, 500);
+                }
             }
         });
 
@@ -794,6 +798,7 @@ async function fetchPlaylist() {
 
         async function downloadSong(song, index, rData, songProgress, songIndexes) {
             try {
+                songDownloading = true;
                 songProgress[index].style.display = "block";
                 songIndexes[index].style.color = "#e55";
 
@@ -803,6 +808,8 @@ async function fetchPlaylist() {
                     coverImage: encodeURIComponent(rData.thumbnail),
                     tracks: { index: index + 1, total: rData.songs.length }
                 };
+
+                if (song.author.includes(album.artist)) song.author = album.artist
 
                 const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(song.url)}&sArtist=${song.author}&playlist=${JSON.stringify(album)}`);
 
