@@ -22,7 +22,6 @@ const update = document.getElementById("update");
 const closeUpdate = document.getElementById("close-update");
 
 // === Error overlay elements ===
-
 const errorOverlay = document.getElementById("error");
 const closeError = document.getElementById("close-error");
 const errorTitle = document.getElementById("err-title");
