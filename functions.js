@@ -64,24 +64,26 @@ const titleTooltip = document.getElementById("title-tp");
 // === Navigation bar UI function ===
 
 logo.onclick = () => { 
-    logo.style.animation = "y-shake 0.4s linear";
-    setTimeout(() => { logo.style.animation = "" }, 500 );
+    logo.style.animation = 'y-shake 0.4s linear';
+    setTimeout(() => { logo.style.animation = '' }, 500 );
     searchMode() 
 }
 
 version.onclick = () => { 
-    version.style.animation = "shrink-slide-right 1s linear forwards";
-    update.style.visibility = "visible";
+    version.style.animation = 'shrink-slide-right 1s linear forwards';
+    update.style.visibility = 'visible';
+    document.body.style.overflow = 'hidden';
 }
 
 closeUpdate.onclick = () => {
-    update.style.visibility = "hidden";
+    update.style.visibility = 'hidden';
+    document.body.style.overflow = 'auto';
 }
 
 // === Settings overlay UI functions ===
 
 settingsNav.onmouseover = () => { settingsNav.style.color = '#e55' }
-settingsNav.onmouseout = () => { if (settings.style.visibility === "hidden") settingsNav.style.color = 'white' }
+settingsNav.onmouseout = () => { if (settings.style.visibility === 'hidden') settingsNav.style.color = 'white' }
 
 function closeSet() {
     settings.style.visibility = 'hidden';
@@ -90,11 +92,11 @@ function closeSet() {
 }
 
 settingsNav.onclick = () => {
-    if (settings.style.visibility === "hidden") {
+    if (settings.style.visibility === 'hidden') {
         settings.style.visibility = 'visible';
         document.body.style.overflow = 'hidden';
     } else {
-        closeSet();
+        closeSet()
     }
 }
 
