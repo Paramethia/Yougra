@@ -4,12 +4,12 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta name="description" content="Yougra is a free YouTube content downloader that lets you convert YouTube videos/music to MP3 or MP4 in any quality." />
+	<meta name="description" content="Yougra is a free YouTube media downloader that lets you download videos, music, or even playlists/albums as either MP3 or MP4." />
 	<meta name="keywords" content="youtube downloader, youtube to mp3, youtube to mp4, free youtube downloader, youtube music downloader, video downloader" />
 	<meta name="author" content="Kyrin" />
 	<meta name="robots" content="index, follow" />
-	<title>Yougra - YouTube Content Grabber</title>
-	<meta property="og:title" content="Yougra – Free YouTube Content Downloader" />
+	<title>Yougra - YouTube Media Grabber</title>
+	<meta property="og:title" content="Yougra – Free YouTube Media Downloader" />
 	<meta property="og:description" content="Download YouTube videos/music as mp4 or mp3 for free in any quality." />
 	<meta property="og:image" content="https://yougra.site/images/Yougra_logo_192x192.png" />
 	<meta property="og:url" content="https://yougra.site" />
@@ -26,7 +26,8 @@
 	<header>
 		<div id="logo"><img src="./images/Yougra logo.png" alt="Yougra logo" /><h1>Yougra</h1></div> <span id="settings-nav"><i class="fa-solid fa-gear"></i></span>
 	</header>
-	<div id="settings">
+	<span id="version"> Beta 1.7 </span>
+	<div id="settings" style="visibility: hidden;">
 		<div>
 			<i id="close-settings" class="fa-xl fa-solid fa-circle-xmark"></i>
 			<div class="sets" id="link-help">
@@ -60,10 +61,28 @@
 
 				<h5> Do not pause the download as it will most likely not be able to resume again </h5>
 				<h5> Try not to download multiple videos at the same time if your internet is slow (it may cause errors) </h5>
-				<h5> Merging will take a long time for large videos when choosing the process download method. How long it takes depends on large the file is </h5>
+				<h5> Merging will take a long time for large videos when choosing the process download method. How long it takes depends on how large the file is </h5>
 			</div>
 		</div>
 	</div>
+	<div id="update">
+		<div>
+			<h3>Beta 1.7</h3>
+			<dl>
+				<dt>⟬ <strong>Minor changes</strong> ⟭</dt>
+				<dd>⌊ Added "Finding..." text in buttons of the link section when it's finding </dd>
+				<dd>⌊ Changed some text for the description in the search section </dd>
+				<dt>⟬ <strong>Improved navigation bar design & UI</strong> ⟭</dt>
+				<dd>⌊ You can now click the logo to quickly go back to the search section </dd>
+				<dd>⌊ Added the version number to the navbar </dd>
+				<dt>⟬ <strong>Shorts + Playlist/Album searching</strong> ⟭</dt>
+				<dd>⌊ Search results will now include shorts, playlists/albums. </dd>
+				<dt>⟬ <strong>More search results</strong> ⟭</dt>
+				<dd>⌊ Search results will now be increased from 15 to 45 total. 30 for videos, and 15 for playlists/albums </dd>
+			</dl>
+			<center><button id="close-update" aria-label="Close update overlay">Nice!</button></center>
+		</div>
+	</div> 
 	<div id="error">
 		<div>
 			<i id="close-error" class="fa-xl fa-solid fa-circle-xmark"></i>
@@ -73,29 +92,30 @@
 		</div>
 	</div> 
 	<main>
-		<span id="version"> Beta 1.6.10 </span>
-
 		<div id="modes">
 			<span id="search-o">Search</span>
 			<span id="link-o">Use link</span>
 		</div>
 
 		<div id="search-mode">
-			<h4>Search for a song or video:</h4>
+			<h4>Search for a <span class="switch">song or video</span>:</h4>
 			<input type="text" id="search-val" placeholder="Enter video/song title or creator name" />
 			<button id="search" aria-label="Search YouTube video/song" onclick="search()">Search</button>
 			<p id="search-err-msg"></p>
 
 			<div id="search-results">
-				<div id="vids"></div>
+				<h3 id="v/s">Videos/Songs</h3>
+				<div id="vids" style="display: none"></div>
+				<h3 id="p/a">Playlists/Albums</h3>
+				<div id="plists" style="display: none"></div>
 			</div>
 
 			<br />
 			<div id="info">
 				<h4>What is Yougra about?</h4>
 				<p>
-				Yougra is a web app that allows you to download videos, music videos, songs, and more. 
-				Simply search for what you want above and click the video you want to download as either 
+				Yougra is a web app that allows you to download videos, audio, songs, playlists, albums, and more. 
+				Simply search for what you want above and click the media you want to download as either 
 				video or audio. Once you select a video, you will be able to choose from different 
 				video quality options before downloading.
 				</p>
@@ -104,9 +124,14 @@
 				<p>
 				In addition to searching, you can paste the exact YouTube video or song link in the 
 				<strong>"Use link"</strong> section located above the search bar on the right. In this 
-				section, you can also paste YouTube playlist or album links. Playlists and albums are 
-				currently downloadable as audio only. If you're unsure how to get a playlist link, you 
+				section, you can also paste YouTube playlist or album links. <em>Playlists are 
+				currently downloadable as audio only</em>. If you're unsure how to get a playlist link, you 
 				can find instructions in the Settings menu at the top right (the gear icon).
+				</p>
+
+				<p>
+				<i><strong>Pro tip:</strong> Add "album" next to album name when searching, 
+				to easily find actual albums instead of playlists pretending to be albums.</i>
 				</p>
 
 				<p>
@@ -154,8 +179,8 @@
 			</div>
 			<hr id ="hl" color="#e55" />
 			<div id="playlist">
-				<h4>Enter a YouTube <span id="p-or-a">playlist</span> link:</h4>
-				<input type="text" id="playlist-link" placeholder="https://www.youtube.com/playlist?list=PLQwL0_xxmc6zA0fnVvP8Vpy6gb3R96ZoQ">
+				<h4>Enter a YouTube <span class="switch">playlist</span> link:</h4>
+				<input type="text" id="playlist-link" placeholder="https://youtube.com/playlist?list=PLQwL0_xxmc6zA0fnVvP8Vpy6gb3R96ZoQ">
 				<button id="find-list" aria-label="Find YouTube playlist" onclick="fetchPlaylist()">Find it</button>
 				<p id="playlist-err-msg"></p>
 				
@@ -190,7 +215,7 @@
 			"@type": "WebApplication",
 			"name": "Yougra",
 			"url": "https://yougra.site",
-			"description": "Free YouTube downloader for MP3 and MP4.",
+			"description": "Free YouTube media downloader for MP3 and MP4.",
 			"applicationCategory": "Multimedia",
 			"operatingSystem": "All"
 		}
