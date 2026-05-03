@@ -289,17 +289,12 @@ async function search() {
         return
     }
 
-    if (validVideoURL(searchInput)) {
+    if (validVideoURL(searchInput) || searchInput.includes("playlist?list=")) {
         document.getElementById("search-val").value = "";
-        document.getElementById("vid-link").value = searchInput;
+        validVideoURL(searchInput) ? document.getElementById("vid-link").value = searchInput : document.getElementById("playlist-link").value = searchInput;
         urlMode();
-        fetchVideo();
+        validVideoURL(searchInput) ? fetchVideo() : fetchPlaylist();
         return
-    } else if (searchInput.includes("playlist?list=")) {
-        document.getElementById("search-val").value = "";
-        document.getElementById("playlist-link").value = searchInput;
-        urlMode();
-        fetchPlaylist();
     }
 
     searchB.innerText = "Searching...";
