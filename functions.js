@@ -69,10 +69,16 @@ logo.onclick = () => {
     searchMode() 
 }
 
+const currentVersion = "Beta 1.7.1";
+const savedVersion = localStorage.getItem("version");
+
+if (savedVersion === currentVersion) version.style.animation = "none"
+
 version.onclick = () => { 
     version.style.animation = 'shrink-slide-right 1s linear forwards';
     update.style.visibility = 'visible';
     document.body.style.overflow = 'hidden';
+    localStorage.setItem("version", currentVersion);
 }
 
 closeUpdate.onclick = () => {
@@ -251,8 +257,24 @@ pora.onmouseover = () => { pora.style.backgroundColor = "rgba(150, 150, 150, 0.3
 vors.onmouseout = () => { if (vids.style.display === "none") vors.style.backgroundColor = "rgba(150, 150, 150, 0.1)" }
 pora.onmouseout = () => { if (plists.style.display === "none") pora.style.backgroundColor = "rgba(150, 150, 150, 0.1)" }
 
-vors.onclick = () => { vids.style.display === "none" ? vids.style.display = "flex" : vids.style.display = "none" }
-pora.onclick = () => { plists.style.display === "none" ? plists.style.display = "flex" : plists.style.display = "none" }
+vors.onclick = () => { 
+    if (vids.style.display === "none") {
+        vids.style.display = "flex";
+        vors.innerText = vors.innerText.replace("▽", "△");
+    } else {
+        vids.style.display = "none";
+        vors.innerText = vors.innerText.replace("△", "▽");
+    }
+}
+pora.onclick = () => { 
+    if (plists.style.display === "none") { 
+        plists.style.display = "flex";
+        pora.innerText = pora.innerText.replace("▽", "△");
+    } else { 
+        plists.style.display = "none";
+        pora.innerText = pora.innerText.replace("△", "▽");
+    } 
+}
 
 // === Search section functions ===
 
@@ -265,6 +287,19 @@ async function search() {
         searchErr.innerText = "Type something!!";
         setTimeout(() => { searchErr.innerText = "" }, 3400 );
         return
+    }
+
+    if (validVideoURL(searchInput)) {
+        document.getElementById("search-val").value = "";
+        document.getElementById("vid-link").value = searchInput;
+        urlMode();
+        fetchVideo();
+        return
+    } else if (searchInput.includes("playlist?list=")) {
+        document.getElementById("search-val").value = "";
+        document.getElementById("playlist-link").value = searchInput;
+        urlMode();
+        fetchPlaylist();
     }
 
     searchB.innerText = "Searching...";
@@ -335,6 +370,8 @@ async function search() {
     }
 
     searchResults.style.display = "block";
+    vors.innerText = vors.innerText.replace("△", "▽");
+    vors.style.backgroundColor = "rgba(150, 150, 150, 0.1)";
 
     if (!playlists.length) {
         [vors, pora].forEach(element => element.style.display = "none")
@@ -399,7 +436,7 @@ window.addEventListener("keydown", searchKey);
  
 // === Link section functions ===
 
-function validURL(url) {
+function validVideoURL(url) {
     return (
         /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/watch\?v=/.test(url) ||
         /^https?:\/\/youtu\.be\//.test(url) ||
@@ -486,7 +523,7 @@ async function fetchVideo() {
         return;
     }
 
-    if (!validURL(url)) {
+    if (!validVideoURL(url)) {
         videoErr.innerText = "That's not a valid YouTube link";
         setTimeout(() => { videoErr.innerText = "" }, 4500 );
         return;
@@ -730,7 +767,7 @@ async function fetchVideo() {
                             progressText.innerText = `Collecting ${message.fType} - ${message.downloaded || 0}mb / ${message.total}mb`;
                         }
 
-                        if (message.status === "merging") {
+                        if (message.status === "merging" || message.downloaded === message.total) {
                             downloadBtn.innerText = "Wait";
                             progressText.innerText = `Merging...`;
                             progress.style.backgroundColor = '#e55';
@@ -804,7 +841,7 @@ async function fetchPlaylist() {
         return
     }
 
-    if (!url.includes("playlist?") || !url.includes("list=")) {
+    if (!url.includes("playlist?list=")) {
         playlistErr.innerText = "That's not a valid YouTube playlist link";
         setTimeout(() => { playlistErr.innerText = "" }, 4000 );
         return;
@@ -925,19 +962,20 @@ async function fetchPlaylist() {
 
                 const album = {
                     title: encodeURIComponent(rData.title),
-                    artist: rData.author,
+                    artist: encodeURIComponent(rData.author),
                     coverImage: encodeURIComponent(rData.thumbnail),
                     tracks: { index: index + 1, total: rData.songs.length }
                 };
 
                 if (song.author.toLowerCase().includes(album.artist.toLowerCase())) song.author = album.artist
 
-                const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(song.url)}&sArtist=${song.author}&playlist=${JSON.stringify(album)}`);
+                const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(song.url)}&sArtist=${encodeURIComponent(song.author)}&playlist=${JSON.stringify(album)}`);
 
                 if (!res.ok) {
                     const resJ = await res.json();
                     showError(resJ.errorTitle, resJ.errorMessage);
                     songProgress[index].style.display = "none";
+                    songDownloading = false;
                     return;
                 }
 

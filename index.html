@@ -26,7 +26,7 @@
 	<header>
 		<div id="logo"><img src="./images/Yougra logo.png" alt="Yougra logo" /><h1>Yougra</h1></div> <span id="settings-nav"><i class="fa-solid fa-gear"></i></span>
 	</header>
-	<span id="version"> Beta 1.7 </span>
+	<span id="version">Beta 1.7.1</span>
 	<div id="settings" style="visibility: hidden;">
 		<div>
 			<i id="close-settings" class="fa-xl fa-solid fa-circle-xmark"></i>
@@ -67,18 +67,16 @@
 	</div>
 	<div id="update">
 		<div>
-			<h3>Beta 1.7</h3>
+			<h3>Beta 1.7.1</h3>
 			<dl>
-				<dt>⟬ <strong>Minor changes</strong> ⟭</dt>
-				<dd>⌊ Added "Finding..." text in buttons of the link section when it's finding </dd>
-				<dd>⌊ Changed some text for the description in the search section </dd>
-				<dt>⟬ <strong>Improved navigation bar design & UI</strong> ⟭</dt>
-				<dd>⌊ You can now click the logo to quickly go back to the search section </dd>
-				<dd>⌊ Added the version number to the navbar </dd>
-				<dt>⟬ <strong>Shorts + Playlist/Album searching</strong> ⟭</dt>
-				<dd>⌊ Search results will now include shorts, playlists/albums. </dd>
-				<dt>⟬ <strong>More search results</strong> ⟭</dt>
-				<dd>⌊ Search results will now be increased from 15 to 45 total. 30 for videos, and 15 for playlists/albums </dd>
+				<dt>⟬ <strong>Fixes</strong> ⟭</dt>
+				<dd>⌊ Merging not showing progress sometimes </dd>
+				<dd>⌊ Downloads not being able to start again if an error happens for album downloads </dd>
+				<dd>⌊ Some specific artists' albums not being able to be downloaded </dd>
+				<dt>⟬ <strong>Improvement</strong> ⟭</dt>
+				<dd>⌊ Improved Videos/Songs + Playlists/Albums expansion buttons </dd>
+				<dt>⟬ <strong>New feature</strong> ⟭</dt>
+				<dd>⌊ Adding links to to the search section will now automatically take you to the link section </dd>
 			</dl>
 			<center><button id="close-update" aria-label="Close update overlay">Nice!</button></center>
 		</div>
@@ -104,9 +102,9 @@
 			<p id="search-err-msg"></p>
 
 			<div id="search-results">
-				<h3 id="v/s">Videos/Songs</h3>
+				<h3 id="v/s">Videos/Songs ▽</h3>
 				<div id="vids" style="display: none"></div>
-				<h3 id="p/a">Playlists/Albums</h3>
+				<h3 id="p/a">Playlists/Albums ▽</h3>
 				<div id="plists" style="display: none"></div>
 			</div>
 
