@@ -323,11 +323,12 @@ input[type="text"]:-webkit-autofill {
     text-align: left;
 }
 #search-results h3 { 
-    border: 2px dotted lightgray;
+    border: 2px dotted #bbb;
     border-radius: 15px;
     padding: 10px;
     background-color: rgba(150, 150, 150, 0.1);
     text-align: center;
+    color: #bbb;
     cursor: pointer;
 }
 #search-results h3:hover { transition: 0.3s }
@@ -782,7 +783,10 @@ input[type="text"]:-webkit-autofill {
 
     #search { margin-top: 12px }
 
-    #search-results h3 { font-size: 1.1rem }
+    #search-results h3 { 
+        border: 1px dotted lightgray;
+        font-size: 1.1rem;
+    }
 
     .video { margin-top: 5px }
 
