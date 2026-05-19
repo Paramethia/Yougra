@@ -69,7 +69,7 @@ logo.onclick = () => {
     searchMode() 
 }
 
-const currentVersion = "Beta 1.7.1";
+const currentVersion = "Beta 1.7.2";
 const savedVersion = localStorage.getItem("version");
 
 if (savedVersion === currentVersion) version.style.animation = "none"
@@ -146,7 +146,7 @@ sets.forEach((con, index) => {
 
 let method = localStorage.getItem("method") || "process";
 
-if (method === "fast") immediate.style.backgroundColor = 'rgba(170, 170, 170, 0.2)';
+if (method === "immediate") immediate.style.backgroundColor = 'rgba(170, 170, 170, 0.2)';
 if (method === "process") process.style.backgroundColor = 'rgba(170, 170, 170, 0.2)';
 
 immediate.onmouseover = () => { if (immediate.style.background !== 'rgba(170, 170, 170, 0.2)') immediate.style.backgroundColor = 'rgba(170, 170, 170, 0.2)' }
@@ -154,15 +154,15 @@ immediate.onmouseout = () => { if (method === "process") immediate.style.backgro
 immediate.onclick = () => { 
     if (method === "process") {
         process.style.backgroundColor = "";
-        method = "fast";
+        method = "immediate";
         localStorage.setItem("method", method);
     }
 }
 
 process.onmouseover = () => { if (process.style.background !== 'rgba(170, 170, 170, 0.2)') process.style.backgroundColor = 'rgba(170, 170, 170, 0.2)' }
-process.onmouseout = () => { if (method === "fast") process.style.backgroundColor = '' }
+process.onmouseout = () => { if (method === "immediate") process.style.backgroundColor = '' }
 process.onclick = () => { 
-    if (method === "fast") {
+    if (method === "immediate") {
         immediate.style.backgroundColor = "";
         method = "process";
         localStorage.setItem("method", method);
@@ -353,7 +353,7 @@ async function search() {
             return `
                 <div class="playlist">
                     <div style="min-height: 150px; min-width: 200px; position: relative; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
-                        <center><img src="${playlist.thumbnail}" ${playlist.type === "Album" ? 'style="width: 55%"' : ""}/></center>
+                        <center><img src="${playlist.thumbnail}" ${playlist.type !== "Playlist" ? 'style="width: 55%"' : ""}/></center>
                         <svg id="plist-icon" fill="rgba(235, 74, 74, 0.6)" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="28px" height="28px" viewBox="0 0 476.91 476.909" xml:space="preserve" stroke="#aaa"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M62.802,142.287h121.682c4.45,0,10.95-3.805,13.32-7.999l24.816-41.066H62.802C28.12,93.222,0,121.342,0,156.026v20.779 C13.266,156.086,36.425,142.287,62.802,142.287z"></path> <path d="M414.105,67.708H266.913c-8.681,0-19.151,6.125-23.399,13.685l-7.147,11.828l-28.489,47.157 c-4.246,7.558-14.719,13.684-23.393,13.684H62.802C28.12,154.062,0,182.183,0,216.865v115.794v13.737 c0,34.685,28.12,62.805,62.802,62.805h351.303c34.685,0,62.805-28.12,62.805-62.805v-13.737V156.026v-25.515 C476.91,95.829,448.79,67.708,414.105,67.708z M208.372,335.332h163.952c4.34,0,7.851,3.515,7.851,7.851 c0,4.349-3.511,7.851-7.851,7.851H208.372c-4.332,0-7.851-3.502-7.851-7.851C200.521,338.847,204.04,335.332,208.372,335.332z M200.521,301.762c0-4.344,3.519-7.851,7.851-7.851h163.952c4.34,0,7.851,3.507,7.851,7.851c0,4.341-3.511,7.851-7.851,7.851 H208.372C204.04,309.612,200.521,306.103,200.521,301.762z M380.19,216.52c0,4.332-3.526,7.851-7.85,7.851H250.659 c-4.332,0-7.847-3.519-7.847-7.851c0-4.334,3.515-7.851,7.847-7.851H372.34C376.664,208.669,380.19,212.186,380.19,216.52z M372.34,252.491c4.323,0,7.85,3.502,7.85,7.85c0,4.341-3.526,7.852-7.85,7.852H208.372c-4.332,0-7.851-3.511-7.851-7.852 c0-4.348,3.519-7.85,7.851-7.85H372.34z M128.618,305.337c10.395-6.052,21.512-8.007,30.413-6.288v-67.912V208.82v-6.899h6.904 h10.047h35.53c3.817,0,6.899,3.092,6.899,6.899v15.409c0,3.815-3.09,6.901-6.899,6.901h-35.53v87.636h-0.088 c-0.571,10.552-8.752,22.466-21.919,30.132c-17.829,10.379-37.956,9.028-44.955-2.989 C102.017,333.878,110.791,315.716,128.618,305.337z"></path> </g> </g> </g></svg>
                     </div>
                     <h4 class="p-title">${playlist.title.length < 29 ? playlist.title : playlist.title.slice(0, 28).trimEnd() + "..."}</h4>
@@ -435,7 +435,8 @@ function validVideoURL(url) {
     return (
         /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/watch\?v=/.test(url) ||
         /^https?:\/\/youtu\.be\//.test(url) ||
-        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/shorts\//.test(url)
+        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/shorts\//.test(url) ||
+        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/live\//.test(url)
     );
 }
 
@@ -581,7 +582,7 @@ async function fetchVideo() {
         document.getElementById("v-title").innerText = data.title;
         document.getElementById("v-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
         document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${data.publishDate}`;
-        document.getElementById("views").innerHTML = `<strong>Views ~</strong> ${views}`;
+        document.getElementById("v-views").innerHTML = `<strong>Views ~</strong> ${views}`;
         document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
 
         selection.innerText = `Selected ${format}`;
@@ -631,7 +632,17 @@ async function fetchVideo() {
 
             try {
                 if (format === "audio") {
-                    // Trigger download via native browser stream & an ancor tag
+                    // Trigger download via native browser stream IF it's not a song OR audio is long
+                    if (!data.song || data.lengthSeconds >= 900) {
+                        window.location.href = `https://api.yougra.site/download-a?url=${encodeURIComponent(url)}`;
+                        setTimeout(() => {
+                            downloadBtn.disabled = false;
+                            downloadBtn.style.filter = "brightness(100%)";
+                        }, 15000);
+                        return
+                    }
+
+                    // Otherwise, wait for the download on server, then download directly from browser
                     progressText.innerText = "Wait for it...";
                     const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(url)}`);
 
@@ -639,6 +650,7 @@ async function fetchVideo() {
                         const resJ = await res.json();
                         downloadBtn.disabled = false;
                         downloadBtn.style.filter = "brightness(100%)";
+                        progressText.innerText = "";
                         showError(resJ.errorTitle, resJ.errorMessage);
                         return
                     }
@@ -714,8 +726,8 @@ async function fetchVideo() {
                         document.getElementById("progress-bar").style.display = "none";
                     }, 500);
                 } else if (format === "video") {
-                    if (method === "fast") {
-                        window.location.href = `https://api.yougra.site/fast-download?url=${encodeURIComponent(url)}&itag=${itag}`;
+                    if (method === "immediate") {
+                        window.location.href = `https://api.yougra.site/immediate-download?url=${encodeURIComponent(url)}&itag=${itag}`;
 
                         setTimeout(() => {
                             downloadBtn.disabled = false;
@@ -762,8 +774,8 @@ async function fetchVideo() {
                             progressText.innerText = `Collecting ${message.fType} - ${message.downloaded || 0}mb / ${message.total}mb`;
                         }
 
-                        if (message.status === "merging" || message.downloaded === message.total) {
-                            downloadBtn.innerText = "Wait";
+                        if (message.status === "merging") {
+                            downloadBtn.innerText = `${Math.round(message.progress) || 0}%`;
                             progressText.innerText = `Merging...`;
                             progress.style.backgroundColor = '#e55';
                             progress.style.width = `${Math.round(message.progress) || 0}%`;
@@ -891,11 +903,12 @@ async function fetchPlaylist() {
         }
 
         rData.songs.forEach((song, index) => {
+            if (!song.title.includes("-") && !song.title.includes("–")) return
             if (song.title.toLowerCase().includes(song.author.toLowerCase()) || song.title.toLowerCase().includes(rData.author.toLowerCase())) {
-                rData.songs[index].title = cleanSongTitle(song.title.split("-")[1])
+                rData.songs[index].title = cleanSongTitle(song.title.split(/[-–]/)[1])
             } else if (multipleArtists) {
                 artists.forEach(artist => {
-                    if (song.title.includes(artist.trim())) rData.songs[index].title = cleanSongTitle(song.title.split("-")[1])
+                    if (song.title.includes(artist.trim())) rData.songs[index].title = cleanSongTitle(song.title.split(/[-–]/)[1])
                 })
             }
         });
