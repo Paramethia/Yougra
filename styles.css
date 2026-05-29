@@ -673,7 +673,7 @@ input[type="text"]:-webkit-autofill {
     background-color: rgb(58, 58, 58, 0.7);
 }
 
-.song #s-name:hover { color: #888 }
+#s-name:hover, #s-author:hover { color: #888 }
 
 .progress {
     height: 100%;

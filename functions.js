@@ -69,7 +69,7 @@ logo.onclick = () => {
     searchMode() 
 }
 
-const currentVersion = "Beta 1.7.2";
+const currentVersion = "Beta 1.7.3";
 const savedVersion = localStorage.getItem("version");
 
 if (savedVersion === currentVersion) version.style.animation = "none"
@@ -198,8 +198,8 @@ setInterval(() => {
 function toolTipper(titleElements, items) {
     titleElements.forEach((titleE, index) => {
         titleE.addEventListener("mousemove", (e) => {
-            const title = items[index].title;
-            titleTooltip.innerText = title;
+            const tip = titleE.id === "s-author" ? items[index].author : items[index].title;
+            titleTooltip.innerText = tip;
             titleTooltip.style.top = `${e.clientY - 35}px`;
             titleTooltip.style.left = `${e.clientX - 17}px`;
             titleTooltip.style.visibility = "visible";
@@ -558,7 +558,7 @@ async function fetchVideo() {
 
         const videoFormats = data.qualities.filter(vF => vF.type === 'videoonly' && vF.qualityLabel !== '144p');
         videoFormats.reverse();
-        const defaultVidO = videoFormats.find(vid => vid.qualityLabel === "480p") || videoFormats.find(vid => vid.qualityLabel === "360p");
+        const defaultVidO = videoFormats.find(vid => vid.qualityLabel === "480p") || videoFormats.find(vid => vid.qualityLabel === "360p") || videoFormats.find(vid => vid.qualityLabel === "240p");
         const audioFormats = data.qualities.filter(aF => aF.type === 'audioonly');
         const selectedAudio = audioFormats.pop();
 
@@ -578,7 +578,7 @@ async function fetchVideo() {
                 ${ videoFormats.map(vid => { return `<option value="${vid.qualityLabel}">${vid.qualityLabel}</option>` })}
             </select>
         `;
-        document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${selectedAudio.size}</span></p>`;
+        document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${parseFloat(selectedAudio.size)}mb</span></p>`;
         document.getElementById("v-title").innerText = data.title;
         document.getElementById("v-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
         document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${data.publishDate}`;
@@ -612,7 +612,6 @@ async function fetchVideo() {
         }, 4400);
 
         const qualities = document.getElementById("qualities");
-        
         qualities.value = defaultVidO.qualityLabel;
         let itag = defaultVidO.itag;
 
@@ -632,19 +631,10 @@ async function fetchVideo() {
 
             try {
                 if (format === "audio") {
-                    // Trigger download via native browser stream IF it's not a song OR audio is long
-                    if (!data.song || data.lengthSeconds >= 900) {
-                        window.location.href = `https://api.yougra.site/download-a?url=${encodeURIComponent(url)}`;
-                        setTimeout(() => {
-                            downloadBtn.disabled = false;
-                            downloadBtn.style.filter = "brightness(100%)";
-                        }, 15000);
-                        return
-                    }
+                    const metadata = data.song && data.lengthSeconds < 900 ? "yes" : "no";
 
-                    // Otherwise, wait for the download on server, then download directly from browser
                     progressText.innerText = "Wait for it...";
-                    const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(url)}`);
+                    const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(url)}&metadata=${metadata}`);
 
                     if (!res.ok) {
                         const resJ = await res.json();
@@ -663,7 +653,7 @@ async function fetchVideo() {
                     const chunks = [];
 
                     progressText.innerText = "Downloading...";
-                    document.getElementById("progress-bar").style.display = "block";
+                    if (metadata === "yes") document.getElementById("progress-bar").style.display = "block";
 
                     while (true) {
                         const { done, value } = await reader.read();
@@ -680,7 +670,7 @@ async function fetchVideo() {
                             progressText.innerText = `${(received / 1024 / 1024).toFixed(2)}mb / ${(total / 1024 / 1024).toFixed(2)}mb`;
                         } else {
                             // fallback if no content-length
-                            progressText.innerText = `${(received / 1024 / 1024).toFixed(2)}mb downloaded`;
+                            progressText.innerText = `Downloading - ${(received / 1024 / 1024).toFixed(2)}MB / ${parseFloat(selectedAudio.size) + 1.7}MB`; // Approximate total size
                         }
                     }
 
@@ -771,7 +761,7 @@ async function fetchVideo() {
                             downloadBtn.innerText = `${Math.floor(message.progress) || 0}%`;
                             progress.style.backgroundColor = '#f5353c';
                             progress.style.width = `${message.progress}%`;
-                            progressText.innerText = `Collecting ${message.fType} - ${message.downloaded || 0}mb / ${message.total}mb`;
+                            progressText.innerText = message.downloaded !== message.total ? `Collecting ${message.fType} - ${message.downloaded || 0}mb / ${message.total}mb` : "Merging... (progress may not show at times)";
                         }
 
                         if (message.status === "merging") {
@@ -873,9 +863,9 @@ async function fetchPlaylist() {
         }
 
         if (!rData.songs.length) {
-            console.warn("No songs were served. Retrying request...");
+            console.warn(`No songs were served for ${rData.title} playlist/album...`);
+            showError("Empty data", "No songs were served for this playlist/album. Retry or try a different one?");            
             findPlaylist.disabled = false;
-            fetchPlaylist();
             return
         }
 
@@ -913,17 +903,40 @@ async function fetchPlaylist() {
             }
         });
 
-        let maxText = 65;
+        function cleanPlaylistTitle(title) {
+            return title
+                .replace(/[\(\[]?\b(full|official)\s+(album|ep)\b[\)\]]?/gi, "")
+                .replace(/\s{2,}/g, " ")
+                .replace(/[\(\[]\s*[\)\]]/g, "")
+                .trim();
+        }
+        rData.title = cleanPlaylistTitle(rData.title);
+
+        let maxCtitle = 65;
         if (screen.width <= 450 || window.innerWidth <= 450) {
-            maxText = 30
+            maxCtitle = 30
         } else if (screen.width <= 790 || window.innerWidth <= 790) {
-            maxText = 37
-        } else if (screen.width <= 1070 || window.innerWidth <= 1070) maxText = 45
+            maxCtitle = 37
+        } else if (screen.width <= 1070 || window.innerWidth <= 1070) maxCtitle = 45
+
+        let maxStitle = 25;
+
+        if (screen.width <= 350 || window.innerWidth <= 350) {
+            maxStitle = 12
+        } else if (screen.width <= 390 || window.innerWidth <= 390) {
+            maxStitle = 17
+        } else if (screen.width <= 450 || window.innerWidth <= 440) maxStitle = 21
+
+        let maxSartist = 20;
+
+        if (screen.width <= 755 || window.innerWidth <= 755) {
+            maxSartist = 10
+        } else if (screen.width <= 820 || window.innerWidth <= 820) maxSartist = 14
 
         document.getElementById("loader-2").style.display = "none";
         document.getElementById("p").style.display = "block";
         document.getElementById("p-thumbnail").src = rData.thumbnail;
-        document.getElementById("p-title").innerText = rData.title.length > maxText ? rData.title.slice(0, maxText).trimEnd() + "..." : rData.title;
+        document.getElementById("p-title").innerText = rData.title.length > maxCtitle ? rData.title.slice(0, maxCtitle).trimEnd() + "..." : rData.title;
         document.getElementById("p-author").innerHTML = `<strong>By ~</strong> ${rData.author}`;
         document.getElementById("a-amount").innerHTML = `<strong>Audio ~</strong> ${rData.songs.length}`;
         document.getElementById("songs").innerHTML = rData.songs.map((song, index) => {
@@ -932,8 +945,8 @@ async function fetchPlaylist() {
                 <div class="progress"></div>
                 <span class="s-number">${index + 1}</span>
                 <div class="song">
-                    <span id="s-name" class="s-name">${song.title.length < 25 ? song.title : song.title.slice(0, 24).trimEnd() + "..."}</span>
-                    <span id="s-author">${song.author}</span>
+                    <span id="s-name" class="s-name">${song.title.length > maxStitle ? song.title.slice(0, maxStitle).trimEnd() + "..." : song.title}</span>
+                    <span id="s-author" class="s-author">${song.author.length > maxSartist ? song.author.slice(0, maxSartist).trimEnd() + "+" : song.author}</span>
                     <span id="s-duration">${song.duration}</span>
                 </div>
                 </div>
@@ -960,7 +973,8 @@ async function fetchPlaylist() {
             }
         });
 
-        toolTipper(document.querySelectorAll('.s-name'), rData.songs)
+        toolTipper(document.querySelectorAll('.s-name'), rData.songs);
+        toolTipper(document.querySelectorAll(".s-author"), rData.songs);
 
         async function downloadSong(song, index, rData, songProgress, songIndexes) {
             try {
@@ -977,7 +991,7 @@ async function fetchPlaylist() {
 
                 if (song.author.toLowerCase().includes(album.artist.toLowerCase())) song.author = album.artist
 
-                const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(song.url)}&sArtist=${encodeURIComponent(song.author)}&playlist=${JSON.stringify(album)}`);
+                const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(song.url)}&sArtist=${encodeURIComponent(song.author)}&sTitle=${encodeURIComponent(song.title)}&playlist=${JSON.stringify(album)}`);
 
                 if (!res.ok) {
                     const resJ = await res.json();
