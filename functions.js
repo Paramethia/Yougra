@@ -667,7 +667,7 @@ async function fetchVideo() {
 
                             progress.style.width = `${percent}%`;
                             downloadBtn.innerText = `${Math.floor(percent)}%`;
-                            progressText.innerText = `${(received / 1024 / 1024).toFixed(2)}mb / ${(total / 1024 / 1024).toFixed(2)}mb`;
+                            progressText.innerText = `Downloading - ${(received / 1024 / 1024).toFixed(2)}mb / ${(total / 1024 / 1024).toFixed(2)}mb`;
                         } else {
                             // fallback if no content-length
                             progressText.innerText = `Downloading - ${(received / 1024 / 1024).toFixed(2)}MB / ${parseFloat(selectedAudio.size) + 1.7}MB`; // Approximate total size
