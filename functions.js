@@ -69,7 +69,7 @@ logo.onclick = () => {
     searchMode() 
 }
 
-const currentVersion = "Beta 1.7.3";
+const currentVersion = "Beta 1.7.4";
 const savedVersion = localStorage.getItem("version");
 
 if (savedVersion === currentVersion) version.style.animation = "none"
@@ -541,7 +541,7 @@ async function fetchVideo() {
         findInfo.innerText = "Finding...";
         findInfo.disabled = true;
         
-        const response = await fetch("https://api.yougra.site/get-info", {
+        const response = await fetch("https://api.yougra.site/video", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url })
@@ -578,7 +578,7 @@ async function fetchVideo() {
                 ${ videoFormats.map(vid => { return `<option value="${vid.qualityLabel}">${vid.qualityLabel}</option>` })}
             </select>
         `;
-        document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${parseFloat(selectedAudio.size)}mb</span></p>`;
+        document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${parseFloat(selectedAudio.size) + 1.4}mb</span></p>`;
         document.getElementById("v-title").innerText = data.title;
         document.getElementById("v-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
         document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${data.publishDate}`;
@@ -632,7 +632,7 @@ async function fetchVideo() {
             try {
                 if (format === "audio") {
                     const metadata = data.song && data.lengthSeconds < 900 ? "yes" : "no";
-
+ 
                     progressText.innerText = "Wait for it...";
                     const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(url)}&metadata=${metadata}`);
 
@@ -653,7 +653,7 @@ async function fetchVideo() {
                     const chunks = [];
 
                     progressText.innerText = "Downloading...";
-                    if (metadata === "yes") document.getElementById("progress-bar").style.display = "block";
+                    if (contentLength) document.getElementById("progress-bar").style.display = "block";
 
                     while (true) {
                         const { done, value } = await reader.read();
@@ -670,7 +670,7 @@ async function fetchVideo() {
                             progressText.innerText = `Downloading - ${(received / 1024 / 1024).toFixed(2)}mb / ${(total / 1024 / 1024).toFixed(2)}mb`;
                         } else {
                             // fallback if no content-length
-                            progressText.innerText = `Downloading - ${(received / 1024 / 1024).toFixed(2)}MB / ${parseFloat(selectedAudio.size) + 1.7}MB`; // Approximate total size
+                            progressText.innerText = `Downloading - ${(received / 1024 / 1024).toFixed(2)}MB / ${parseFloat(selectedAudio.size) + 1.4}MB`; // Approximate total size
                         }
                     }
 
@@ -700,7 +700,6 @@ async function fetchVideo() {
                     const a = document.createElement("a");
                     a.href = downloadUrl;
                     a.download = `${cleanAudioTitle(data.title)}.mp3`;
-
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
@@ -996,6 +995,7 @@ async function fetchPlaylist() {
                 if (!res.ok) {
                     const resJ = await res.json();
                     showError(resJ.errorTitle, resJ.errorMessage);
+                    songIndexes[index].style.color = "lightgray";
                     songProgress[index].style.display = "none";
                     songDownloading = false;
                     return;
@@ -1057,6 +1057,7 @@ async function fetchPlaylist() {
                 await new Promise(res => setTimeout(res, 500));
             }
 
+            songDownloading = false;
             downloadBtn.disabled = false;
             downloadBtn.style.filter = "brightness(100%)";
         }
