@@ -653,7 +653,7 @@ async function fetchVideo() {
                     const chunks = [];
 
                     progressText.innerText = "Downloading...";
-                    if (!contentLength) document.getElementById("progress-bar").style.display = "block";
+                    if (contentLength) document.getElementById("progress-bar").style.display = "block";
 
                     while (true) {
                         const { done, value } = await reader.read();
