@@ -69,7 +69,7 @@ logo.onclick = () => {
     searchMode() 
 }
 
-const currentVersion = "Beta 1.7.4";
+const currentVersion = "Beta 1.7.5";
 const savedVersion = localStorage.getItem("version");
 
 if (savedVersion === currentVersion) version.style.animation = "none"
@@ -578,7 +578,7 @@ async function fetchVideo() {
                 ${ videoFormats.map(vid => { return `<option value="${vid.qualityLabel}">${vid.qualityLabel}</option>` })}
             </select>
         `;
-        document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${parseFloat(selectedAudio.size) + 1.4}mb</span></p>`;
+        document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${(parseFloat(selectedAudio.size) + 1.4)}mb</span></p>`;
         document.getElementById("v-title").innerText = data.title;
         document.getElementById("v-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
         document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${data.publishDate}`;
@@ -782,6 +782,7 @@ async function fetchVideo() {
                                 downloadBtn.style.filter = "brightness(100%)";
                                 document.getElementById("progress-bar").style.display = "none";
                                 progressText.innerText = "";
+                                progress.style.backgroundColor = '#f5353c';
                             }, 500);
                             ws.close();
                         }
@@ -1036,6 +1037,7 @@ async function fetchPlaylist() {
             } catch (err) {
                 console.error("Song download failed:", err);
                 showError("Failed to download song", err);
+                songIndexes[index].style.color = "lightgray";
                 songProgress[index].style.display = "none";
             }
         }

@@ -26,7 +26,7 @@
 	<header>
 		<div id="logo"><img src="./images/Yougra logo.png" alt="Yougra logo" /><h1>Yougra</h1></div> <span id="settings-nav"><i class="fa-solid fa-gear"></i></span>
 	</header>
-	<span id="version">Beta 1.7.4</span>
+	<span id="version">Beta 1.7.5</span>
 	<div id="settings" style="visibility: hidden;">
 		<div>
 			<i id="close-settings" class="fa-xl fa-solid fa-circle-xmark"></i>
@@ -45,36 +45,35 @@
 				<h3>Download method</h3>
 
 				<h4 id="immediate">Immediate</h4>
-				<p>This ensures that every <strong>video</strong> you download always start immediatly without processing. Keep in mind that the file may show up as corrupted for some devices.</p>
+				<p>This ensures that every <strong>video</strong> you download always start immediatly without processing. Keep in mind that the file may be corrupted for some devices.</p>
 
 				<h4 id="process">Process</h4>
-				<p>This ensures that the <strong>video</strong> works on any device and is also seekable by having a process of downloading and merging on the server, then the download will start. Not recommended for large downloads if you are inpatient as it will take a long time before it starts the download. There is also a max file size requirement (5GB) for downloading videos for this option.</p>
+				<p>This ensures that the <strong>video</strong> works on any device by having a process of downloading and merging on the server, then the download will start. Not recommended for long videos if you are inpatient, as it will take a long time before it starts the download. There is also a max file size requirement (5GB) for downloading videos for this option.</p>
 			</div>
 			<div class="sets" id="bug-report">
 				<h3>Noticed any bugs/glitches?</h3>
 
 				<h4>Tell me</h4>
-				<p>Remember that this website is still in beta/testing stage, so errors WILL happen eventually. Just tell me if you noticed anything odd (click it below): <br /> <a href="mailto:kyrinkompi@gmail.com">kyrinkompi@gmail.com</a></p>
+				<p>Remember that this web app is still in beta/testing stage, so errors WILL happen eventually. Just tell me if you noticed anything odd (click it below): <br /> <a href="mailto:kyrinkompi@gmail.com">kyrinkompi@gmail.com</a></p>
 			</div>
 			<div class="sets" id="warning">
 				<h3>Warnings</h3>
 
 				<h5> Do not pause the download as it will most likely not be able to resume again </h5>
 				<h5> Try not to download multiple videos at the same time if your internet is slow (it may cause errors) </h5>
-				<h5> Merging will take a long time for large videos when choosing the process download method. How long it takes depends on how large the file is </h5>
 			</div>
 		</div>
 	</div>
 	<div id="update">
 		<div>
-			<h3>Beta 1.7.4</h3>
+			<h3>Beta 1.7.5</h3>
 			<dl>
-				<dt>⟬ <strong>Fix</strong> ⟭</dt>
-				<dd>⌊ Songs that could not download from albums/playlists will now auto reset so you can retry them</dd>
+				<dt>⟬ <strong>Fixes</strong> ⟭</dt>
+				<dd>⌊ Approximate audio file size in download options adding multiple decimals at times</dd>
+				<dd>⌊ Songs that failed to download from playlists/albums not resetting</dd>
 				<dt>⟬ <strong>Improvements</strong> ⟭</dt>
-				<dd>⌊ Audio file size in download options will show more accurate approximate file size</dd>
-				<dd>⌊ Progress bar will show up for non-metadata downloads</dd>
-				<dd>⌊ Non-metadata audio downloads will be slightly faster</dd>
+				<dd>⌊ Changed Yougra logo font</dd>
+				<dd>⌊ Made music detection system more accurate</dd>
 			</dl>
 			<center><button id="close-update" aria-label="Close update overlay">Cool</button></center>
 		</div>

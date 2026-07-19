@@ -1,3 +1,8 @@
+@font-face {
+    font-family: 'FuturaCyrillicBold';
+    src: url('./FuturaCyrillicBold.ttf') format('truetype');
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -39,6 +44,7 @@ header img {
 header h1 {
     display: inline-block;
     margin-left: 4px;
+    font-family: 'FuturaCyrillicBold';
     font-size: 1.4rem;
     color: white;
     transform: translateY(-8px);
