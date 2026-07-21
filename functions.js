@@ -578,7 +578,7 @@ async function fetchVideo() {
                 ${ videoFormats.map(vid => { return `<option value="${vid.qualityLabel}">${vid.qualityLabel}</option>` })}
             </select>
         `;
-        document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${(parseFloat(selectedAudio.size) + 1.4)}mb</span></p>`;
+        document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${(parseFloat(selectedAudio.size) + 1.4).toFixed(2)}mb</span></p>`;
         document.getElementById("v-title").innerText = data.title;
         document.getElementById("v-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
         document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${data.publishDate}`;
