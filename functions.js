@@ -44,13 +44,13 @@ const pListsCon = document.getElementById("plists");
     // Video elements
 const findInfo = document.getElementById("find-info");
 const videoErr = document.getElementById("video-err-msg");
+const watch = document.getElementById("watch");
 const selection = document.getElementById("selection-msg");
 const vidCon = document.getElementById("video-info");
 const vdOptionsB = document.getElementById("v-d-options-b");
 const vdOptions = document.getElementById("v-d-options");
 const vidSet = document.getElementById("vid-o");
 const audSet = document.getElementById("aud-o");
-
     // Playlist elements
 const findPlaylist = document.getElementById("find-list");
 const playlistErr = document.getElementById("playlist-err-msg");
@@ -69,7 +69,7 @@ logo.onclick = () => {
     searchMode() 
 }
 
-const currentVersion = "Beta 1.7.5";
+const currentVersion = "Beta 1.7.6";
 const savedVersion = localStorage.getItem("version");
 
 if (savedVersion === currentVersion) version.style.animation = "none"
@@ -553,8 +553,10 @@ async function fetchVideo() {
             return
         }
 
-        const views = new Intl.NumberFormat('fr-FR').format(data.viewCount);
-        const likes = new Intl.NumberFormat('fr-FR').format(data.likeCount);
+        const numFormat = window.innerWidth > 355 || screen.width > 355 ? new Intl.NumberFormat('fr-FR') : new Intl.NumberFormat('en', { notation: 'compact' });
+
+        const views = numFormat.format(data.viewCount);
+        const likes = numFormat.format(data.likeCount);
 
         const videoFormats = data.qualities.filter(vF => vF.type === 'videoonly' && vF.qualityLabel !== '144p');
         videoFormats.reverse();
@@ -567,11 +569,15 @@ async function fetchVideo() {
             aS = Number(aS.replace("mb", ""));
             return Math.round(vS + aS)
         }
+        
+        watch.innerHTML = `
+            <img id="v-thumbnail" src="${data.thumbnail}" alt="Youtube video thumbnail" />
+            <span id="play"><i class="fa-solid fa-play"></i> watch</span>
+            <span id="length">${formatTime(data.lengthSeconds)}</span>
+        `;
 
         document.getElementById("loader-1").style.display = "none";
         document.getElementById("v").style.display = "block";
-        document.getElementById("v-thumbnail").src = data.thumbnail;
-        document.getElementById("length").innerHTML = formatTime(data.lengthSeconds);
         document.getElementById("vid-o").innerHTML = `
             <p>Video <span id="v-size">${fullSize(defaultVidO.size, selectedAudio.size)}mb</span></p>
             <select id="qualities">
@@ -580,10 +586,25 @@ async function fetchVideo() {
         `;
         document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${(parseFloat(selectedAudio.size) + 1.4).toFixed(2)}mb</span></p>`;
         document.getElementById("v-title").innerText = data.title;
-        document.getElementById("v-author").innerHTML = `<strong>Poster ~</strong> ${data.author}`;
-        document.getElementById("posted").innerHTML = `<strong>Posted ~</strong> ${data.publishDate}`;
-        document.getElementById("v-views").innerHTML = `<strong>Views ~</strong> ${views}`;
-        document.getElementById("likes").innerHTML = `<strong>Likes ~</strong> ${likes}`;
+        document.getElementById("v-author").innerHTML = `<strong>@${data.author}</strong> `;
+        document.getElementById("v-views").innerHTML = `<i class="fa-regular fa-eye"></i> ${views}`;
+        document.getElementById("likes").innerHTML = `<i class="fa-regular fa-thumbs-up"></i> ${likes}`;
+        document.getElementById("posted").innerHTML = `<i class="fa-regular fa-calendar"></i> ${window.innerWidth > 355 || screen.width > 355 ? data.pDate.exact : data.pDate.relative}`;
+
+        document.getElementById("play").onclick = () => {
+            watch.innerHTML = "";
+
+            const iframe = document.createElement("iframe");
+            iframe.src = `https://www.youtube.com/embed/${data.videoID}`;
+            iframe.title = data.title || "YouTube video player";
+            iframe.frameBorder = "0";
+            iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share");
+            iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+            iframe.setAttribute("allowfullscreen", "true");
+            iframe.style.aspectRatio = "16 / 9";
+
+            watch.appendChild(iframe);
+        }
 
         selection.innerText = `Selected ${format}`;
         selection.style.visibility = "visible";
@@ -913,11 +934,19 @@ async function fetchPlaylist() {
         rData.title = cleanPlaylistTitle(rData.title);
 
         let maxCtitle = 65;
-        if (screen.width <= 450 || window.innerWidth <= 450) {
+        if (screen.width <= 380 || window.innerWidth <= 380) {
+            maxCtitle = 25
+        } else if (screen.width <= 450 || window.innerWidth <= 450) {
             maxCtitle = 30
         } else if (screen.width <= 790 || window.innerWidth <= 790) {
             maxCtitle = 37
         } else if (screen.width <= 1070 || window.innerWidth <= 1070) maxCtitle = 45
+
+        let maxCauthor = 28;
+
+        if (screen.width <= 450 || window.innerWidth <= 450) {
+            maxCauthor = 8
+        } else if (screen.width <= 755 || window.innerWidth <= 755)  { maxCauthor = 17 }
 
         let maxStitle = 25;
 
@@ -937,7 +966,7 @@ async function fetchPlaylist() {
         document.getElementById("p").style.display = "block";
         document.getElementById("p-thumbnail").src = rData.thumbnail;
         document.getElementById("p-title").innerText = rData.title.length > maxCtitle ? rData.title.slice(0, maxCtitle).trimEnd() + "..." : rData.title;
-        document.getElementById("p-author").innerHTML = `<strong>By ~</strong> ${rData.author}`;
+        document.getElementById("p-author").innerHTML = `<i class="fa-regular fa-user"></i>${rData.author.length > maxCauthor ? rData.author.slice(0, maxCauthor).trimEnd() + "..." : rData.author}`;
         document.getElementById("a-amount").innerHTML = `<strong>Audio ~</strong> ${rData.songs.length}`;
         document.getElementById("songs").innerHTML = rData.songs.map((song, index) => {
             return `

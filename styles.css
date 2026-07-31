@@ -378,7 +378,7 @@ input[type="text"]:-webkit-autofill {
     margin-top: 3px;
 }
 
-#duration, #length {
+#duration, #length, #play {
     border-radius: 5px;
     padding: 5px;
     background-color: rgba(34, 34, 34, 0.7);
@@ -467,7 +467,22 @@ input[type="text"]:-webkit-autofill {
     border-radius: 8px;
 }
 
-#length {
+#watch { 
+    position: relative;
+    width: 100%;
+    border-radius: 8px;
+    background: radial-gradient(#e55, #202020)
+}
+#watch #play {
+    position: absolute;
+    bottom: 10px;
+    right: 45%;
+}
+#watch #play:hover {
+    cursor: pointer;
+    color: rgb(238, 117, 117);
+}
+#watch #length {
     position: relative;
     top: -35px;
     left: 9px;
@@ -544,7 +559,9 @@ input[type="text"]:-webkit-autofill {
 
 #details {
     position: relative;
-    margin-top: 1.5rem;
+    margin-top: 2.5rem;
+    border-top: 1px solid #555;
+    border-bottom: 1px solid #555;
     border-radius: 15px;
     padding: 15px;
     background-color: #282828;
@@ -557,8 +574,25 @@ input[type="text"]:-webkit-autofill {
 }
 
 #details p {
-    margin: 0.3rem 0;
+    font-size: 15px;
     color: #ccc;
+}
+#details #v-author {
+    margin-top: 2px;
+    margin-bottom: 12px;
+}
+
+#details #_ {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+#details #_ span {
+    border: 1px solid #777;
+    border-radius: 7px;
+    padding: 5px;
+    background-color: rgba(125, 125, 125, 0.4);
+    font-size: 0.8rem;
 }
 
 #download, #download-all {
@@ -763,6 +797,9 @@ input[type="text"]:-webkit-autofill {
 @media only screen and (max-width: 700px) {
     #p-header { height: 75px }
     #p-header img { height: 75px }
+
+    #watch #play { right: 40% }
+
     #p-info { 
         height: 75px;
         transform: translateY(-5px);
@@ -795,6 +832,11 @@ input[type="text"]:-webkit-autofill {
     }
 
     .video { margin-top: 5px }
+    #download { 
+        height: 32px;
+        width: 90px;
+     }
+    #details h2 { font-size: 1.1rem }
 
     #p-header { 
         display: flex;
@@ -812,6 +854,8 @@ input[type="text"]:-webkit-autofill {
 /* Smaller phones portrait view styling */
 
 @media only screen and (max-width: 390px) {
+    #watch #play { right: 36% }
+
     #p-header { height: 70px }
     #p-header img { height: 70px }
     #p-title { font-size: 14px }
