@@ -473,6 +473,10 @@ input[type="text"]:-webkit-autofill {
     border-radius: 8px;
     background: radial-gradient(#e55, #202020)
 }
+#watch img {
+    width: 100%;
+    border-radius: 8px;
+}
 #watch #play {
     position: absolute;
     bottom: 10px;
@@ -487,6 +491,7 @@ input[type="text"]:-webkit-autofill {
     bottom: 10px;
     left: 8px;
 }
+#watch iframe { border-radius: 8px }
 
 #v-d-options-b, #p-d-options-b {
     float: right;
