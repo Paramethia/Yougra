@@ -462,11 +462,6 @@ input[type="text"]:-webkit-autofill {
 
 #v { display: none }
 
-#video-info img {
-    width: 100%;
-    border-radius: 8px;
-}
-
 #watch { 
     position: relative;
     width: 100%;
