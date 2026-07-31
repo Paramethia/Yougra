@@ -483,9 +483,9 @@ input[type="text"]:-webkit-autofill {
     color: rgb(238, 117, 117);
 }
 #watch #length {
-    position: relative;
-    top: -35px;
-    left: 9px;
+    position: absolute;
+    bottom: 10px;
+    left: 8px;
 }
 
 #v-d-options-b, #p-d-options-b {
