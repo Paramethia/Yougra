@@ -506,6 +506,7 @@ input[type="text"]:-webkit-autofill {
     margin-top: 5px;
     margin-right: 8px;
     border-radius: 9px;
+    transform: translateY(3px);
     background-color: #3f3f3f;
     padding: 5px 7px;
     font-size: 0.8rem;
@@ -578,9 +579,12 @@ input[type="text"]:-webkit-autofill {
     color: #ccc;
 }
 #details #v-author {
+    max-width: 300px;
     margin-top: 2px;
     margin-bottom: 12px;
+    cursor: pointer;
 }
+#details #v-author:hover { color: #e77 }
 
 #details #_ {
     display: flex;

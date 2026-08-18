@@ -69,7 +69,7 @@ logo.onclick = () => {
     searchMode() 
 }
 
-const currentVersion = "Beta 1.7.6";
+const currentVersion = "Beta 1.7.7";
 const savedVersion = localStorage.getItem("version");
 
 if (savedVersion === currentVersion) version.style.animation = "none"
@@ -587,6 +587,7 @@ async function fetchVideo() {
         document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${(parseFloat(selectedAudio.size) + 1.4).toFixed(2)}mb</span></p>`;
         document.getElementById("v-title").innerText = data.title;
         document.getElementById("v-author").innerHTML = `<strong>@${data.author}</strong> `;
+        document.getElementById("v-author").onclick = () => { window.open(`https://youtube.com/@${data.author}`, '_blank') };
         document.getElementById("v-views").innerHTML = `<i class="fa-regular fa-eye"></i> ${views}`;
         document.getElementById("likes").innerHTML = `<i class="fa-regular fa-thumbs-up"></i> ${likes}`;
         document.getElementById("posted").innerHTML = `<i class="fa-regular fa-calendar"></i> ${window.innerWidth > 355 || screen.width > 355 ? data.pDate.exact : data.pDate.relative}`;
@@ -848,9 +849,16 @@ async function fetchVideo() {
 
 function playlistFindKey(event) { if (event.key === "Enter") fetchPlaylist() }
 
+let pDownloading = false;
 let fpTries = 0;
 
 async function fetchPlaylist() {
+    if (pDownloading) {
+        playlistErr.innerText = "Can't fetch while already downloading";
+        setTimeout(() => { playlistErr.innerText = "" }, 3400 );
+        return
+    }
+
     const url = document.getElementById("playlist-link").value;
 
     if (!url) {
@@ -994,6 +1002,7 @@ async function fetchPlaylist() {
 
                     // reset after done
                     setTimeout(() => {
+                        pDownloading = false;
                         songDownloading = false;
                         songProgress[index].style.width = "0";
                         songProgress[index].style.display = "none";
@@ -1007,6 +1016,7 @@ async function fetchPlaylist() {
 
         async function downloadSong(song, index, rData, songProgress, songIndexes) {
             try {
+                pDownloading = true;
                 songDownloading = true;
                 songProgress[index].style.display = "block";
                 songIndexes[index].style.color = "#e55";
@@ -1027,6 +1037,7 @@ async function fetchPlaylist() {
                     showError(resJ.errorTitle, resJ.errorMessage);
                     songIndexes[index].style.color = "lightgray";
                     songProgress[index].style.display = "none";
+                    pDownloading = false;
                     songDownloading = false;
                     return;
                 }
@@ -1088,6 +1099,7 @@ async function fetchPlaylist() {
                 await new Promise(res => setTimeout(res, 500));
             }
 
+            pDownloading = false;
             songDownloading = false;
             downloadBtn.disabled = false;
             downloadBtn.style.filter = "brightness(100%)";
