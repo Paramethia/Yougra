@@ -318,6 +318,11 @@ input[type="text"]:-webkit-autofill {
 
 #info p { font-size: 0.8rem }
 
+#v-count, #p-count {
+    color: #e55; 
+    font-size: 11px;
+}
+
 #video-info, #search-results, #playlist-info {
     display: none;
     max-width: 600px;

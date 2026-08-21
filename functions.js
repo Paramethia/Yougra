@@ -260,19 +260,19 @@ pora.onmouseout = () => { if (plists.style.display === "none") pora.style.backgr
 vors.onclick = () => { 
     if (vids.style.display === "none") {
         vids.style.display = "flex";
-        vors.innerText = vors.innerText.replace("▽", "△");
+        vors.innerHTML = vors.innerHTML.replace("▽", "△");
     } else {
         vids.style.display = "none";
-        vors.innerText = vors.innerText.replace("△", "▽");
+        vors.innerHTML = vors.innerHTML.replace("△", "▽");
     }
 }
 pora.onclick = () => { 
     if (plists.style.display === "none") { 
         plists.style.display = "flex";
-        pora.innerText = pora.innerText.replace("▽", "△");
+        pora.innerHTML = pora.innerHTML.replace("▽", "△");
     } else { 
         plists.style.display = "none";
-        pora.innerText = pora.innerText.replace("△", "▽");
+        pora.innerHTML = pora.innerHTML.replace("△", "▽");
     } 
 }
 
@@ -365,15 +365,17 @@ async function search() {
     }
 
     searchResults.style.display = "block";
-    vors.innerText = vors.innerText.replace("△", "▽");
+    vors.innerHTML = vors.innerHTML.replace("△", "▽");
     vors.style.backgroundColor = "rgba(150, 150, 150, 0.1)";
 
     if (!playlists.length) {
-        [vors, pora].forEach(element => element.style.display = "none")
+        [vors, pora].forEach(element => element.style.display = "none");
         vids.style.display = "flex";
         plists.style.display = "none";
     } else {
-        [vors, pora].forEach(element => element.style.display = "block")
+        [vors, pora].forEach(element => element.style.display = "block");
+        document.getElementById("v-count").innerText = videos.length;
+        document.getElementById("p-count").innerText = playlists.length;
         vids.style.display = "none";
     }
 
