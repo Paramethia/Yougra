@@ -261,22 +261,18 @@ vors.onclick = () => {
     if (vids.style.display === "none") {
         vids.style.display = "flex";
         vors.innerHTML = vors.innerHTML.replace("▽", "△");
-        vors.innerHTML = vors.innerHTML.replace(" animation: wave 1s linear 5", " animation: none");
     } else {
         vids.style.display = "none";
         vors.innerHTML = vors.innerHTML.replace("△", "▽");
-        vors.innerHTML = vors.innerHTML.replace(" animation: none", " animation: wave 1s linear 5")
     }
 }
 pora.onclick = () => { 
     if (plists.style.display === "none") { 
         plists.style.display = "flex";
         pora.innerHTML = pora.innerHTML.replace("▽", "△");
-        pora.innerHTML = pora.innerHTML.replace(" animation: wave 1s linear 5", " animation: none");
     } else { 
         plists.style.display = "none";
         pora.innerHTML = pora.innerHTML.replace("△", "▽");
-        pora.innerHTML = pora.innerHTML.replace(" animation: none", "animation: wave 1s linear 5");
     } 
 }
 

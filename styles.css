@@ -318,11 +318,6 @@ input[type="text"]:-webkit-autofill {
 
 #info p { font-size: 0.8rem }
 
-#v-count, #p-count {
-    color: #e55; 
-    font-size: 11px;
-}
-
 #video-info, #search-results, #playlist-info {
     display: none;
     max-width: 600px;
@@ -343,6 +338,18 @@ input[type="text"]:-webkit-autofill {
     cursor: pointer;
 }
 #search-results h3:hover { transition: 0.3s }
+
+#search-results h3 span:nth-child(2),
+#seasrch-results h3 span:nth-child(2) {
+    display: inline-block; 
+    color:#e55; 
+    animation: wave 1s linear 4;
+}
+
+#v-count, #p-count {
+    color: #e55; 
+    font-size: 11px;
+}
 
 #video-info { 
     width: 100%;
