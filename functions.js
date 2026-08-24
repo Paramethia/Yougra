@@ -607,7 +607,7 @@ async function fetchVideo() {
         document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${(parseFloat(selectedAudio.size) + 1.4).toFixed(2)}mb</span></p>`;
         document.getElementById("v-title").innerText = data.title;
         document.getElementById("v-author").innerHTML = `<strong>@${data.author}</strong> `;
-        document.getElementById("v-author").onclick = () => { window.open(`https://youtube.com/@${data.author.includes(" ") ? data.author.replaceAll(" ", "") : data.athor}`, '_blank') };
+        document.getElementById("v-author").onclick = () => { window.open(`https://youtube.com/@${data.author.includes(" ") ? data.author.replaceAll(" ", "") : data.author}`, '_blank') };
         document.getElementById("v-views").innerHTML = `<i class="fa-regular fa-eye"></i> ${views}`;
         document.getElementById("likes").innerHTML = `<i class="fa-regular fa-thumbs-up"></i> ${likes}`;
         document.getElementById("posted").innerHTML = `<i class="fa-regular fa-calendar"></i> ${window.innerWidth > 355 || screen.width > 355 ? data.pDate.exact : data.pDate.relative}`;
