@@ -182,8 +182,8 @@ function showError(eT = "Server error", eM = "Something is wrong with the server
 // === Text switch UI code ===
 
 const switchTexts = document.querySelectorAll(".switch");
-let sE = document.getElementById("search-val");
-const placeholders = ["Enter video/song title or creator name", "Enter playlist/album title or artist name"];
+const sE = document.getElementById("search-query");
+const placeholders = ["Enter video/song title or author name", "Enter playlist/album title or artist name"];
 
 setInterval(() => {
     switchTexts[0].innerText === "song or video" ? switchTexts[0].innerText = "playlist or album" : switchTexts[0].innerText = "song or video"
@@ -281,7 +281,7 @@ pora.onclick = () => {
 let searchTries = 0;
 
 async function search() {
-    const searchInput = document.getElementById("search-val").value;
+    const searchInput = document.getElementById("search-query").value;
 
     if (!searchInput) {
         searchErr.innerText = "Type something!!";
@@ -289,11 +289,17 @@ async function search() {
         return
     }
 
-    if (validVideoURL(searchInput) || searchInput.includes("playlist?list=")) {
-        document.getElementById("search-val").value = "";
-        validVideoURL(searchInput) ? document.getElementById("vid-link").value = searchInput : document.getElementById("playlist-link").value = searchInput;
+    if (searchInput.includes("https://") && !/youtube\.com|youtu\.be/.test(searchInput)) {
+        searchErr.innerText = "Only YouTube links, pal";
+        setTimeout(() => { searchErr.innerText = "" }, 4400 );
+        return
+    }
+
+    if (validYouTubeURL(searchInput)) {
+        document.getElementById("search-query").value = "";
+        document.getElementById(searchInput.includes("playlist?list=") ? "playlist-link" : "video-link").value = searchInput;
         urlMode();
-        validVideoURL(searchInput) ? fetchVideo() : fetchPlaylist();
+        searchInput.includes("playlist?list=") ? fetchPlaylist() : fetchVideo();
         return
     }
 
@@ -385,7 +391,7 @@ async function search() {
     vidCons.forEach((vidCon, index) => { 
         vidCon.onclick = (e) => {
             e.stopPropagation();
-            document.getElementById("vid-link").value = videos[index].url;
+            document.getElementById("video-link").value = videos[index].url;
             urlMode();
             fetchVideo();
         }
@@ -433,14 +439,17 @@ window.addEventListener("keydown", searchKey);
  
 // === Link section functions ===
 
-function validVideoURL(url) {
+function validYouTubeURL(url) {
     return (
-        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/watch\?v=/.test(url) ||
-        /^https?:\/\/youtu\.be\//.test(url) ||
-        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/shorts\//.test(url) ||
-        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/live\//.test(url)
+        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/(watch\?v=|shorts\/|live\/|playlist\?list=)/.test(url) ||
+        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/watch\?.*&list=/.test(url) ||
+        /^https?:\/\/youtu\.be\//.test(url)
     );
 }
+
+[document.getElementById("video-link"), document.getElementById("playlist-link")].forEach(input => {
+    input.addEventListener("click", () => input.value = "" )
+})
 
 let pdo = false;
 
@@ -513,7 +522,7 @@ function videoFindKey(event) { if (event.key === "Enter") fetchVideo() }
 let fvTries = 0;
 
 async function fetchVideo() {
-    const url = document.getElementById("vid-link").value;
+    const url = document.getElementById("video-link").value;
 
     if (!url) {
         videoErr.innerText = "Where's the link, dawg?";
@@ -521,10 +530,19 @@ async function fetchVideo() {
         return;
     }
 
-    if (!validVideoURL(url)) {
-        videoErr.innerText = "That's not a valid YouTube link";
-        setTimeout(() => { videoErr.innerText = "" }, 4500 );
+    if (!validYouTubeURL(url)) {
+        document.getElementById("video-link").value = "";
+        document.getElementById("search-query").value = url;
+        searchMode();
+        search();
         return;
+    }
+
+    if (url.includes("playlist?list=")) {
+        document.getElementById("video-link").value = "";
+        document.getElementById("playlist-link").value = url;
+        fetchPlaylist();
+        return
     }
 
     vidCon.style.display = "inline-block";
@@ -869,10 +887,19 @@ async function fetchPlaylist() {
         return
     }
 
-    if (!url.includes("playlist?list=")) {
-        playlistErr.innerText = "That's not a valid YouTube playlist link";
-        setTimeout(() => { playlistErr.innerText = "" }, 4000 );
+    if (!validYouTubeURL) {
+        document.getElementById("playlist-link").value = "";
+        document.getElementById("search-query").value = url;
+        searchMode();
+        search();
         return;
+    }
+
+    if (!url.includes("playlist?list=")) {
+        document.getElementById("playlist-link").value = "";
+        document.getElementById("video-link").value = url;
+        fetchVideo();
+        return
     }
 
     playCon.style.display = "block";
