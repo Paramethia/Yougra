@@ -339,6 +339,18 @@ input[type="text"]:-webkit-autofill {
 }
 #search-results h3:hover { transition: 0.3s }
 
+#search-results h3 span:nth-child(2),
+#seasrch-results h3 span:nth-child(2) {
+    display: inline-block; 
+    color:#e55; 
+    animation: wave 1s linear 4;
+}
+
+#v-count, #p-count {
+    color: #e55; 
+    font-size: 11px;
+}
+
 #video-info { 
     width: 100%;
     position: relative 
@@ -506,6 +518,7 @@ input[type="text"]:-webkit-autofill {
     margin-top: 5px;
     margin-right: 8px;
     border-radius: 9px;
+    transform: translateY(3px);
     background-color: #3f3f3f;
     padding: 5px 7px;
     font-size: 0.8rem;
@@ -578,9 +591,12 @@ input[type="text"]:-webkit-autofill {
     color: #ccc;
 }
 #details #v-author {
+    max-width: 300px;
     margin-top: 2px;
     margin-bottom: 12px;
+    cursor: pointer;
 }
+#details #v-author:hover { color: #e77 }
 
 #details #_ {
     display: flex;
@@ -757,6 +773,14 @@ input[type="text"]:-webkit-autofill {
 }
 @keyframes minimise {
     from { max-height: 420px } to { max-height: 57px }
+}
+
+@keyframes wave {
+  30% { transform: scale(1.2); }
+  40%, 60% { transform: rotate(-20deg) scale(1.2); }
+  50% { transform: rotate(20deg) scale(1.2); }
+  70% { transform: rotate(0deg) scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 @keyframes border-light-up { 

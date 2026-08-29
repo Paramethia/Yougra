@@ -69,7 +69,7 @@ logo.onclick = () => {
     searchMode() 
 }
 
-const currentVersion = "Beta 1.7.6";
+const currentVersion = "Beta 1.7.7";
 const savedVersion = localStorage.getItem("version");
 
 if (savedVersion === currentVersion) version.style.animation = "none"
@@ -182,8 +182,8 @@ function showError(eT = "Server error", eM = "Something is wrong with the server
 // === Text switch UI code ===
 
 const switchTexts = document.querySelectorAll(".switch");
-let sE = document.getElementById("search-val");
-const placeholders = ["Enter video/song title or creator name", "Enter playlist/album title or artist name"];
+const sE = document.getElementById("search-query");
+const placeholders = ["Enter video/song title or author name", "Enter playlist/album title or artist name"];
 
 setInterval(() => {
     switchTexts[0].innerText === "song or video" ? switchTexts[0].innerText = "playlist or album" : switchTexts[0].innerText = "song or video"
@@ -260,19 +260,19 @@ pora.onmouseout = () => { if (plists.style.display === "none") pora.style.backgr
 vors.onclick = () => { 
     if (vids.style.display === "none") {
         vids.style.display = "flex";
-        vors.innerText = vors.innerText.replace("▽", "△");
+        vors.innerHTML = vors.innerHTML.replace("▽", "△");
     } else {
         vids.style.display = "none";
-        vors.innerText = vors.innerText.replace("△", "▽");
+        vors.innerHTML = vors.innerHTML.replace("△", "▽");
     }
 }
 pora.onclick = () => { 
     if (plists.style.display === "none") { 
         plists.style.display = "flex";
-        pora.innerText = pora.innerText.replace("▽", "△");
+        pora.innerHTML = pora.innerHTML.replace("▽", "△");
     } else { 
         plists.style.display = "none";
-        pora.innerText = pora.innerText.replace("△", "▽");
+        pora.innerHTML = pora.innerHTML.replace("△", "▽");
     } 
 }
 
@@ -281,7 +281,7 @@ pora.onclick = () => {
 let searchTries = 0;
 
 async function search() {
-    const searchInput = document.getElementById("search-val").value;
+    const searchInput = document.getElementById("search-query").value;
 
     if (!searchInput) {
         searchErr.innerText = "Type something!!";
@@ -289,11 +289,17 @@ async function search() {
         return
     }
 
-    if (validVideoURL(searchInput) || searchInput.includes("playlist?list=")) {
-        document.getElementById("search-val").value = "";
-        validVideoURL(searchInput) ? document.getElementById("vid-link").value = searchInput : document.getElementById("playlist-link").value = searchInput;
+    if (searchInput.includes("https://") && !/youtube\.com|youtu\.be/.test(searchInput)) {
+        searchErr.innerText = "Only YouTube links, pal";
+        setTimeout(() => { searchErr.innerText = "" }, 4400 );
+        return
+    }
+
+    if (validYouTubeURL(searchInput)) {
+        document.getElementById("search-query").value = "";
+        document.getElementById(searchInput.includes("playlist?list=") ? "playlist-link" : "video-link").value = searchInput;
         urlMode();
-        validVideoURL(searchInput) ? fetchVideo() : fetchPlaylist();
+        searchInput.includes("playlist?list=") ? fetchPlaylist() : fetchVideo();
         return
     }
 
@@ -365,15 +371,17 @@ async function search() {
     }
 
     searchResults.style.display = "block";
-    vors.innerText = vors.innerText.replace("△", "▽");
+    vors.innerHTML = vors.innerHTML.replace("△", "▽");
     vors.style.backgroundColor = "rgba(150, 150, 150, 0.1)";
 
     if (!playlists.length) {
-        [vors, pora].forEach(element => element.style.display = "none")
+        [vors, pora].forEach(element => element.style.display = "none");
         vids.style.display = "flex";
         plists.style.display = "none";
     } else {
-        [vors, pora].forEach(element => element.style.display = "block")
+        [vors, pora].forEach(element => element.style.display = "block");
+        document.getElementById("v-count").innerText = videos.length;
+        document.getElementById("p-count").innerText = playlists.length;
         vids.style.display = "none";
     }
 
@@ -383,7 +391,7 @@ async function search() {
     vidCons.forEach((vidCon, index) => { 
         vidCon.onclick = (e) => {
             e.stopPropagation();
-            document.getElementById("vid-link").value = videos[index].url;
+            document.getElementById("video-link").value = videos[index].url;
             urlMode();
             fetchVideo();
         }
@@ -431,14 +439,17 @@ window.addEventListener("keydown", searchKey);
  
 // === Link section functions ===
 
-function validVideoURL(url) {
+function validYouTubeURL(url) {
     return (
-        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/watch\?v=/.test(url) ||
-        /^https?:\/\/youtu\.be\//.test(url) ||
-        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/shorts\//.test(url) ||
-        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/live\//.test(url)
+        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/(watch\?v=|shorts\/|live\/|playlist\?list=)/.test(url) ||
+        /^https?:\/\/(www\.)?(youtube|music\.youtube)\.com\/watch\?.*&list=/.test(url) ||
+        /^https?:\/\/youtu\.be\//.test(url)
     );
 }
+
+[document.getElementById("video-link"), document.getElementById("playlist-link")].forEach(input => {
+    input.addEventListener("click", () => input.value = "" )
+})
 
 let pdo = false;
 
@@ -511,7 +522,7 @@ function videoFindKey(event) { if (event.key === "Enter") fetchVideo() }
 let fvTries = 0;
 
 async function fetchVideo() {
-    const url = document.getElementById("vid-link").value;
+    const url = document.getElementById("video-link").value;
 
     if (!url) {
         videoErr.innerText = "Where's the link, dawg?";
@@ -519,10 +530,19 @@ async function fetchVideo() {
         return;
     }
 
-    if (!validVideoURL(url)) {
-        videoErr.innerText = "That's not a valid YouTube link";
-        setTimeout(() => { videoErr.innerText = "" }, 4500 );
+    if (!validYouTubeURL(url)) {
+        document.getElementById("video-link").value = "";
+        document.getElementById("search-query").value = url;
+        searchMode();
+        search();
         return;
+    }
+
+    if (url.includes("playlist?list=")) {
+        document.getElementById("video-link").value = "";
+        document.getElementById("playlist-link").value = url;
+        fetchPlaylist();
+        return
     }
 
     vidCon.style.display = "inline-block";
@@ -587,6 +607,7 @@ async function fetchVideo() {
         document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${(parseFloat(selectedAudio.size) + 1.4).toFixed(2)}mb</span></p>`;
         document.getElementById("v-title").innerText = data.title;
         document.getElementById("v-author").innerHTML = `<strong>@${data.author}</strong> `;
+        document.getElementById("v-author").onclick = () => { window.open(`https://youtube.com/@${data.author.includes(" ") ? data.author.replaceAll(" ", "") : data.author}`, '_blank') };
         document.getElementById("v-views").innerHTML = `<i class="fa-regular fa-eye"></i> ${views}`;
         document.getElementById("likes").innerHTML = `<i class="fa-regular fa-thumbs-up"></i> ${likes}`;
         document.getElementById("posted").innerHTML = `<i class="fa-regular fa-calendar"></i> ${window.innerWidth > 355 || screen.width > 355 ? data.pDate.exact : data.pDate.relative}`;
@@ -816,7 +837,7 @@ async function fetchVideo() {
                             downloadBtn.disabled = false;
                             downloadBtn.style.filter = "brightness(100%)";
                             document.getElementById("progress-bar").style.display = "none";
-                            progressText.innerText = "Error occured while merging";
+                            progressText.innerText = "Error occured while collecting";
                             setTimeout(() => { progressText.innerText = "" }, 8700);
                         }
                     }
@@ -848,9 +869,16 @@ async function fetchVideo() {
 
 function playlistFindKey(event) { if (event.key === "Enter") fetchPlaylist() }
 
+let pDownloading = false;
 let fpTries = 0;
 
 async function fetchPlaylist() {
+    if (pDownloading) {
+        playlistErr.innerText = "Can't fetch while already downloading";
+        setTimeout(() => { playlistErr.innerText = "" }, 3400 );
+        return
+    }
+
     const url = document.getElementById("playlist-link").value;
 
     if (!url) {
@@ -859,10 +887,19 @@ async function fetchPlaylist() {
         return
     }
 
-    if (!url.includes("playlist?list=")) {
-        playlistErr.innerText = "That's not a valid YouTube playlist link";
-        setTimeout(() => { playlistErr.innerText = "" }, 4000 );
+    if (!validYouTubeURL) {
+        document.getElementById("playlist-link").value = "";
+        document.getElementById("search-query").value = url;
+        searchMode();
+        search();
         return;
+    }
+
+    if (!url.includes("playlist?list=")) {
+        document.getElementById("playlist-link").value = "";
+        document.getElementById("video-link").value = url;
+        fetchVideo();
+        return
     }
 
     playCon.style.display = "block";
@@ -994,6 +1031,7 @@ async function fetchPlaylist() {
 
                     // reset after done
                     setTimeout(() => {
+                        pDownloading = false;
                         songDownloading = false;
                         songProgress[index].style.width = "0";
                         songProgress[index].style.display = "none";
@@ -1007,6 +1045,7 @@ async function fetchPlaylist() {
 
         async function downloadSong(song, index, rData, songProgress, songIndexes) {
             try {
+                pDownloading = true;
                 songDownloading = true;
                 songProgress[index].style.display = "block";
                 songIndexes[index].style.color = "#e55";
@@ -1027,6 +1066,7 @@ async function fetchPlaylist() {
                     showError(resJ.errorTitle, resJ.errorMessage);
                     songIndexes[index].style.color = "lightgray";
                     songProgress[index].style.display = "none";
+                    pDownloading = false;
                     songDownloading = false;
                     return;
                 }
@@ -1088,6 +1128,7 @@ async function fetchPlaylist() {
                 await new Promise(res => setTimeout(res, 500));
             }
 
+            pDownloading = false;
             songDownloading = false;
             downloadBtn.disabled = false;
             downloadBtn.style.filter = "brightness(100%)";
