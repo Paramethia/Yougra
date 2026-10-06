@@ -1061,7 +1061,7 @@ async function fetchPlaylist() {
 
                 if (song.author.toLowerCase().includes(album.artist.toLowerCase())) song.author = album.artist
 
-                const res = await fetch(`https//:${testServer}/download-a?url=${encodeURIComponent(song.url)}&sArtist=${encodeURIComponent(song.author)}&sTitle=${encodeURIComponent(song.title)}&playlist=${JSON.stringify(album)}`);
+                const res = await fetch(`https://${testServer}/download-a?url=${encodeURIComponent(song.url)}&sArtist=${encodeURIComponent(song.author)}&sTitle=${encodeURIComponent(song.title)}&playlist=${JSON.stringify(album)}`);
 
                 if (!res.ok) {
                     const resJ = await res.json();
