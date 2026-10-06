@@ -3,7 +3,7 @@ const [prodServer, testServer] = ["api.yougra.site", "yougra-server.onrender.com
 // Ping sever on page load to wake up Render server (doing this because of the free tier)
 window.addEventListener("load", () => {
     setTimeout(() => {
-        fetch(`${testServer}/ping`).then(() => console.log("Server warmed up")).catch(() => console.warn("Could not reach server (might still be waking up)"));
+        fetch(`https://${testServer}/ping`).then(() => console.log("Server warmed up")).catch(() => console.warn("Could not reach server (might still be waking up)"));
     }, 1500);
 });
 
@@ -308,7 +308,7 @@ async function search() {
     searchB.innerText = "Searching...";
     searchB.disabled = true;
 
-    const response = await fetch(`https:${testServer}/search`, {
+    const response = await fetch(`https://${testServer}/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input: searchInput })
@@ -817,7 +817,7 @@ async function fetchVideo() {
                         if (message.status === 'complete') {
                             processed = true;
                             // Trigger the file download via a new request
-                            window.location.href = `https:${testServer}${message.path}`;
+                            window.location.href = `https://${testServer}${message.path}`;
                             
                             // Reset UI after a short delay
                             setTimeout(() => {
@@ -910,7 +910,7 @@ async function fetchPlaylist() {
         findPlaylist.innerText = "Finding...";
         findPlaylist.disabled = true;
 
-        const response = await fetch(`https:${testServer}/playlist`, { 
+        const response = await fetch(`https://${testServer}/playlist`, { 
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url }) 
@@ -1061,7 +1061,7 @@ async function fetchPlaylist() {
 
                 if (song.author.toLowerCase().includes(album.artist.toLowerCase())) song.author = album.artist
 
-                const res = await fetch(`https:${testServer}/download-a?url=${encodeURIComponent(song.url)}&sArtist=${encodeURIComponent(song.author)}&sTitle=${encodeURIComponent(song.title)}&playlist=${JSON.stringify(album)}`);
+                const res = await fetch(`https//:${testServer}/download-a?url=${encodeURIComponent(song.url)}&sArtist=${encodeURIComponent(song.author)}&sTitle=${encodeURIComponent(song.title)}&playlist=${JSON.stringify(album)}`);
 
                 if (!res.ok) {
                     const resJ = await res.json();
