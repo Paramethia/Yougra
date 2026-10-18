@@ -286,7 +286,7 @@ input[type="text"]:-webkit-autofill {
     transition: border 0.5s ease-in-out 0s;
 }
 
-#search, #find-info, #find-list {
+#search, #grab-video, #grab-list {
     padding: 0.5rem 1rem;
     margin-left: 0.5rem;
     background-color: #e22;
@@ -296,7 +296,7 @@ input[type="text"]:-webkit-autofill {
     color: #ddd;
     cursor: pointer;
 }
-#search:hover, #find-info:hover, #find-list:hover {
+#search:hover, #grab-video:hover, #grab-list:hover {
     border-radius: 4px;
     background-color: #cc0000;
 }
@@ -843,7 +843,7 @@ input[type="text"]:-webkit-autofill {
     #v-info, #playlist { width: 100% }
     input[type="text"] { width: 90% }
 
-    #find-info, #find-list {
+    #grab-video, #grab-list {
         display: block;
         margin: 7px auto;
     }
