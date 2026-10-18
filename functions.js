@@ -1,7 +1,9 @@
+const [prodServer, testServer] = ["api.yougra.site", "yougra-server.onrender.com"];
+
 // Ping sever on page load to wake up Render server (doing this because of the free tier)
 window.addEventListener("load", () => {
     setTimeout(() => {
-        fetch("https://yougra-server.onrender.com/ping").then(() => console.log("Server warmed up")).catch(() => console.warn("Could not reach server (might still be waking up)"));
+        fetch(`https://${testServer}/ping`).then(() => console.log("Server warmed up")).catch(() => console.warn("Could not reach server (might still be waking up)"));
     }, 1500);
 });
 
@@ -42,7 +44,7 @@ const pListsCon = document.getElementById("plists");
 
 // === URL elements ===
     // Video elements
-const findInfo = document.getElementById("find-info");
+const grabVideo = document.getElementById("grab-video");
 const videoErr = document.getElementById("video-err-msg");
 const watch = document.getElementById("watch");
 const selection = document.getElementById("selection-msg");
@@ -52,7 +54,7 @@ const vdOptions = document.getElementById("v-d-options");
 const vidSet = document.getElementById("vid-o");
 const audSet = document.getElementById("aud-o");
     // Playlist elements
-const findPlaylist = document.getElementById("find-list");
+const grabPlaylist = document.getElementById("grab-list");
 const playlistErr = document.getElementById("playlist-err-msg");
 const playCon = document.getElementById("playlist-info");
 const pdOptionsB = document.getElementById("p-d-options-b");
@@ -69,7 +71,7 @@ logo.onclick = () => {
     searchMode() 
 }
 
-const currentVersion = "Beta 1.7.7";
+const currentVersion = "Beta 1.7.8";
 const savedVersion = localStorage.getItem("version");
 
 if (savedVersion === currentVersion) version.style.animation = "none"
@@ -281,7 +283,7 @@ pora.onclick = () => {
 let searchTries = 0;
 
 async function search() {
-    const searchInput = document.getElementById("search-query").value;
+    const searchInput = sE.value;
 
     if (!searchInput) {
         searchErr.innerText = "Type something!!";
@@ -296,7 +298,7 @@ async function search() {
     }
 
     if (validYouTubeURL(searchInput)) {
-        document.getElementById("search-query").value = "";
+        sE.value = "";
         document.getElementById(searchInput.includes("playlist?list=") ? "playlist-link" : "video-link").value = searchInput;
         urlMode();
         searchInput.includes("playlist?list=") ? fetchPlaylist() : fetchVideo();
@@ -306,7 +308,7 @@ async function search() {
     searchB.innerText = "Searching...";
     searchB.disabled = true;
 
-    const response = await fetch("https://api.yougra.site/search", {
+    const response = await fetch(`https://${testServer}/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input: searchInput })
@@ -447,6 +449,36 @@ function validYouTubeURL(url) {
     );
 }
 
+function extractContentId(url) {
+    if (!validYouTubeURL(url)) return url
+    
+	const parsed = new URL(url);
+
+	// youtu.be/<id>
+	if (parsed.hostname === "youtu.be") {
+		return parsed.pathname.slice(1);
+	}
+
+	// youtube.com or music.youtube.com/watch?v=<id>
+	if ((parsed.hostname.includes("youtube.com") || parsed.hostname.includes("music.youtube.com")) && parsed.searchParams.has("v")) {
+		return parsed.searchParams.get("v");
+	}
+
+	// youtube.com or music.youtube.com/shorts/<id>
+	if (parsed.pathname.startsWith("/shorts/")) {
+		return parsed.pathname.split("/shorts/")[1].split(/[?#]/)[0];
+	}
+	
+	// youtube.com/live/<id>
+	if (parsed.pathname.startsWith("/live/")) {
+		return parsed.pathname.split("/live/")[1].split(/[?#]/)[0];
+	}
+
+    if (parsed.searchParams.has("list")) return parsed.searchParams.get("list")
+
+	return null;
+}
+
 [document.getElementById("video-link"), document.getElementById("playlist-link")].forEach(input => {
     input.addEventListener("click", () => input.value = "" )
 })
@@ -522,28 +554,30 @@ function videoFindKey(event) { if (event.key === "Enter") fetchVideo() }
 let fvTries = 0;
 
 async function fetchVideo() {
-    const url = document.getElementById("video-link").value;
+    const videoI = document.getElementById("video-link").value;
 
-    if (!url) {
+    if (!videoI) {
         videoErr.innerText = "Where's the link, dawg?";
         setTimeout(() => { videoErr.innerText = "" }, 3000 );
         return;
     }
 
-    if (!validYouTubeURL(url)) {
+    if (!validYouTubeURL(videoI)) {
         document.getElementById("video-link").value = "";
-        document.getElementById("search-query").value = url;
+        sE.value = videoI;
         searchMode();
         search();
         return;
     }
 
-    if (url.includes("playlist?list=")) {
+    if (videoI.includes("playlist?list=")) {
         document.getElementById("video-link").value = "";
-        document.getElementById("playlist-link").value = url;
+        document.getElementById("playlist-link").value = videoI;
         fetchPlaylist();
         return
     }
+
+    const id = extractContentId(videoI);
 
     vidCon.style.display = "inline-block";
 
@@ -558,13 +592,13 @@ async function fetchVideo() {
     }
 
     try {
-        findInfo.innerText = "Finding...";
-        findInfo.disabled = true;
+        grabVideo.innerText = "Grabbing...";
+        grabVideo.disabled = true;
         
-        const response = await fetch("https://api.yougra.site/video", {
+        const response = await fetch(`https://${prodServer}/video`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url })
+            body: JSON.stringify({ id })
         });
 
         const data = await response.json();
@@ -606,8 +640,8 @@ async function fetchVideo() {
         `;
         document.getElementById("aud-o").innerHTML = `<p>Audio <span id="a-size">${(parseFloat(selectedAudio.size) + 1.4).toFixed(2)}mb</span></p>`;
         document.getElementById("v-title").innerText = data.title;
-        document.getElementById("v-author").innerHTML = `<strong>@${data.author}</strong> `;
-        document.getElementById("v-author").onclick = () => { window.open(`https://youtube.com/@${data.author.includes(" ") ? data.author.replaceAll(" ", "") : data.author}`, '_blank') };
+        document.getElementById("v-author").innerHTML = `<strong>@${data.author.name}</strong> `;
+        document.getElementById("v-author").onclick = () => { window.open(data.author.url, '_blank') };
         document.getElementById("v-views").innerHTML = `<i class="fa-regular fa-eye"></i> ${views}`;
         document.getElementById("likes").innerHTML = `<i class="fa-regular fa-thumbs-up"></i> ${likes}`;
         document.getElementById("posted").innerHTML = `<i class="fa-regular fa-calendar"></i> ${window.innerWidth > 355 || screen.width > 355 ? data.pDate.exact : data.pDate.relative}`;
@@ -616,7 +650,7 @@ async function fetchVideo() {
             watch.innerHTML = "";
 
             const iframe = document.createElement("iframe");
-            iframe.src = `https://www.youtube.com/embed/${data.videoID}`;
+            iframe.src = `https://www.youtube.com/embed/${id}`;
             iframe.title = data.title || "YouTube video player";
             iframe.frameBorder = "0";
             iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share");
@@ -676,7 +710,7 @@ async function fetchVideo() {
                     const metadata = data.song && data.lengthSeconds < 900 ? "yes" : "no";
  
                     progressText.innerText = "Wait for it...";
-                    const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(url)}&metadata=${metadata}`);
+                    const res = await fetch(`https://${prodServer}/download-a?id=${id}&metadata=${metadata}`);
 
                     if (!res.ok) {
                         const resJ = await res.json();
@@ -758,7 +792,7 @@ async function fetchVideo() {
                     }, 500);
                 } else if (format === "video") {
                     if (method === "immediate") {
-                        window.location.href = `https://api.yougra.site/immediate-download?url=${encodeURIComponent(url)}&itag=${itag}`;
+                        window.location.href = `https://${prodServer}/immediate-download?id=${id}&itag=${itag}`;
 
                         setTimeout(() => {
                             downloadBtn.disabled = false;
@@ -775,12 +809,12 @@ async function fetchVideo() {
                         return
                     }
 
-                    const ws = new WebSocket('wss://api.yougra.site');
+                    const ws = new WebSocket(`wss://${prodServer}`);
                     let processed = false;
 
                     ws.onopen = () => {
                         console.log('WebSocket connected.');
-                        ws.send(JSON.stringify({ url, itag }));
+                        ws.send(JSON.stringify({ id, itag }));
                         downloadBtn.innerText = "0%";
                         progressText.innerText = "Wait for it...";
                         document.getElementById("progress-bar").style.display = "block";
@@ -815,7 +849,7 @@ async function fetchVideo() {
                         if (message.status === 'complete') {
                             processed = true;
                             // Trigger the file download via a new request
-                            window.location.href = `https://api.yougra.site${message.path}`;
+                            window.location.href = `https://${prodServer}${message.path}`;
                             
                             // Reset UI after a short delay
                             setTimeout(() => {
@@ -862,8 +896,8 @@ async function fetchVideo() {
         setTimeout(() => { videoErr.innerText = "" }, fvTries === 3 ? 5000 : 4000);
         console.error("Error occured while fetching video: \n", err);
     } finally {
-        findInfo.innerText = "Find it";
-        findInfo.disabled = false;
+        grabVideo.innerText = "Grab it";
+        grabVideo.disabled = false;
     }
 }
 
@@ -879,9 +913,9 @@ async function fetchPlaylist() {
         return
     }
 
-    const url = document.getElementById("playlist-link").value;
+    const playlistI = document.getElementById("playlist-link").value;
 
-    if (!url) {
+    if (!playlistI) {
         playlistErr.innerText = "Where's the link, dawg?";
         setTimeout(() => { playlistErr.innerText = "" }, 3400 );
         return
@@ -889,29 +923,31 @@ async function fetchPlaylist() {
 
     if (!validYouTubeURL) {
         document.getElementById("playlist-link").value = "";
-        document.getElementById("search-query").value = url;
+        sE.value = playlistI;
         searchMode();
         search();
         return;
     }
 
-    if (!url.includes("playlist?list=")) {
+    if (!playlistI.includes("playlist?list=")) {
         document.getElementById("playlist-link").value = "";
-        document.getElementById("video-link").value = url;
+        document.getElementById("video-link").value = playlistI;
         fetchVideo();
         return
     }
 
+    const id = extractContentId(playlistI);
+
     playCon.style.display = "block";
 
     try {
-        findPlaylist.innerText = "Finding...";
-        findPlaylist.disabled = true;
+        grabPlaylist.innerText = "Grabbing...";
+        grabPlaylist.disabled = true;
 
-        const response = await fetch("https://api.yougra.site/playlist", { 
+        const response = await fetch(`https://${prodServer}/playlist`, { 
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url }) 
+            body: JSON.stringify({ id }) 
         })
 
         const rData = await response.json();
@@ -923,7 +959,7 @@ async function fetchPlaylist() {
         if (!rData.songs.length) {
             console.warn(`No songs were served for ${rData.title} playlist/album...`);
             showError("Empty data", "No songs were served for this playlist/album. Retry or try a different one?");            
-            findPlaylist.disabled = false;
+            grabPlaylist.disabled = false;
             return
         }
 
@@ -1050,16 +1086,17 @@ async function fetchPlaylist() {
                 songProgress[index].style.display = "block";
                 songIndexes[index].style.color = "#e55";
 
-                const album = {
+                const collection = {
                     title: encodeURIComponent(rData.title),
                     artist: encodeURIComponent(rData.author),
                     coverImage: encodeURIComponent(rData.thumbnail),
+                    type: rData.type,
                     tracks: { index: index + 1, total: rData.songs.length }
                 };
 
-                if (song.author.toLowerCase().includes(album.artist.toLowerCase())) song.author = album.artist
+                if (song.author.toLowerCase().includes(collection.artist.toLowerCase())) song.author = collection.artist
 
-                const res = await fetch(`https://api.yougra.site/download-a?url=${encodeURIComponent(song.url)}&sArtist=${encodeURIComponent(song.author)}&sTitle=${encodeURIComponent(song.title)}&playlist=${JSON.stringify(album)}`);
+                const res = await fetch(`https://${prodServer}/download-a?id=${song.id}&sArtist=${encodeURIComponent(song.author)}&sTitle=${encodeURIComponent(song.title)}&playlist=${JSON.stringify(collection)}`);
 
                 if (!res.ok) {
                     const resJ = await res.json();
@@ -1148,7 +1185,7 @@ async function fetchPlaylist() {
         setTimeout(() => { playlistErr.innerText = "" }, fpTries === 3 ? 5000 : 4000);
         console.error("Error occured while fetching playlist:", error);
     } finally {
-        findPlaylist.innerText = "Find it";
-        findPlaylist.disabled = false;
+        grabPlaylist.innerText = "Grab it";
+        grabPlaylist.disabled = false;
     }
 }
