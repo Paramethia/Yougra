@@ -609,8 +609,8 @@ async function fetchVideo() {
 
         const numFormat = window.innerWidth > 355 || screen.width > 355 ? new Intl.NumberFormat('fr-FR') : new Intl.NumberFormat('en', { notation: 'compact' });
 
-        const views = numFormat.format(data.viewCount);
-        const likes = numFormat.format(data.likeCount);
+        const views = numFormat.format(data.views);
+        const likes = numFormat.format(data.likes);
 
         const videoFormats = data.qualities.filter(vF => vF.type === 'videoonly' && vF.qualityLabel !== '144p');
         videoFormats.reverse();
