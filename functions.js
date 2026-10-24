@@ -612,10 +612,10 @@ async function fetchVideo() {
         const views = numFormat.format(data.views);
         const likes = numFormat.format(data.likes);
 
-        const videoFormats = data.qualities.filter(vF => vF.type === 'videoonly' && vF.qualityLabel !== '144p');
+        const videoFormats = data.formats.filter(vF => vF.type === 'videoonly' && vF.qualityLabel !== '144p');
         videoFormats.reverse();
         const defaultVidO = videoFormats.find(vid => vid.qualityLabel === "480p") || videoFormats.find(vid => vid.qualityLabel === "360p") || videoFormats.find(vid => vid.qualityLabel === "240p");
-        const audioFormats = data.qualities.filter(aF => aF.type === 'audioonly');
+        const audioFormats = data.formats.filter(aF => aF.type === 'audioonly');
         const selectedAudio = audioFormats.pop();
 
         function fullSize(vS, aS) {
@@ -707,7 +707,7 @@ async function fetchVideo() {
 
             try {
                 if (format === "audio") {
-                    const metadata = data.song && data.lengthSeconds < 900 ? "yes" : "no";
+                    const metadata = data.song && data.lengthSeconds < 900;
  
                     progressText.innerText = "Wait for it...";
                     const res = await fetch(`https://${prodServer}/download-a?id=${id}&metadata=${metadata}`);
