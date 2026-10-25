@@ -24,9 +24,44 @@
 </head>
 <body>
 	<header>
-		<div id="logo"><img src="./images/Yougra logo.png" alt="Yougra logo" /><h1>Yougra</h1></div> <span id="settings-nav"><i class="fa-solid fa-gear"></i></span>
+		<svg id="nav-tog" width="30px" height="30px" viewBox="0 0 24 24" fill="#ccc" xmlns="http://www.w3.org/2000/svg">
+			<path d="M4 18L20 18" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+			<path d="M4 12L20 12" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+			<path d="M4 6L20 6" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+		</svg>
+		<div id="logo"><img src="./images/Yougra logo.png" alt="Yougra logo" /><h1>Yougra</h1></div> 
+		<div id="head-search"><input type="search" id="search-query" placeholder="Enter video/song title or author name" style="animation:none"/><span id="search-b"><i class="fa-solid fa-magnifying-glass"></i></span></div>
+		
 	</header>
-	<span id="version">Beta 1.7.8</span>
+	<aside id="sidebar" style="display: none;">
+		<div class="route" id="home-r">Home <i class="fa-solid fa-house"></i></div>
+		<div class="route" id="info-r">Info <i class="fa-solid fa-question"></i></div>
+		<div class="route" id="search-r">Search <i class="fa-solid fa-magnifying-glass"></i></div>
+		<div class="route" id="grab-r">Grab <i class="fa-solid fa-circle-down"></i></div>
+		<div id="settings-o">Settings <i class="fa-solid fa-gear"></i></div>
+	</aside>
+	<span id="version">Beta 2</span>
+	<div id="update">
+		<div>
+			<h3>Beta 2 - preview Ⅰ</h3>
+			<dl>
+				<dt>⟬ <strong>Rebuild</strong> ⟭</dt>
+				<dd>⌊ Rebuilt the whole website for SPA routing. This means you will be able to share pages with friends to share content they can download</dd>
+				<dd>⌊ Added different routes for home <strong>(new)</strong>, info, search, grab, and more to come</dd>
+				<dt>⟬ <strong>UI & UX improvements</strong> ⟭</dt>
+				<dt>⟬ Updated layout for top bar</dt>
+				<dt>⟬ New background design</dt>
+				<dd>⌊ Only one search bar at the top to use both for links and searching</dd>
+				<dd>⌊ Added sidebar navigation</dd>
+				<dd>⌊ Re-designed loaders</dd>
+				<dd>⌊ Search results' share buttons now copy with website link to grab route</dd>
+				<dd>⌊ Improved UI for download options for videos</dd>
+				<dd>⌊ Added metadata toggle for audio download options</dd>
+				<font color="#aaa" size="2">More features coming soon for beta 2</font>
+			</dl>
+			<center><button id="close-update" aria-label="Close update overlay">Cool</button></center>
+		</div>
+	</div> 
 	<div id="settings" style="visibility: hidden;">
 		<div>
 			<i id="close-settings" class="fa-xl fa-solid fa-circle-xmark"></i>
@@ -63,20 +98,6 @@
 				<h5> Try not to download multiple videos at the same time if your internet is slow (it may cause errors) </h5>
 			</div>
 		</div>
-	</div>
-	<div id="update">
-		<div>
-			<h3>Beta 1.7.8</h3>
-			<dl>
-				<dt>⟬ <strong>Fix</strong> ⟭</dt>
-				<dd>⌊ Made video authors <em>always</em> link to correct YT channel pages when clicked</dd>
-				<dt>⟬ <strong>Improvements</strong> ⟭</dt>
-				<dd>⌊ Changed "Find it" buttons text to "Grab it"</dd>
-				<dd>⌊ Added collection types to playlists (preparation for Beta 2)</dd>
-				<dd>⌊ Updated API requests to require IDs now (preparation for Beta 2)</dd>
-			</dl>
-			<center><button id="close-update" aria-label="Close update overlay">Cool</button></center>
-		</div>
 	</div> 
 	<div id="error">
 		<div>
@@ -87,16 +108,74 @@
 		</div>
 	</div> 
 	<main>
-		<div id="modes">
-			<span id="search-o">Search</span>
-			<span id="link-o">Use link</span>
+		<div id="home">
+			<h1>Grab YouTube Content. <font color="#e55">Keep it forever.</font></h1>
+			<p>Search or paste a YT link -- then download videos, audio, playlists, songs, albums, shorts, and more with pristine quality, straight to your device.</p>
+			<br />
+			<span id="start">Start grabbing</span>
+			<br /> <br />
+			<h3> ⌈ Supported content ⌉</h3>
+			<div id="supports">
+				<span>Videos</span><span>Audio</span><span>Playlists</span><span>Albums</span>
+				<span>Songs</span><span>Podcasts</span><span>Lives</span>
+			</div>
+			<h3> ⌈ Supported files ⌉</h3>
+			<div id="formats">
+				<span>.mp4</span><span>.m4a</span><span>.mp3</span>
+			</div>
 		</div>
+		<div id="info">
+			<h4>What is Yougra about?</h4>
+			<p>
+			Yougra is a web app that allows you to download videos, audio, songs, playlists, albums, and more. 
+			Simply search for what you want above and click the media you want to download as either 
+			video or audio. Once you select a video, you will be able to choose from different 
+			video quality options before downloading.
+			</p>
 
-		<div id="search-mode">
-			<h4>Search for a <span class="switch">song or video</span>:</h4>
-			<input type="text" id="search-query" placeholder="Enter video/song title or author name" />
-			<button id="search" aria-label="Search YouTube video/song" onclick="search()">Search</button>
+			<h4>Help</h4>
+			<p>
+			In addition to searching, you can paste the exact YouTube video or song link along with playlists or album links 
+			to quickly grab them. <em>Playlists are currently downloadable as audio only</em>. If you're unsure how to get
+			an album link, you can find instructions in the <span id="s-shortcut">Settings</span>.
+			</p>
+
+			<p>
+			<i><strong>Pro tip:</strong> Add "album" next to album name when searching, 
+			to easily find actual albums instead of playlists pretending to be albums.</i>
+			</p>
+
+			<p>
+			Speaking of settings, you will also find download methods there for <strong>videos</strong>. 
+			There are two methods: <strong>Immediate</strong> and <strong>Process</strong>. By default, 
+			the Process method is selected, but you can switch between them at any time. The 
+			differences between these methods are explained in the Settings menu.
+			</p>
+
+			<h4>Features</h4>
+
+			<ul>
+				<li>Audio/Music detection system (auto selects fitting format)</li>
+				<li>Video quality selection choice</li>
+				<li>Download audio as m4a or mp3</li>
+				<li>Download audio from YT video</li>
+				<li>Custom download methods</li>
+				<li>Content link sharing (share links to videos/songs or playlists/albums for friends to download)</li>
+				<li>Custom search results <strong>(coming soon)</strong></li>
+				<li>Custom audio metadata <strong>(coming soon)</strong></li>
+				<li>Download stats <strong>(coming eventually)</strong></li>
+			</ul>
+		</div>
+		<div id="search">
+			<h4>Search for a <span class="switch">song or video</span>👆</h4>
 			<p id="search-err-msg"></p>
+			<div id="search-loader" aria-label="Searching" role="status">
+				<svg id="search-glass" viewBox="0 0 48 48" aria-hidden="true">
+					<circle cx="20" cy="20" r="13"></circle>
+					<line x1="29.5" y1="29.5" x2="40" y2="40"></line>
+				</svg>
+				<span>Searching...</span>
+			</div>
 
 			<div id="search-results">
 				<h3 id="v/s"><span id="v-count"></span>Videos/Songs <span>▽</span></h3>
@@ -104,107 +183,180 @@
 				<h3 id="p/a"><span id="p-count"></span>Playlists/Albums <span>▽</span></h3>
 				<div id="plists" style="display: none"></div>
 			</div>
-
-			<br />
-			<div id="info">
-				<h4>What is Yougra about?</h4>
-				<p>
-				Yougra is a web app that allows you to download videos, audio, songs, playlists, albums, and more. 
-				Simply search for what you want above and click the media you want to download as either 
-				video or audio. Once you select a video, you will be able to choose from different 
-				video quality options before downloading.
-				</p>
-
-				<h4>Help</h4>
-				<p>
-				In addition to searching, you can paste the exact YouTube video or song link in the 
-				<strong>"Use link"</strong> section located above the search bar on the right. In this 
-				section, you can also paste YouTube playlist or album links. <em>Playlists are 
-				currently downloadable as audio only</em>. If you're unsure how to get a playlist link, you 
-				can find instructions in the Settings menu at the top right (the gear icon).
-				</p>
-
-				<p>
-				<i><strong>Pro tip:</strong> Add "album" next to album name when searching, 
-				to easily find actual albums instead of playlists pretending to be albums.</i>
-				</p>
-
-				<p>
-				Speaking of Settings, you will also find download methods there for <strong>videos</strong>. 
-				There are two methods: <strong>Immediate</strong> and <strong>Process</strong>. By default, 
-				the Process method is selected, but you can switch between them at any time. The 
-				differences between these methods are explained in the Settings menu.
-				</p>
-			</div>
 		</div>
 		<div id="title-tp"></div>
-		 
-		<div id="link-mode">
+
+		<div id="grab">
 			<div id="v-info">
-				<h4>Enter a YouTube video/song link:</h4>
-				<input type="text" id="video-link" placeholder="https://youtube.com/watch?v=SvwfkTmyHFU">
-				<button id="grab-video" aria-label="Grab YouTube video" onclick="fetchVideo()">Grab it</button>
+				<h4>Enter YouTube video/song link 👆</h4>
 				<p id="video-err-msg"></p>
-				<br />
-				<div id="video-info">
-					<div id="loader-1" class="loader"></div>
-					<div id="v">
-						<div id="watch"></div>
-						<span id="v-d-options-b"><svg id="dots" onclick="toggleVdownloadOptions()" width="25px" height="25px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M5.7 12.1143C4.82423 12.1143 4.11429 12.8242 4.11429 13.7C4.11429 14.5758 4.82423 15.2857 5.7 15.2857C6.57577 15.2857 7.28571 14.5758 7.28571 13.7C7.28571 12.8242 6.57577 12.1143 5.7 12.1143ZM2 13.7C2 11.6565 3.65655 10 5.7 10C7.74345 10 9.4 11.6565 9.4 13.7C9.4 15.7435 7.74345 17.4 5.7 17.4C3.65655 17.4 2 15.7435 2 13.7Z" fill="#ccc" fill-rule="evenodd" /><path clip-rule="evenodd" d="M22.7 12.1143C21.8242 12.1143 21.1143 12.8242 21.1143 13.7C21.1143 14.5758 21.8242 15.2857 22.7 15.2857C23.5758 15.2857 24.2857 14.5758 24.2857 13.7C24.2857 12.8242 23.5758 12.1143 22.7 12.1143ZM19 13.7C19 11.6565 20.6565 10 22.7 10C24.7435 10 26.4 11.6565 26.4 13.7C26.4 15.7435 24.7435 17.4 22.7 17.4C20.6565 17.4 19 15.7435 19 13.7Z" fill="#ccc" fill-rule="evenodd"/><path clip-rule="evenodd" d="M14.2 12.1143C13.3242 12.1143 12.6143 12.8242 12.6143 13.7C12.6143 14.5758 13.3242 15.2857 14.2 15.2857C15.0758 15.2857 15.7857 14.5758 15.7857 13.7C15.7857 12.8242 15.0758 12.1143 14.2 12.1143ZM10.5 13.7C10.5 11.6565 12.1565 10 14.2 10C16.2435 10 17.9 11.6565 17.9 13.7C17.9 15.7435 16.2435 17.4 14.2 17.4C12.1565 17.4 10.5 15.7435 10.5 13.7Z" fill="#ccc" fill-rule="evenodd"/></svg></span>
-						<span id="selection-msg"></span>
-						<div id="details">
-							<div id="v-d-options">
-								<p><strong>Download it as...</strong></p>
-								<hr />
-								<div id="vid-o"></div>
-								<div id="aud-o"></div>
+				<div class="grab-loader" role="status" aria-label="Grabbing content">
+					<div class="grab-scene">
+
+						<div class="grab-glow"></div>
+
+						<div class="grab-content">
+							<div class="grab-thumbnail">
+								<svg viewBox="0 0 24 24" aria-hidden="true">
+									<path d="M8 5v14l11-7z" fill="currentColor"/>
+								</svg>
 							</div>
-							<h2 id="v-title"></h2>
-							<p id="v-author"></p>
-							<div id="_">
-								<span id="v-views"></span>
-								<span id="likes"></span>
-								<span id="posted"></span>
+
+							<div class="grab-content-info">
+								<span class="grab-content-title">YouTube Content</span>
+								<span class="grab-content-subtitle">Retrieving media...</span>
 							</div>
-							<button id="download">Download</button>
+
+							<span class="grab-content-icon">↓</span>
 						</div>
-						<p id="progress-txt"></p>
-						<div id="progress-bar"><div id="progress"></div></div>
+
+						<div class="grab-hand" aria-hidden="true">
+							<svg viewBox="0 0 100 100" fill="none">
+								<path
+									d="M31 49V25 C31 16 44 16 44 25V43 V18 C44 9 57 9 57 18V42 V23 C57 14 70 14 70 23V47 V35 C70 26 83 28 83 37V61 C83 81 70 91 51 91 C35 91 26 81 22 69 L12 51 C8 43 19 36 25 44Z"
+									fill="#292929"
+									stroke="#f6363c"
+									stroke-width="3.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M44 43V55 M57 42V53 M70 47V55"
+									stroke="#f6363c"
+									stroke-width="3"
+									stroke-linecap="round"
+								/>
+							</svg>
+						</div>
+
+						<span class="grab-particle particle-one"></span>
+						<span class="grab-particle particle-two"></span>
+						<span class="grab-particle particle-three"></span>
+
 					</div>
+
+					<div class="grab-loader-text">
+						<h3>Grabbing content<span class="grab-dots"></span></h3>
+						<p>Reaching out to retrieve your media...</p>
+					</div>
+				</div>
+				<div id="video-info">
+					<div id="watch"></div>
+					<svg id="v-d-options-b" fill="#ccc" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+						<path d="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256S397.391,0,256,0z M256,472 c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z" />
+						<g>
+						<path d="M152.312,242.875c17.797,14.688,42.258,16.219,61.484,5.828l4.227,3.828l18.062-14.906 c-1.367-3.688-1.914-7.656-1.547-11.688c0.516-5.719,2.859-10.969,6.602-15.234c3.102-18.172-3.266-37.375-18.641-50.062 c-16.188-13.344-37.164-21.203-55.352-13.766c-2.273,0.938,7.055,20.531,7.055,20.531l23.57,7.875L205.508,202l-7.359,8.625 l-7.344,8.609l-28.141-2.844l-11.953-21.422c0,0-21.266-5.656-21.805-3.328C124.602,210.594,136.125,229.531,152.312,242.875z"/>
+						<path d="M375.875,322l-68.125-51.203c-1.406,2-2.969,3.859-4.938,5.484c-4.844,4.031-11.172,6.297-17.656,6.297 c-4.891,0-9.609-1.266-13.75-3.594l-12.602,10.406l81.805,73.953L360.484,368l11.781-13.781L384,340.438L375.875,322z"/>
+						<path d="M278.047,261.312c3.297,3.875,9.156,4.391,13.078,1.125c3.891-3.188,4.406-8.875,1.234-12.75l70.375-57.672 c7.672-6.328,8.672-17.578,2.234-25.125c-6.453-7.547-17.922-8.531-25.562-2.203L269,222.375c-3.297-3.781-9.07-4.266-12.961-1.031 c-3.93,3.219-4.438,9.016-1.133,12.859l5.703,6.672l-97.93,80.781l-13.031,3.953l-15,19.156l11.75,13.766l21.555-10.594 l6.586-12.406l97.836-80.859L278.047,261.312z"/>
+						</g>
+					</svg>
+					<span id="selection-msg"></span>
+					<div id="details">
+						<div id="v-d-options">
+							<p><strong>Download it as...</strong></p>
+							<hr />
+							<span id="v-select">Video <i class="fa-regular fa-file-video"></i></span>
+							<span id="a-select">Audio <i class="fa-regular fa-file-audio"></i></span>
+							<div id="aud-o"></div>
+							<div id="vid-o"></div>
+						</div>
+						<h2 id="v-title"></h2>
+						<p id="v-author"></p>
+						<div id="_">
+							<span id="v-views"></span>
+							<span id="v-likes"></span>
+							<span id="posted"></span>
+						</div>
+						<button id="download">Download</button>
+					</div>
+
+					<p id="progress-txt"></p>
+					<div id="progress-bar"><div id="progress"></div></div>
 				</div>
 			</div>
 			<hr id ="hl" color="#e55" />
 			<div id="playlist">
-				<h4>Enter a YouTube <span class="switch">playlist</span> link:</h4>
-				<input type="text" id="playlist-link" placeholder="https://youtube.com/playlist?list=PLQwL0_xxmc6zA0fnVvP8Vpy6gb3R96ZoQ">
-				<button id="grab-list" aria-label="Grab YouTube playlist" onclick="fetchPlaylist()">Grab it</button>
+				<h4>Enter a YouTube <span class="switch">playlist</span> link 👆</h4>
 				<p id="playlist-err-msg"></p>
-				
-				<div id="playlist-info">
-					<div id="loader-2" class="loader"></div>
-					<div id="p">
-						<span id="p-d-options-b"><svg id="dots" onclick="togglePdownloadOptions()" width="25px" height="25px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M5.7 12.1143C4.82423 12.1143 4.11429 12.8242 4.11429 13.7C4.11429 14.5758 4.82423 15.2857 5.7 15.2857C6.57577 15.2857 7.28571 14.5758 7.28571 13.7C7.28571 12.8242 6.57577 12.1143 5.7 12.1143ZM2 13.7C2 11.6565 3.65655 10 5.7 10C7.74345 10 9.4 11.6565 9.4 13.7C9.4 15.7435 7.74345 17.4 5.7 17.4C3.65655 17.4 2 15.7435 2 13.7Z" fill="#ccc" fill-rule="evenodd" /><path clip-rule="evenodd" d="M22.7 12.1143C21.8242 12.1143 21.1143 12.8242 21.1143 13.7C21.1143 14.5758 21.8242 15.2857 22.7 15.2857C23.5758 15.2857 24.2857 14.5758 24.2857 13.7C24.2857 12.8242 23.5758 12.1143 22.7 12.1143ZM19 13.7C19 11.6565 20.6565 10 22.7 10C24.7435 10 26.4 11.6565 26.4 13.7C26.4 15.7435 24.7435 17.4 22.7 17.4C20.6565 17.4 19 15.7435 19 13.7Z" fill="#ccc" fill-rule="evenodd"/><path clip-rule="evenodd" d="M14.2 12.1143C13.3242 12.1143 12.6143 12.8242 12.6143 13.7C12.6143 14.5758 13.3242 15.2857 14.2 15.2857C15.0758 15.2857 15.7857 14.5758 15.7857 13.7C15.7857 12.8242 15.0758 12.1143 14.2 12.1143ZM10.5 13.7C10.5 11.6565 12.1565 10 14.2 10C16.2435 10 17.9 11.6565 17.9 13.7C17.9 15.7435 16.2435 17.4 14.2 17.4C12.1565 17.4 10.5 15.7435 10.5 13.7Z" fill="#ccc" fill-rule="evenodd"/></svg></span>
-						<div id="p-d-options">
-							<p>You can click each song to download or just:</p>
-							<hr />
-							<center><button id="download-all">Download all</button></center>
-						</div>
-						<div id="p-header">
-							<img id="p-thumbnail" alt="Youtube playlist thumbnail" />
-							<div id="p-info">
-								<h4 id="p-title"></h4>
-								<p id="p-author"></p>
-								<p id="a-amount"></p>
+				<div class="grab-loader" role="status" aria-label="Grabbing content">
+					<div class="grab-scene">
+
+						<div class="grab-glow"></div>
+
+						<div class="grab-content">
+							<div class="grab-thumbnail">
+								<svg viewBox="0 0 24 24" aria-hidden="true">
+									<path d="M8 5v14l11-7z" fill="currentColor"/>
+								</svg>
 							</div>
+
+							<div class="grab-content-info">
+								<span class="grab-content-title">YouTube Content</span>
+								<span class="grab-content-subtitle">Retrieving media...</span>
+							</div>
+
+							<span class="grab-content-icon">↓</span>
 						</div>
-						<div id="songs"></div>
+
+						<div class="grab-hand" aria-hidden="true">
+							<svg viewBox="0 0 100 100" fill="none">
+								<path
+									d="M31 49V25 C31 16 44 16 44 25V43 V18 C44 9 57 9 57 18V42 V23 C57 14 70 14 70 23V47 V35 C70 26 83 28 83 37V61 C83 81 70 91 51 91 C35 91 26 81 22 69 L12 51 C8 43 19 36 25 44Z"
+									fill="#292929"
+									stroke="#f6363c"
+									stroke-width="3.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M44 43V55 M57 42V53 M70 47V55"
+									stroke="#f6363c"
+									stroke-width="3"
+									stroke-linecap="round"
+								/>
+							</svg>
+						</div>
+
+						<span class="grab-particle particle-one"></span>
+						<span class="grab-particle particle-two"></span>
+						<span class="grab-particle particle-three"></span>
+
 					</div>
+
+					<div class="grab-loader-text">
+						<h3>Grabbing content<span class="grab-dots"></span></h3>
+						<p>Reaching out to retrieve your media...</p>
+					</div>
+				</div>
+				<div id="playlist-info">
+					<svg id="p-d-options-b" fill="#ccc" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+						<path d="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256S397.391,0,256,0z M256,472 c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z" />
+						<g>
+						<path d="M152.312,242.875c17.797,14.688,42.258,16.219,61.484,5.828l4.227,3.828l18.062-14.906 c-1.367-3.688-1.914-7.656-1.547-11.688c0.516-5.719,2.859-10.969,6.602-15.234c3.102-18.172-3.266-37.375-18.641-50.062 c-16.188-13.344-37.164-21.203-55.352-13.766c-2.273,0.938,7.055,20.531,7.055,20.531l23.57,7.875L205.508,202l-7.359,8.625 l-7.344,8.609l-28.141-2.844l-11.953-21.422c0,0-21.266-5.656-21.805-3.328C124.602,210.594,136.125,229.531,152.312,242.875z"/>
+						<path d="M375.875,322l-68.125-51.203c-1.406,2-2.969,3.859-4.938,5.484c-4.844,4.031-11.172,6.297-17.656,6.297 c-4.891,0-9.609-1.266-13.75-3.594l-12.602,10.406l81.805,73.953L360.484,368l11.781-13.781L384,340.438L375.875,322z"/>
+						<path d="M278.047,261.312c3.297,3.875,9.156,4.391,13.078,1.125c3.891-3.188,4.406-8.875,1.234-12.75l70.375-57.672 c7.672-6.328,8.672-17.578,2.234-25.125c-6.453-7.547-17.922-8.531-25.562-2.203L269,222.375c-3.297-3.781-9.07-4.266-12.961-1.031 c-3.93,3.219-4.438,9.016-1.133,12.859l5.703,6.672l-97.93,80.781l-13.031,3.953l-15,19.156l11.75,13.766l21.555-10.594 l6.586-12.406l97.836-80.859L278.047,261.312z"/>
+						</g>
+					</svg>
+					<div id="p-d-options">
+						<p>You can click each song to download or just:</p>
+						<hr />
+						<center><button id="download-all">Download all</button></center>
+					</div>
+					<div id="p-header">
+						<img id="p-thumbnail" alt="Youtube playlist thumbnail" />
+						<div id="p-info">
+							<h4 id="p-title"></h4>
+							<p id="p-author"></p>
+							<p id="a-amount"></p>
+						</div>
+					</div>
+					<div id="songs"></div>
 				</div>
 			</div>
 		</div>
 	</main>
 	<script> window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); } </script>
-	<script src="./functions.js"></script>
+	<script type="module" src="src/home.ts"></script>
 	<script type="application/ld+json">
 		{
 			"@context": "https://schema.org",
