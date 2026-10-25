@@ -2,7 +2,7 @@ const version = document.getElementById("version");
 const update = document.getElementById("update");
 const closeUpdate = document.getElementById("close-update");
 
-const currentVersion:string = "Beta 1.7.7";
+const currentVersion:string = "Beta 2 - preview Ⅰ";
 const savedVersion = localStorage.getItem("version");
 
 export default function updateCheck() {
