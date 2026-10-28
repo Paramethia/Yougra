@@ -1,6 +1,7 @@
 import { api } from '../home.ts';
 import showError from '../overlays/error.ts';
 import { route } from '../components/sidebar.ts';
+import settings from '../overlays/settings.ts';
 import tooltipper from '../components/tooltip.ts';
 import type { SearchResponse, SearchVideo, SearchPlaylist} from '../types.ts';
 
@@ -185,11 +186,17 @@ export default {
             vids.style.display = "flex";
             plists.style.display = "none";
         } else {
-            [vors, pora].forEach(element => element.style.display = "block");
+            [vors, pora].forEach(element => {
+                element.style.display = "block";
+                if (settings.allResults) {
+                    if (element.id === "v/s" && vids.style.display === "none") element.click();
+                    if (element.id === "p/a" && plists.style.display === "none") element.click();
+                }
+            });
             const [vCount, pCount] = [document.getElementById("v-count"), document.getElementById("p-count")]
             if (vCount) vCount.innerText = String(videos.length);
             if (pCount) pCount.innerText = String(playlists.length);
-            vids.style.display = "none";
+            if (!settings.allResults) vids.style.display = "none";
         }
 
         const vidCons: NodeListOf<HTMLElement> = document.querySelectorAll(".video");

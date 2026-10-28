@@ -43,7 +43,7 @@
 	<span id="version">Beta 2</span>
 	<div id="update">
 		<div>
-			<h3>Beta 2 - preview Ⅰ</h3>
+			<h3>Beta 2 - preview ⅠⅠ</h3>
 			<dl>
 				<dt>⟬ <strong>Rebuild</strong> ⟭</dt>
 				<dd>⌊ Rebuilt the whole website for SPA routing. This means you will be able to share pages with friends to share content they can download</dd>
@@ -55,8 +55,13 @@
 				<dd>⌊ Added sidebar navigation</dd>
 				<dd>⌊ Re-designed loaders</dd>
 				<dd>⌊ Search results' share buttons now copy with website link to grab route</dd>
-				<dd>⌊ Improved UI for download options for videos</dd>
-				<dd>⌊ Added metadata toggle for audio download options</dd>
+				<dt>⟬ <strong>Better download options</strong> ⟭</dt>
+				<dd>⌊ Improved UI for download options</dd>
+				<dd>⌊ Added metadata & .mp4 toggle for audio download options</dd>
+				<dd>⌊ Added playlist author removal option for playlists' options</dd>
+				<dt>⟬ <strong>More settings</strong> ⟭</dt>
+				<dd>⌊ Search results options</dd>
+				<dd>⌊ Album metadata options</dd>
 				<font color="#aaa" size="2">More features coming soon for beta 2</font>
 			</dl>
 			<center><button id="close-update" aria-label="Close update overlay">Cool</button></center>
@@ -65,8 +70,8 @@
 	<div id="settings" style="visibility: hidden;">
 		<div>
 			<i id="close-settings" class="fa-xl fa-solid fa-circle-xmark"></i>
-			<div class="sets" id="link-help">
-				<h3>How to get an album link?</h3>
+			<div class="sets">
+				<h3>Claiming YT album links</h3>
 
 				<h4>Mobile</h4>
 				<img src="./images/Mobile help.jpeg" alt="Mobile help"/>
@@ -76,8 +81,17 @@
 				<img src="./images/PC help.jpeg" alt="PC help"/>
 				<p>While scrolling looking at a list of albums on <strong>YouTube music</strong> on PC, just click those 3 dots and you should see an option to share and copy the link.</p>
 			</div>
-			<div class="sets" id="d-method">
-				<h3>Download method</h3>
+			<div class="sets">
+				<h3>Search results</h3>
+
+				<div class="option-con">
+					<i class="fa-solid fa-toggle-on fa-xl"></i>
+					<h5>Auto show all results</h5>
+					<p>Automatically show all results when searching</p>
+				</div>
+			</div>
+			<div class="sets">
+				<h3>Video download method</h3>
 
 				<h4 id="immediate">Immediate</h4>
 				<p>This ensures that every <strong>video</strong> you download always start immediatly without processing. Keep in mind that the file may be corrupted for some devices.</p>
@@ -85,17 +99,21 @@
 				<h4 id="process">Process</h4>
 				<p>This ensures that the <strong>video</strong> works on any device by having a process of downloading and merging on the server, then the download will start. Not recommended for long videos if you are inpatient, as it will take a long time before it starts the download. There is also a max file size requirement (5GB) for downloading videos for this option.</p>
 			</div>
-			<div class="sets" id="bug-report">
+			<div class="sets">
+				<h3>Album metadata</h3>
+
+				<div class="option-con">
+					<i class="fa-solid fa-toggle-off fa-xl"></i>
+					<h5>More metadata</h5>
+					<p>Get album release year + high quality cover art (usually)</p>
+					<p style="font-size:12px; color:#F9BB62;">⚠️ It will slightly slow down album fetching</p>
+				</div>
+			</div>
+			<div class="sets">
 				<h3>Noticed any bugs/glitches?</h3>
 
 				<h4>Tell me</h4>
 				<p>Remember that this web app is still in beta/testing stage, so errors WILL happen eventually. Just tell me if you noticed anything odd (click it below): <br /> <a href="mailto:kyrinkompi@gmail.com">kyrinkompi@gmail.com</a></p>
-			</div>
-			<div class="sets" id="warning">
-				<h3>Warnings</h3>
-
-				<h5> Do not pause the download as it will most likely not be able to resume again </h5>
-				<h5> Try not to download multiple videos at the same time if your internet is slow (it may cause errors) </h5>
 			</div>
 		</div>
 	</div> 
@@ -155,14 +173,14 @@
 			<h4>Features</h4>
 
 			<ul>
-				<li>Audio/Music detection system (auto selects fitting format)</li>
+				<li>Audio/Music detection system (auto selects fitting format to download)</li>
 				<li>Video quality selection choice</li>
 				<li>Download audio as m4a or mp3</li>
 				<li>Download audio from YT video</li>
 				<li>Custom download methods</li>
 				<li>Content link sharing (share links to videos/songs or playlists/albums for friends to download)</li>
-				<li>Custom search results <strong>(coming soon)</strong></li>
-				<li>Custom audio metadata <strong>(coming soon)</strong></li>
+				<li>Download queueing <strong>(coming eventually)</strong></li>
+				<li>Custom audio metadata <strong>(coming eventually)</strong></li>
 				<li>Download stats <strong>(coming eventually)</strong></li>
 			</ul>
 		</div>
@@ -242,6 +260,7 @@
 				</div>
 				<div id="video-info">
 					<div id="watch"></div>
+					<span id="vdob"></span>
 					<svg id="v-d-options-b" fill="#ccc" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
 						<path d="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256S397.391,0,256,0z M256,472 c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z" />
 						<g>
@@ -329,6 +348,7 @@
 					</div>
 				</div>
 				<div id="playlist-info">
+					<span id="pdob"></span>
 					<svg id="p-d-options-b" fill="#ccc" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
 						<path d="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256S397.391,0,256,0z M256,472 c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z" />
 						<g>
@@ -338,8 +358,12 @@
 						</g>
 					</svg>
 					<div id="p-d-options">
-						<p>You can click each song to download or just:</p>
+						<h4 style="font-size: 16px; text-align: center;">Collection options</h4>
 						<hr />
+						<p id="c-type">Collection type ~ </p>
+						<center><p id="a-remove" style="font-size: 14px;">Remove "album" author <i class="fa-solid fa-toggle-on"></i></center>
+						<hr />
+						<p style="font-size: 12px">You can click each song to download or just:</p>
 						<center><button id="download-all">Download all</button></center>
 					</div>
 					<div id="p-header">

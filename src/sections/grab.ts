@@ -9,6 +9,7 @@ const videoErr = document.getElementById("video-err-msg");
 const watch = document.getElementById("watch");
 const selection = document.getElementById("selection-msg");
 const vidCon = document.getElementById("video-info");
+const vdob = document.getElementById("vdob");
 const vdOptionsB = document.getElementById("v-d-options-b") as HTMLButtonElement;
 const vdOptions = document.getElementById("v-d-options");
 const vSelect = document.getElementById("v-select");
@@ -25,9 +26,11 @@ let vSize: HTMLElement;
 let aSize: HTMLElement;
 let qualities: HTMLSelectElement;
 let metadataT: HTMLElement;
+let m4aT: HTMLElement;
 // Playlist elements
 const playlistErr = document.getElementById("playlist-err-msg");
 const playCon = document.getElementById("playlist-info");
+const pdob = document.getElementById("pdob");
 const pdOptionsB = document.getElementById("p-d-options-b") as HTMLButtonElement;
 const pdOptions = document.getElementById("p-d-options");
 const [pImg, pTitle, pAuthor, pSongCount, pSongs] = [
@@ -54,45 +57,44 @@ export default {
             }
         }
 
-        if (vdOptions && pdOptions) {
+        if (vdob && vdOptions && pdob && pdOptions) {
             vdOptions.style.display = "none";
             pdOptions.style.display = "none";
 
             document.addEventListener("click", event => {
                 if (!(event.target instanceof Node)) return
-                if (vdOptions.style.display === "block" && !vdOptions.contains(event.target) && event.target !== vdOptionsB && event.target !== document.getElementById('dots')) {
+                if (vdOptions.style.display === "block" && !vdOptions.contains(event.target) && event.target !== vdob) {
                     vdOptionsB.style.background = '#2a2a2a';
                     vdOptions.style.display = 'none';
-                } else if (pdOptions.style.display === "block" && !pdOptions.contains(event.target) && event.target !== pdOptionsB && event.target !== document.getElementById('dots')) {
+                } else if (pdOptions.style.display === "block" && !pdOptions.contains(event.target) && event.target !== pdob) {
                     pdOptionsB.style.background = '#2a2a2a';
                     pdOptions.style.display = 'none';
                 }
             });
 
-            vdOptionsB.onmouseover = () => { vdOptionsB.style.background = '#3f3f3f' }
-            vdOptionsB.onmouseout = () => { if (vdOptions.style.display !== "block") vdOptionsB.style.background = '#2a2a2a' }
-            pdOptionsB.onmouseover = () => { pdOptionsB.style.background = '#3f3f3f' }
-            pdOptionsB.onmouseout = () => { if (pdOptions.style.display !== "block") pdOptionsB.style.background = '#2a2a2a' }
-        }
-
-        vdOptionsB.onclick = function toggleVdownloadOptions() {
-            if (!vdOptions) return
-            if (vdOptions.style.display === "none") {
-                vdOptionsB.style.background = '#3f3f3f';
-                vdOptions.style.display = 'block';
-            } else {
-                vdOptionsB.style.background = '#2a2a2a';
-                vdOptions.style.display = 'none';
+            vdob.onmouseover = () => { vdOptionsB.style.background = '#3f3f3f' }
+            vdob.onmouseout = () => { if (vdOptions.style.display !== "block") vdOptionsB.style.background = '#2a2a2a' }
+            vdob.onclick = () => {
+                if (!vdOptions) return
+                if (vdOptions.style.display === "none") {
+                    vdOptionsB.style.background = '#3f3f3f';
+                    vdOptions.style.display = 'block';
+                } else {
+                    vdOptionsB.style.background = '#2a2a2a';
+                    vdOptions.style.display = 'none';
+                }
             }
-        }
-        pdOptionsB.onclick = function togglePdownloadOptions() {
-            if (!pdOptions) return
-            if (pdOptions.style.display === "none") {
-                pdOptionsB.style.background = '#3f3f3f';
-                pdOptions.style.display = 'block';
-            } else {
-                pdOptionsB.style.background = '#2a2a2a';
-                pdOptions.style.display = 'none';
+            pdob.onmouseover = () => { pdOptionsB.style.background = '#3f3f3f' }
+            pdob.onmouseout = () => { if (pdOptions.style.display !== "block") pdOptionsB.style.background = '#2a2a2a' }
+            pdob.onclick = () => {
+                if (!pdOptions) return
+                if (pdOptions.style.display === "none") {
+                    pdOptionsB.style.background = '#3f3f3f';
+                    pdOptions.style.display = 'block';
+                } else {
+                    pdOptionsB.style.background = '#2a2a2a';
+                    pdOptions.style.display = 'none';
+                }
             }
         }
 
@@ -193,6 +195,7 @@ export default {
                 vidCon.style.display = "block";
 
                 let metadata = video.song && video.lengthSeconds < 900 ? true : false;
+                let extension = "mp3";
 
                 watch.innerHTML = `
                     <img id="v-thumbnail" src="${video.thumbnail}" alt="Youtube video thumbnail" />
@@ -209,8 +212,8 @@ export default {
                     `;
                     vAudO.innerHTML = `
                         <p style="font-size: 14px;">File size ~ <span id="a-size">${(parseFloat(String(selectedAudio.size)) + 1.4).toFixed(2)}mb</span></p>
-                        <p style="font-size: 14px;">Bitrate ~ <span id="a-size">${parseInt(selectedAudio.bitrate)}kbps</span></p>
                         <p id="metadata" style="font-size: 14px;">Metadata <i class="fa-solid fa-toggle-${metadata ? 'on' : 'off'}"></i>
+                        <p id="m4a" style="font-size: 14px;">.m4a <i class="fa-solid fa-toggle-${extension !== "mp3" ? 'on' : 'off'}"></i>
                     `;
                 }
                 
@@ -244,10 +247,9 @@ export default {
                 this.format = data.song ? "audio" : "video";
                 selection.innerText = `Selected ${this.format}`;
 
-                [vSize, aSize, qualities, metadataT] = [
-                    document.getElementById("v-size"), document.getElementById("a-size"), document.getElementById("qualities"), document.getElementById("metadata")
-                ] as [HTMLElement, HTMLElement, HTMLSelectElement, HTMLElement];
-
+                [vSize, aSize, qualities, metadataT, m4aT] = [
+                    document.getElementById("v-size"), document.getElementById("a-size"), document.getElementById("qualities"), document.getElementById("metadata"), document.getElementById("m4a")
+                ] as [HTMLElement, HTMLElement, HTMLSelectElement, HTMLElement, HTMLElement];
                 if (!aSize || !qualities || !metadataT || !defaultVidO || !selectedAudio) {
                     console.warn("Format update could not apply visually. Some required elements/variables missing");
                     return
@@ -280,15 +282,25 @@ export default {
                     itag = currentVideo.itag;
                 });
 
-                const togI = document.querySelector("#metadata > i");
+                const togI = [document.querySelector("#metadata > i"), document.querySelector("#m4a > i")];
+
                 metadataT.onclick = () => {
                     if (!metadata) {
-                        togI?.classList.replace("fa-toggle-off", "fa-toggle-on");
+                        togI[0]?.classList.replace("fa-toggle-off", "fa-toggle-on");
                         metadata = true;
                     } else {
-                        togI?.classList.replace("fa-toggle-on", "fa-toggle-off");
+                        togI[0]?.classList.replace("fa-toggle-on", "fa-toggle-off");
                         metadata = false;
                     } 
+                }
+                m4aT.onclick = () => {
+                    if (extension === "mp3") {
+                        togI[1]?.classList.replace("fa-toggle-off", "fa-toggle-on");
+                        extension = "m4a";
+                    } else if (extension === "m4a") {
+                        togI[1]?.classList.replace("fa-toggle-on", "fa-toggle-off");
+                        extension = "mp3";
+                    }
                 }
 
                 const downloadBtn = document.getElementById("download") as HTMLButtonElement;
@@ -333,7 +345,7 @@ export default {
                             if (contentLength) progressBar.style.display = "block";
 
                             while (true) {
-                                const { done, value } = await reader.read();
+                                const { done } = await reader.read();
 
                                 if (done) break;
 
@@ -374,7 +386,7 @@ export default {
 
                             const a = document.createElement("a");
                             a.href = downloadURL;
-                            a.download = `${cleanAudioTitle(data.title)}.mp3`;
+                            a.download = `${cleanAudioTitle(data.title)}.${extension}`;
                             document.body.appendChild(a);
                             a.click();
                             a.remove();
@@ -402,7 +414,7 @@ export default {
                                 return
                             }
                             
-                            const ws = new WebSocket(`ws://${api.prod}`);
+                            const ws = new WebSocket(`wss://${api.prod}`);
                             const format = this.format;
                             let downloaded = false;
 
@@ -536,13 +548,10 @@ export default {
                 }
 
                 if (!rData.songs.length) {
-                    console.warn(`No songs were served for ${rData.title} playlist/album...`);
-                    showError("Empty data", "No songs were served for this playlist/album. Retry or try a different one?");            
+                    console.warn(`No songs were served for ${rData.title} ${rData.type.toLowerCase()}...`);
+                    showError("Empty data", `No songs were served for this ${rData.type.toLowerCase()}. Retry or try a different one?`);            
                     return
                 }
-
-                loaders[1].style.display = "none";
-                playCon.style.display = "block";
 
                 const playlist: Playlist = rData;
 
@@ -550,6 +559,74 @@ export default {
                 let artists: string[];
 
                 if (multipleArtists) artists = playlist.author.split(",")
+
+                const escapeQuery = (value: string) => value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
+                const aRemove = document.getElementById("a-remove");
+                let album;
+                if (playlist.type === "Album" && settings.moreMD) {
+                    if (aRemove) aRemove.style.display = "none";
+                    const query = `releasegroup:"${escapeQuery(playlist.title)}" AND ` + `artist:"${escapeQuery(playlist.author)}"`;
+                    const params = new URLSearchParams({ query, fmt: "json", limit: "5"});
+
+                    const mbRes = await fetch(`https://musicbrainz.org/ws/2/release-group?${params}`, {
+                        headers: {
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3"
+                        }
+                    });
+
+                    if (!response.ok) {
+                        console.warn("MusicBrainz lookup failed:", mbRes.status);
+                        return;
+                    }
+
+                    const data = await mbRes.json();
+
+                    album = data["release-groups"]?.[0];
+                } else if (playlist.type === "Playlist" && aRemove) { aRemove.style.display = "block" }
+
+                let artwork: string | null | undefined = null;
+                let year = "";
+
+                interface CoverArtImage {
+                    front?: boolean;
+                    approved?: boolean;
+                    types?: string[];
+                    image: string;
+                    thumbnails?: {
+                        small: string;
+                        large: string;
+                    };
+                }
+
+                if (album) {
+                    const artRes = await fetch(`https://coverartarchive.org/release-group/${album.id}`);
+
+                    if (artRes.ok) {
+                        const artData: { images?: CoverArtImage[];} = await artRes.json();
+
+                        const images = artData.images ?? [];
+
+                        // Prefer the designated front cover.
+                        const cover = images.find(image => image.front) ?? images.find(image => image.types?.includes("Front"));
+
+                        if (cover) {
+                            // Prefer the 500px || 250px thumbnail; otherwise use the original.
+                            artwork = cover.thumbnails?.large || cover.thumbnails?.small || cover.image;
+
+                            // Avoid mixed-content problems on HTTPS websites.
+                            if (artwork) artwork = artwork.replace(/^http:/, "https:");
+                            console.log("Found higher quality cover art:", artwork);
+                        }
+                    } else if (artRes.status !== 404) {
+                        console.warn("Cover Art Archive request failed:", artRes.status);
+                    }
+                    year = album["first-release-date"]?.slice(0, 4);
+                    console.log("Found release year:", year);
+                }
+
+                loaders[1].style.display = "none";
+                playCon.style.display = "block";
                 
                 function cleanSongTitle(title: string | undefined) {
                     const promoKeywords = /(official|music|video|visualizer|lyrics?|lyric\s*video|audio|hd|4k|mv|performance|live|remaster(ed)?)/i;
@@ -571,7 +648,7 @@ export default {
                     } else return ""
                 }
                 
-                playlist.songs.forEach((song, index) => {
+                playlist.songs.forEach((song) => {
                     if (!song.title.includes("-") && !song.title.includes("–")) return
                     if (song.title.toLowerCase().includes(song.author.toLowerCase()) || song.title.toLowerCase().includes(playlist.author.toLowerCase())) {
                         song.title = cleanSongTitle(song.title.split(/[-–]/)[1])
@@ -620,7 +697,31 @@ export default {
                     maxSartist = 10
                 } else if (screen.width <= 820 || window.innerWidth <= 820) maxSartist = 14
 
-                pImg.src = playlist.thumbnail;
+                const cType = document.getElementById("c-type");
+                if (playlist.type === "Album") {
+                    if (playlist.songs.length < 3) {
+                        playlist.type = "Single";
+                    } else if (playlist.songs.length <= 6) {
+                        playlist.type = "EP";
+                    }
+                }
+
+                if (cType) cType.innerHTML = `Collection type ~ <font color="#e66">${playlist.type}</font>`;
+                let removeAuthor = playlist.type === "Playlist";
+                if (aRemove) {
+                    const iTag = document.querySelector("#a-remove > i");
+                    aRemove.onclick = () => {
+                        if (removeAuthor) {
+                            iTag?.classList.replace("fa-toggle-on", "fa-toggle-off");
+                            removeAuthor = false;
+                        } else {
+                            iTag?.classList.replace("fa-toggle-off", "fa-toggle-on");
+                            removeAuthor = true;
+                        }
+                    }
+                }
+
+                pImg.src = artwork ? artwork : playlist.thumbnail;
                 pTitle.innerText = playlist.title.length > maxCtitle ? playlist.title.slice(0, maxCtitle).trimEnd() + "..." : playlist.title;
                 pAuthor.innerHTML = `<i class="fa-regular fa-user"></i>${playlist.author.length > maxCauthor ? playlist.author.slice(0, maxCauthor).trimEnd() + "..." : playlist.author}`;
                 pSongCount.innerHTML = `<strong>Audio ~</strong> ${playlist.songs.length}`;
@@ -674,8 +775,9 @@ export default {
 
                         const collection = {
                             title: encodeURIComponent(playlist.title),
-                            artist: encodeURIComponent(playlist.author),
-                            coverImage: encodeURIComponent(playlist.thumbnail),
+                            artist: removeAuthor ? "" : encodeURIComponent(playlist.author),
+                            coverImage: encodeURIComponent(artwork ? artwork : playlist.thumbnail),
+                            release: year ? year : "",
                             type: playlist.type,
                             tracks: { index: index + 1, total: playlist.songs.length }
                         };
@@ -746,6 +848,11 @@ export default {
                         if (!song || !songIndex || !songProg)  {
                             showError("Failed to start download for song", "Song or elements missing");
                             return
+                        }
+                        const nums = song.duration.split(":");
+                        if (nums.length >= 3) {
+                            console.warn("Audio is too long. Likely does not belong in collection. Skipping...");
+                            continue
                         }
                         await downloadSong(song, i, playlist, songProg, songIndex);
 
