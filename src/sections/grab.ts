@@ -1,8 +1,9 @@
-import { api } from '../home.ts';
 import showError from '../overlays/error.ts';
 import settings from '../overlays/settings.ts';
 import tooltipper from '../components/tooltip.ts';
 import type { Video, Playlist, Song } from '../types.ts';
+
+const prodAPI = "api.yougra.site";
 
 // Video elements
 const videoErr = document.getElementById("video-err-msg");
@@ -155,7 +156,7 @@ export default {
             }
 
             try {
-                const response = await fetch(`https://${api.prod}/video`, {
+                const response = await fetch(`https://${prodAPI}/video`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id })
@@ -321,7 +322,7 @@ export default {
                     try {
                         if (this.format === "audio") {
                             progressText.innerText = "Wait for it...";
-                            const res = await fetch(`https://${api.prod}/download-a?id=${id}&metadata=${metadata}`);
+                            const res = await fetch(`https://${prodAPI}/download-a?id=${id}&metadata=${metadata}`);
 
                             if (!res.ok) {
                                 const resJ = await res.json();
@@ -406,15 +407,15 @@ export default {
                             }, 500);
                         } else if (this.format === "video") {
                             if (settings.method === "immediate") {
-                                window.location.href = `https://${api.prod}/immediate-download?id=${id}&itag=${itag}`;
+                                window.location.href = `https://${prodAPI}/immediate-download?id=${id}&itag=${itag}`;
                                 setTimeout(() => {
                                     downloadBtn.disabled = false;
                                     downloadBtn.style.filter = "brightness(100%)";
                                 }, 15000);
                                 return
                             }
-                            
-                            const ws = new WebSocket(`wss://${api.prod}`);
+
+                            const ws = new WebSocket(`wss://${prodAPI}`);
                             const format = this.format;
                             let downloaded = false;
 
@@ -457,7 +458,7 @@ export default {
                                     downloaded = true;
                                     // Trigger the file download via a new request
 
-                                    window.location.href = `https://${api.prod}${message.path}`;
+                                    window.location.href = `https://${prodAPI}${message.path}`;
                                     
                                     // Reset UI after a short delay
                                     setTimeout(() => {
@@ -535,7 +536,7 @@ export default {
             playCon.style.display = "none";
 
             try {
-                const response = await fetch(`https://${api.prod}/playlist`, { 
+                const response = await fetch(`https://${prodAPI}/playlist`, { 
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id }) 
@@ -784,7 +785,7 @@ export default {
 
                         if (song.author.toLowerCase().includes(collection.artist.toLowerCase())) song.author = collection.artist
                         
-                        const res = await fetch(`https://${api.prod}/download-a?id=${song.id}&sArtist=${encodeURIComponent(song.author)}&sTitle=${encodeURIComponent(song.title)}&playlist=${JSON.stringify(collection)}`);
+                        const res = await fetch(`https://${prodAPI}/download-a?id=${song.id}&sArtist=${encodeURIComponent(song.author)}&sTitle=${encodeURIComponent(song.title)}&playlist=${JSON.stringify(collection)}`);
 
                         if (!res.ok) {
                             const resJ = await res.json();

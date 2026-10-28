@@ -1,4 +1,3 @@
-import { api } from '../home.ts';
 import showError from '../overlays/error.ts';
 import { route } from '../components/sidebar.ts';
 import settings from '../overlays/settings.ts';
@@ -114,7 +113,7 @@ export default {
 
         loader.style.display = "inline-flex";
 
-        const response = await fetch(`https://${api.prod}/search`, {
+        const response = await fetch(`https://api.yougra.site/search`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ input: searchInput })

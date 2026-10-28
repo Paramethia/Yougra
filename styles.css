@@ -318,6 +318,23 @@ aside #settings-o { border-bottom: none }
     width: 80%;
     opacity: 0.5;
 }
+#settings .option-con {
+    margin: 10px 0;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    padding: 8px;
+    background-color: rgba(150, 150, 150, 0.2);
+    text-align: left;
+}
+#settings .option-con h5, #settings .option-con p { margin: 0 }
+#settings .option-con p {
+    font-size: 14px;
+    color: #aaa;
+}
+#settings .option-con i { 
+    float: right; 
+    margin-top: 15px; 
+}
 
 #immediate, #process {
     display: inline-block;
