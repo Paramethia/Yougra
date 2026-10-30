@@ -308,7 +308,7 @@ async function search() {
     searchB.innerText = "Searching...";
     searchB.disabled = true;
 
-    const response = await fetch(`https://${testServer}/search`, {
+    const response = await fetch(`https://${prodServer}/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input: searchInput })
