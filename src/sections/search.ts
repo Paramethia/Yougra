@@ -8,8 +8,6 @@ const searchI = document.getElementById("search-query") as HTMLInputElement | nu
 const loader = document.getElementById("search-loader");
 const searchErr = document.getElementById("search-err-msg");
 const searchResults = document.getElementById("search-results");
-const vidsCon = document.getElementById("vids");
-const pListsCon = document.getElementById("plists");
 
 const vors = document.getElementById("v/s");
 const pora = document.getElementById("p/a");
@@ -85,7 +83,7 @@ export default {
     },
     tries: 0,
     async fetch() {
-        if (!searchI || !loader || !searchErr || !vidsCon || !searchResults || !vors || !pora || !vids || !plists) {
+        if (!searchI || !loader || !searchErr || !searchResults || !vors || !pora || !vids || !plists) {
             showError("Failed to render search results", "1 or more search element(s) missing")
             return;
         }
@@ -104,7 +102,6 @@ export default {
         }
 
         if (validYouTubeURL(searchInput)) {
-            //searchI.value = "";
             const type = searchInput.includes("playlist?list=") ? "c" : "v";
             history.pushState({}, "", `/grab?${type}=${extractContentId(searchInput)}`);
             route.grab();
@@ -146,11 +143,11 @@ export default {
             return
         }
 
-        vidsCon.innerHTML = videos.map((video) => {
+        vids.innerHTML = videos.map((video) => {
             return `
                 <div class="video">
                     <div style="min-height: 150px; min-width: 200px; position: relative; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
-                        <img src="${video.thumbnail}" />
+                        <img src="${video.thumbnail}" loading="lazy" />
                         <span id="duration">${video.duration}</span>
                     </div>
                     <h4 class="v-title">${video.title.length < 29 ? video.title : video.title.slice(0, 28).trimEnd() + "..."}</h4>
@@ -160,12 +157,12 @@ export default {
             `;
         }).join(""); 
 
-        if (playlists.length && pListsCon) {
-            pListsCon.innerHTML = playlists.map((playlist) => {
+        if (playlists.length && plists) {
+            plists.innerHTML = playlists.map((playlist) => {
                 return `
                     <div class="playlist">
                         <div style="min-height: 150px; min-width: 200px; position: relative; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
-                            <center><img src="${playlist.thumbnail}" ${playlist.type !== "Playlist"? 'style="width: 55%"' : ""}/></center>
+                            <center><img src="${playlist.thumbnail}" loading="lazy" ${playlist.type !== "Playlist"? 'style="width: 55%"' : ""}/></center>
                             <svg id="plist-icon" fill="rgba(235, 74, 74, 0.6)" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="28px" height="28px" viewBox="0 0 476.91 476.909" xml:space="preserve" stroke="#aaa"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M62.802,142.287h121.682c4.45,0,10.95-3.805,13.32-7.999l24.816-41.066H62.802C28.12,93.222,0,121.342,0,156.026v20.779 C13.266,156.086,36.425,142.287,62.802,142.287z"></path> <path d="M414.105,67.708H266.913c-8.681,0-19.151,6.125-23.399,13.685l-7.147,1228l-28.489,47.157 c-4.246,7.558-14.719,13.684-23.393,13.684H62.802C28.12,154.062,0,182.183,0,216.865v115.794v13.737 c0,34.685,28.12,62.805,62.802,62.805h351.303c34.685,0,62.805-28.12,62.805-62.805v-13.737V156.026v-25.515 C476.91,95.829,448.79,67.708,414.105,67.708z M208.372,335.332h163.952c4.34,0,7.851,3.515,7.851,7.851 c0,4.349-3.511,7.851-7.851,7.851H208.372c-4.332,0-7.851-3.502-7.851-7.851C200.521,338.847,204.04,335.332,208.372,335.332z M200.521,301.762c0-4.344,3.519-7.851,7.851-7.851h163.952c4.34,0,7.851,3.507,7.851,7.851c0,4.341-3.511,7.851-7.851,7.851 H208.372C204.04,309.612,200.521,306.103,200.521,301.762z M380.19,216.52c0,4.332-3.526,7.851-7.85,7.851H250.659 c-4.332,0-7.847-3.519-7.847-7.851c0-4.334,3.515-7.851,7.847-7.851H372.34C376.664,208.669,380.19,212.186,380.19,216.52z M372.34,252.491c4.323,0,7.85,3.502,7.85,7.85c0,4.341-3.526,7.852-7.85,7.852H208.372c-4.332,0-7.851-3.511-7.851-7.852 c0-4.348,3.519-7.85,7.851-7.85H372.34z M128.618,305.337c10.395-6.052,21.512-8.007,30.413-6.288v-67.912V208.82v-6.899h6.904 h10.047h35.53c3.817,0,6.899,3.092,6.899,6.899v15.409c0,3.815-3.09,6.901-6.899,6.901h-35.53v87.636h-0.088 c-0.571,10.552-8.752,22.466-21.919,30.132c-17.829,10.379-37.956,9.028-44.955-2.989 C102.017,333.878,110.791,315.716,128.618,305.337z"></path> </g> </g> </g></svg>
                         </div>
                         <h4 class="p-title">${playlist.title.length < 29 ? playlist.title : playlist.title.slice(0, 28).trimEnd() + "..."}</h4>

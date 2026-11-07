@@ -17,26 +17,15 @@ grab.init();
 router.listen();
 router.route();
 
-// APIs
-export const api = { prod: "api.yougra.site", test: "yougra-server.onrender.com"};
-
-// Ping render sever on page load to wake it
-window.addEventListener("load", () => {
-    setTimeout(() => {
-        fetch(`https://${api.test}/ping`).then(() => console.log("Server warmed up")).catch(() => console.warn("Could not reach server (might still be waking up)"));
-    }, 1500);
-});
-
 const searchI = document.getElementById("search-query") as HTMLInputElement;
 const startB = document.getElementById("start") as HTMLButtonElement;
+const searchB = document.getElementById("search-b"); 
 
-const smallerScreen = screen.width <= 700;
-if (!smallerScreen) searchI.style.display = "inline";
-const searchB = document.getElementById("search-b");
+const largerScreen = window.getComputedStyle(searchI).display === "inline-block";
 
 startB.onclick = () => {
     if (!searchI) return
-    if (searchI.style.display === "inline" && !searchI.style.animation.includes("x-shake")) {
+    if (largerScreen && !searchI.style.animation.includes("x-shake")) {
         searchI.style.animation = 'x-shake 0.5s linear 4';
         setTimeout(() => { searchI.style.animation = 'none' }, 2400);
     } else { if (searchB) searchB.click() }
@@ -62,7 +51,6 @@ function searchKey(event: KeyboardEvent) {
     const currentPath = new URL(window.location.href).pathname;
     if (event.key === "Enter") {
         if (!searchI || !searchI.value) return
-        console.log("searching...");
         if (currentPath !== "/search") {
             history.pushState({}, "", "/search");
             router.route();

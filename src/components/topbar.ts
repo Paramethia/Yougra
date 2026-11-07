@@ -12,13 +12,12 @@ const sidebar = document.getElementById("sidebar");
 
 export default function topbar () {
     if (navTog && logo && headSearch && searchB && searchIcon && sidebar) {
-        if (screen.width > 700) sidebar.style.display = "inline-block";
         navTog.onclick = () => {
-            if (sidebar.style.display === "none") {
-                sidebar.style.display = "inline-block"
+            if (sidebar.style.display === "none" || window.getComputedStyle(sidebar).display === "none") {
+                sidebar.style.display = "inline-block";
                 navTog.style.backgroundColor = 'rgba(238, 85, 85, 0.5)';
             } else {
-                sidebar.style.display = "none"
+                sidebar.style.display = "none";
                 navTog.style.backgroundColor = 'transparent';
             }
         }
@@ -29,12 +28,16 @@ export default function topbar () {
             router.route();
         }
         searchB.onclick = () => {
-            if (searchI.style.display !== "inline") {
+            if (searchI.style.display !== "inline" && window.getComputedStyle(searchI).display !== "inline-block") {
                 logo.style.display = "none";
                 headSearch.style.width = "80%";
                 searchI.style.display = "inline";
+                searchI.style.animation = "widen 0.5s ease-in-out";
                 searchB.style.width = "41px";
                 searchB.style.height = "41px";
+                searchB.style.position = "absolute";
+                searchB.style.positionAnchor = "search-b";
+                searchB.style.positionArea = "right center";
                 searchB.style.top = "0";
                 searchB.style.padding = "0";
                 searchB.style.borderTopLeftRadius = "0";

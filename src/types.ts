@@ -60,8 +60,9 @@ export interface Video {
 
 // Collection types
 
-export interface Song {
+export interface Media {
     id: string,
+    thumbnail: string,
     title: string,
     author: string,
     duration: string,
@@ -72,6 +73,6 @@ export interface Playlist {
     author: string,
     thumbnail: string,
     type: string,
-    songs: Song[]
+    media: Media[]
 }
 

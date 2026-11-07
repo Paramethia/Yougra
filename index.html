@@ -33,7 +33,7 @@
 		<div id="head-search"><input type="search" id="search-query" placeholder="Enter video/song title or author name" style="animation:none"/><span id="search-b"><i class="fa-solid fa-magnifying-glass"></i></span></div>
 		
 	</header>
-	<aside id="sidebar" style="display: none;">
+	<aside id="sidebar">
 		<div class="route" id="home-r">Home <i class="fa-solid fa-house"></i></div>
 		<div class="route" id="info-r">Info <i class="fa-solid fa-question"></i></div>
 		<div class="route" id="search-r">Search <i class="fa-solid fa-magnifying-glass"></i></div>
@@ -43,7 +43,7 @@
 	<span id="version">Beta 2</span>
 	<div id="update">
 		<div>
-			<h3>Beta 2 - preview ⅠⅠ</h3>
+			<h3>Beta 2 - preview ⅠⅠⅠ</h3>
 			<dl>
 				<dt>⟬ <strong>Rebuild</strong> ⟭</dt>
 				<dd>⌊ Rebuilt the whole website for SPA routing. This means you will be able to share pages with friends to share content they can download</dd>
@@ -55,10 +55,12 @@
 				<dd>⌊ Added sidebar navigation</dd>
 				<dd>⌊ Re-designed loaders</dd>
 				<dd>⌊ Search results' share buttons now copy with website link to grab route</dd>
+				<dd>⌊ Moved and improved video download button (next to download options icon)</dd>
 				<dt>⟬ <strong>Better download options</strong> ⟭</dt>
 				<dd>⌊ Improved UI for download options</dd>
 				<dd>⌊ Added metadata & .mp4 toggle for audio download options</dd>
 				<dd>⌊ Added playlist author removal option for playlists' options</dd>
+				<dd>⌊ You can now download playlists as videos instead of only audio</dd>
 				<dt>⟬ <strong>More settings</strong> ⟭</dt>
 				<dd>⌊ Search results options</dd>
 				<dd>⌊ Album metadata options</dd>
@@ -71,7 +73,7 @@
 		<div>
 			<i id="close-settings" class="fa-xl fa-solid fa-circle-xmark"></i>
 			<div class="sets">
-				<h3>Claiming YT album links</h3>
+				<h3>Claiming album links</h3>
 
 				<h4>Mobile</h4>
 				<img src="./images/Mobile help.jpeg" alt="Mobile help"/>
@@ -154,8 +156,8 @@
 			<h4>Help</h4>
 			<p>
 			In addition to searching, you can paste the exact YouTube video or song link along with playlists or album links 
-			to quickly grab them. <em>Playlists are currently downloadable as audio only</em>. If you're unsure how to get
-			an album link, you can find instructions in the <span id="s-shortcut">Settings</span>.
+			to quickly grab them. If you're unsure how to get an album link, 
+			you can find instructions in <span id="s-shortcut">Settings</span>.
 			</p>
 
 			<p>
@@ -176,7 +178,7 @@
 				<li>Audio/Music detection system (auto selects fitting format to download)</li>
 				<li>Video quality selection choice</li>
 				<li>Download audio as m4a or mp3</li>
-				<li>Download audio from YT video</li>
+				<li>Download audio from YT videos</li>
 				<li>Custom download methods</li>
 				<li>Content link sharing (share links to videos/songs or playlists/albums for friends to download)</li>
 				<li>Download queueing <strong>(coming eventually)</strong></li>
@@ -210,7 +212,6 @@
 				<p id="video-err-msg"></p>
 				<div class="grab-loader" role="status" aria-label="Grabbing content">
 					<div class="grab-scene">
-
 						<div class="grab-glow"></div>
 
 						<div class="grab-content">
@@ -260,8 +261,9 @@
 				</div>
 				<div id="video-info">
 					<div id="watch"></div>
+					<button id="download">Download</button>
 					<span id="vdob"></span>
-					<svg id="v-d-options-b" fill="#ccc" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+					<svg id="v-d-options-b" fill="#e66" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
 						<path d="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256S397.391,0,256,0z M256,472 c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z" />
 						<g>
 						<path d="M152.312,242.875c17.797,14.688,42.258,16.219,61.484,5.828l4.227,3.828l18.062-14.906 c-1.367-3.688-1.914-7.656-1.547-11.688c0.516-5.719,2.859-10.969,6.602-15.234c3.102-18.172-3.266-37.375-18.641-50.062 c-16.188-13.344-37.164-21.203-55.352-13.766c-2.273,0.938,7.055,20.531,7.055,20.531l23.57,7.875L205.508,202l-7.359,8.625 l-7.344,8.609l-28.141-2.844l-11.953-21.422c0,0-21.266-5.656-21.805-3.328C124.602,210.594,136.125,229.531,152.312,242.875z"/>
@@ -272,10 +274,10 @@
 					<span id="selection-msg"></span>
 					<div id="details">
 						<div id="v-d-options">
-							<p><strong>Download it as...</strong></p>
+							<p><strong>Download as...</strong></p>
 							<hr />
-							<span id="v-select">Video <i class="fa-regular fa-file-video"></i></span>
-							<span id="a-select">Audio <i class="fa-regular fa-file-audio"></i></span>
+							<span class="v-select">Video <i class="fa-regular fa-file-video"></i></span>
+							<span class="a-select">Audio <i class="fa-regular fa-file-audio"></i></span>
 							<div id="aud-o"></div>
 							<div id="vid-o"></div>
 						</div>
@@ -286,7 +288,6 @@
 							<span id="v-likes"></span>
 							<span id="posted"></span>
 						</div>
-						<button id="download">Download</button>
 					</div>
 
 					<p id="progress-txt"></p>
@@ -299,7 +300,6 @@
 				<p id="playlist-err-msg"></p>
 				<div class="grab-loader" role="status" aria-label="Grabbing content">
 					<div class="grab-scene">
-
 						<div class="grab-glow"></div>
 
 						<div class="grab-content">
@@ -349,7 +349,7 @@
 				</div>
 				<div id="playlist-info">
 					<span id="pdob"></span>
-					<svg id="p-d-options-b" fill="#ccc" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+					<svg id="p-d-options-b" fill="#e66" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
 						<path d="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256S397.391,0,256,0z M256,472 c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z" />
 						<g>
 						<path d="M152.312,242.875c17.797,14.688,42.258,16.219,61.484,5.828l4.227,3.828l18.062-14.906 c-1.367-3.688-1.914-7.656-1.547-11.688c0.516-5.719,2.859-10.969,6.602-15.234c3.102-18.172-3.266-37.375-18.641-50.062 c-16.188-13.344-37.164-21.203-55.352-13.766c-2.273,0.938,7.055,20.531,7.055,20.531l23.57,7.875L205.508,202l-7.359,8.625 l-7.344,8.609l-28.141-2.844l-11.953-21.422c0,0-21.266-5.656-21.805-3.328C124.602,210.594,136.125,229.531,152.312,242.875z"/>
@@ -358,30 +358,44 @@
 						</g>
 					</svg>
 					<div id="p-d-options">
-						<h4 style="font-size: 16px; text-align: center;">Collection options</h4>
+						<h4 style="font-size: 16px; text-align: center;">Collect as...</h4>
 						<hr />
-						<p id="c-type">Collection type ~ </p>
-						<center><p id="a-remove" style="font-size: 14px;">Remove "album" author <i class="fa-solid fa-toggle-on"></i></center>
-						<hr />
-						<p style="font-size: 12px">You can click each song to download or just:</p>
+						<span class="v-select" id="video-s">Video <i class="fa-regular fa-file-video"></i></span>
+						<span class="a-select" id="audio-s">Audio <i class="fa-regular fa-file-audio"></i></span>
+						<div id="vid-op">
+							<p>Video quality:</p>
+							<center>
+							<select>
+								<option value="Low">Low</option>
+								<option selected value="Medium">Medium</option>
+								<option value="High">High</option>
+							</select>
+							</center>
+						</div>
+						<div id="aud-op">
+							<p id="c-type">Collection type ~ </p>
+							<center><p id="a-remove" style="font-size: 14px;">Remove "album" author <i class="fa-solid fa-toggle-on"></i></center>
+						</div>
+						<p style="font-size: 12px">Click each media to download or just:</p>
 						<center><button id="download-all">Download all</button></center>
 					</div>
 					<div id="p-header">
-						<img id="p-thumbnail" alt="Youtube playlist thumbnail" />
+						<img id="p-thumbnail" alt="Playlist thumbnail" />
 						<div id="p-info">
 							<h4 id="p-title"></h4>
 							<p id="p-author"></p>
-							<p id="a-amount"></p>
+							<p id="m-amount"></p>
 						</div>
 					</div>
 					<div id="songs"></div>
+					<div id="videos"></div>
 				</div>
 			</div>
 		</div>
 	</main>
 	<script> window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); } </script>
 	<script type="module" src="src/home.ts"></script>
-	<script type="application/ld+json">
+	<!--<script type="application/ld+json">
 		{
 			"@context": "https://schema.org",
 			"@type": "WebApplication",
@@ -391,6 +405,6 @@
 			"applicationCategory": "Multimedia",
 			"operatingSystem": "All"
 		}
-	</script>
+	</script>-->
 </body>
 </html>
