@@ -1181,14 +1181,19 @@ h4 { color: lightgray }
     left: 12px;
     width: 90%;
     height: 5px;
-    border-left: 1px solid #bbb;
-    border-right: 1px solid #bbb;
     border-radius: 10px;
 }
 .v-d-progress {
     height: 100%;
     border-radius: 10px;
     background-color: rgba(238, 85, 85, 0.4);
+}
+.v-d-prog-txt {
+    position: absolute;
+    bottom: 4px;
+    right: 7px;
+    font-size: 0.55rem;
+    color: #c99;
 }
 
 #playlist-info #videos { display: none }

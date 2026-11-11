@@ -39,7 +39,6 @@ const [vOpt, aOpt, pImg, pTitle, pAuthor, pMediaCount, pSongs, pVideos] = [
     document.getElementById("songs"), document.getElementById("videos")
 ] as [HTMLElement, HTMLElement, HTMLImageElement, HTMLElement, HTMLElement, HTMLElement, HTMLElement, HTMLElement];
 
-
 const loaders: NodeListOf<HTMLElement> = document.querySelectorAll(".grab-loader");
 
 export default {
@@ -369,9 +368,13 @@ export default {
                             if (contentLength) progressBar.style.display = "block";
 
                             while (true) {
-                                const { done } = await reader.read();
+                                const { done, value } = await reader.read();
 
                                 if (done) break;
+
+                                chunks.push(value);
+                                received += value.byteLength;
+
 
                                 if (total) {
                                     const percent = (received / total) * 100;
@@ -415,7 +418,7 @@ export default {
                             a.click();
                             a.remove();
 
-                            window.URL.revokeObjectURL(downloadURL);
+                            setTimeout(() => window.URL.revokeObjectURL(downloadURL), 800);
 
                             // Finish writing file
                             // await writable.close(); (Beta 2)
@@ -450,7 +453,6 @@ export default {
                             let downloaded = false;
 
                             ws.onopen = () => {
-                                console.log('WebSocket connected.');
                                 ws.send(JSON.stringify({ id, itag }));
                                 downloadBtn.innerText = "0%";
                                 progressText.innerText = "Wait for it...";
@@ -486,8 +488,8 @@ export default {
 
                                 if (message.status === 'complete') {
                                     downloaded = true;
-                                    // Trigger the file download via a new request
 
+                                    // Trigger the file download via a new request
                                     window.location.href = `https://${prodAPI}${message.path}`;
                                     
                                     // Reset UI after a short delay
@@ -504,7 +506,6 @@ export default {
                             }
 
                             ws.onclose = () => {
-                                console.log('WebSocket disconnected.');
                                 if (!downloaded) {
                                     downloadBtn.innerText = "Download";
                                     downloadBtn.disabled = false;
@@ -599,7 +600,13 @@ export default {
                 if (playlist.type === "Album" && settings.moreMD) {
                     if (aRemove) aRemove.style.display = "none";
                     const query = `releasegroup:"${escapeQuery(playlist.title)}" AND ` + `artist:"${escapeQuery(playlist.author)}"`;
-                    const params = new URLSearchParams({ query, fmt: "json", limit: "5"});
+                    const params = new URLSearchParams({
+                        query,
+                        fmt: "json",
+                        limit: "5",
+                        inc: "genres"
+                    });
+
 
                     const mbRes = await fetch(`https://musicbrainz.org/ws/2/release-group?${params}`, {
                         headers: {
@@ -619,6 +626,7 @@ export default {
 
                 let artwork: string | null | undefined = null;
                 let year = "";
+                let genre = "";
 
                 interface CoverArtImage {
                     front?: boolean;
@@ -655,6 +663,10 @@ export default {
                     }
                     year = album["first-release-date"]?.slice(0, 4);
                     console.log("Found release year:", year);
+                    if (album.tags) {
+                        genre = album.tags[0].name ?? [];
+                        console.log("Found genre:", genre);
+                    }
                 }
 
                 loaders[1].style.display = "none";
@@ -785,6 +797,7 @@ export default {
                             </div>
 
                             <div class="v-d-prog-bar"><div class="v-d-progress"></div></div>
+                            <span class="v-d-prog-txt"></div>
                         </div>
                     `
                 }).join("");
@@ -821,16 +834,16 @@ export default {
                 const vidIndexes: NodeListOf<HTMLElement> = document.querySelectorAll(".v-number");
                 const vidProgBars: NodeListOf<HTMLElement> = document.querySelectorAll(".v-d-prog-bar");
                 const vidProgress: NodeListOf<HTMLElement> = document.querySelectorAll(".v-d-progress");
+                const vidProgTxts: NodeListOf<HTMLElement> = document.querySelectorAll(".v-d-prog-txt");
 
                 vidCons.forEach((vidEl, index) => {
-                    const [vid, vidIndex, vidProgBar, vidProg] = [playlist.media[index], vidIndexes[index], vidProgBars[index], vidProgress[index]]
-                    if (!vid || !vidIndex || !vidProgBar || !vidProg)  {
+                    const [vid, vidIndex, vidProgBar, vidProg, vidProgTxt] = [playlist.media[index], vidIndexes[index], vidProgBars[index], vidProgress[index], vidProgTxts[index]]
+                    if (!vid || !vidIndex || !vidProgBar || !vidProg || !vidProgTxt)  {
                         showError("Failed to start download for video", "Video or elements missing");
                         return
                     }
-                    vidEl.onclick = () => {
-                        if (mediaDownloading) return
-                        downloadVideo(vid, vidProgBar, vidProg, vidIndex);
+                    vidEl.onclick = async () => {
+                        await downloadVideo(vid, vidProgBar, vidProg, vidIndex, vidProgTxt);
                     }
                 });
 
@@ -850,6 +863,7 @@ export default {
                             artist: removeAuthor ? "" : encodeURIComponent(playlist.author),
                             coverImage: encodeURIComponent(artwork ? artwork : playlist.thumbnail),
                             release: year ? year : "",
+                            genre: genre ? genre : "",
                             type: playlist.type,
                             tracks: { index: index + 1, total: playlist.media.length }
                         };
@@ -874,7 +888,7 @@ export default {
                         if (!res.body) throw new Error("No response body received");
                         const reader = res.body.getReader();
                         let received = 0;
-                        const chunks = [];
+                        const chunks: BlobPart[] = [];
 
                         while (true) {
                             const { done, value } = await reader.read();
@@ -911,7 +925,7 @@ export default {
                     }
                 }
 
-                async function downloadVideo(video: Media, vidProgBar: HTMLElement, vidProgress: HTMLElement, vidIndex: HTMLElement): Promise<void> {
+                async function downloadVideo(video: Media, vidProgBar: HTMLElement, vidProgress: HTMLElement, vidIndex: HTMLElement, vidProgTxt: HTMLElement): Promise<void> {
                     return new Promise<void>((resolve, reject) => {
                         try {
                             downloading = true;
@@ -926,7 +940,6 @@ export default {
                             const vQuality = qualityEl.value;
 
                             ws.onopen = () => {
-                                console.log('WebSocket connected.');
                                 ws.send(JSON.stringify({ id: video.id, vQuality }));
                             };
 
@@ -945,28 +958,29 @@ export default {
                                 }
 
                                 if (message.status === "downloading") {
+                                    const [downloaded, total] = [Math.round(message.downloaded || 0), Math.round(message.total)];
                                     vidProgress.style.backgroundColor = 'rgba(238, 55, 55, 0.4)';
                                     vidProgress.style.width = `${message.progress}%`;
+                                    vidProgTxt.innerText = `${downloaded}mb / ${total}mb`;
                                 }
 
                                 if (message.status === "merging") {
-                                    downloadBtn.innerText = `${Math.round(message.progress) || 0}%`;
                                     vidProgress.style.backgroundColor = 'rgba(238, 85, 85, 0.4)';
                                     vidProgress.style.width = `${Math.round(message.progress) || 0}%`;
+                                    vidProgTxt.innerText = `Merging (${Math.round(message.progress)}%)`;
                                 }
 
                                 if (message.status === 'complete') {
                                     downloading = false;
                                     mediaDownloading = false;
                                     downloaded = true;
-                                    // Trigger the file download via a new request
 
                                     window.location.href = `https://${prodAPI}${message.path}`;
-                                    
-                                    // Reset UI after a short delay
+
                                     setTimeout(() => {
                                         vidProgBar.style.display = "none";
                                         vidProgress.style.backgroundColor = 'rgba(238, 85, 85, 0.4)';
+                                        vidProgTxt.innerText = "";
                                     }, 500);
 
                                     ws.close();
@@ -975,13 +989,10 @@ export default {
                             }
 
                             ws.onclose = () => {
-                                console.log('WebSocket disconnected.');
                                 if (!downloaded) {
-                                    downloadBtn.innerText = "Download";
-                                    downloadBtn.disabled = false;
-                                    downloadBtn.style.filter = "brightness(100%)";
                                     vidProgBar.style.display = "none";
                                     vidProgress.style.backgroundColor = 'rgba(238, 85, 85, 0.4)';
+                                    vidProgTxt.innerText = "";
                                     reject(new Error("Video download interrupted"));
                                 }
                             };
@@ -992,6 +1003,7 @@ export default {
                             downloading = false;
                             vidIndex.style.color = "lightgray";
                             vidProgBar.style.display = "none";
+                            vidProgTxt.innerText = "";
                         }
                     });
                 }
@@ -1005,7 +1017,7 @@ export default {
 
                     for (let i = 0; i < playlist.media.length; i++) {
                         const [song, songIndex, songProg] = [playlist.media[i], songIndexes[i], songProgress[i]];
-                        const [vid, vidIndex, vidProgBar, vidProg] = [playlist.media[i], vidIndexes[i], vidProgBars[i], vidProgress[i]]
+                        const [vid, vidIndex, vidProgBar, vidProg, vidProgTxt] = [playlist.media[i], vidIndexes[i], vidProgBars[i], vidProgress[i], vidProgTxts[i]]
                         if (format === "audio") {
                             if (!song || !songIndex || !songProg)  {
                                 showError("Failed to start download for song", "Song or elements missing");
@@ -1024,12 +1036,12 @@ export default {
                             songProg.style.display = "none";
                             songProg.style.color = "";
                         } else if (format === "video") {
-                            if (!vid || !vidIndex || !vidProgBar || !vidProg)  {
+                            if (!vid || !vidIndex || !vidProgBar || !vidProg || !vidProgTxt)  {
                                 showError("Failed to start download for video", "Video or elements missing");
                                 return
                             }
 
-                            await downloadVideo(vid, vidProgBar, vidProg, vidIndex)
+                            await downloadVideo(vid, vidProgBar, vidProg, vidIndex, vidProgTxt)
                         }
 
                         // small delay so browser breathes
