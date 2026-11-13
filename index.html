@@ -43,7 +43,7 @@
 	<span id="version">Beta 2</span>
 	<div id="update">
 		<div>
-			<h3>Beta 2 - preview ⅠⅠⅠ</h3>
+			<h3>Beta 2 - preview &#8547;</h3>
 			<dl>
 				<dt>⟬ <strong>Rebuild</strong> ⟭</dt>
 				<dd>⌊ Rebuilt the whole website for SPA routing. This means you will be able to share pages with friends to share content they can download</dd>
@@ -56,11 +56,16 @@
 				<dd>⌊ Re-designed loaders</dd>
 				<dd>⌊ Search results' share buttons now copy with website link to grab route</dd>
 				<dd>⌊ Moved and improved video download button (next to download options icon)</dd>
+				<dt>⟬ <strong>Notifications</strong> ⟭</dt>
+				<dd>⌊ You will now be notified of certain actions that occur as you use the web app</dd>
 				<dt>⟬ <strong>Better download options</strong> ⟭</dt>
 				<dd>⌊ Improved UI for download options</dd>
 				<dd>⌊ Added metadata & .mp4 toggle for audio download options</dd>
 				<dd>⌊ Added playlist author removal option for playlists' options</dd>
 				<dd>⌊ You can now download playlists as videos instead of only audio</dd>
+				<dt>⟬ <strong>Improved audio downloads</strong> ⟭</dt>
+				<dd>⌊ Audio downloads will now display more detailed progress of the server writing and encoding</dd>
+				<dd>⌊ Audio downloads now download <em>directly</em> after processing instead of through the website</dd>
 				<dt>⟬ <strong>More settings</strong> ⟭</dt>
 				<dd>⌊ Search results options</dd>
 				<dd>⌊ Album metadata options</dd>
@@ -127,6 +132,9 @@
 			<a href="mailto:kyrinkompi@gmail.com">Tell Kyrin to fix this</a>😑
 		</div>
 	</div> 
+	<div class="notification-container" id="notification-container">
+		<!-- Notifications will be inserted here -->
+	</div>
 	<main>
 		<div id="home">
 			<h1>Grab YouTube Content. <font color="#e55">Keep it forever.</font></h1>
@@ -188,7 +196,6 @@
 		</div>
 		<div id="search">
 			<h4>Search for a <span class="switch">song or video</span>👆</h4>
-			<p id="search-err-msg"></p>
 			<div id="search-loader" aria-label="Searching" role="status">
 				<svg id="search-glass" viewBox="0 0 48 48" aria-hidden="true">
 					<circle cx="20" cy="20" r="13"></circle>
@@ -198,9 +205,11 @@
 			</div>
 
 			<div id="search-results">
-				<h3 id="v/s"><span id="v-count"></span>Videos/Songs <span>▽</span></h3>
+				<h3 id="a/c"><span id="a-count"></span>Authors <span>△</span></h3>
+				<div id="auths" style="display: none"></div>
+				<h3 id="v/s"><span id="v-count"></span>Videos/Songs <span>△</span></h3>
 				<div id="vids" style="display: none"></div>
-				<h3 id="p/a"><span id="p-count"></span>Playlists/Albums <span>▽</span></h3>
+				<h3 id="p/a"><span id="p-count"></span>Playlists/Albums <span>△</span></h3>
 				<div id="plists" style="display: none"></div>
 			</div>
 		</div>
@@ -209,7 +218,6 @@
 		<div id="grab">
 			<div id="v-info">
 				<h4>Enter YouTube video/song link 👆</h4>
-				<p id="video-err-msg"></p>
 				<div class="grab-loader" role="status" aria-label="Grabbing content">
 					<div class="grab-scene">
 						<div class="grab-glow"></div>
@@ -297,7 +305,6 @@
 			<hr id ="hl" color="#e55" />
 			<div id="playlist">
 				<h4>Enter a YouTube <span class="switch">playlist</span> link 👆</h4>
-				<p id="playlist-err-msg"></p>
 				<div class="grab-loader" role="status" aria-label="Grabbing content">
 					<div class="grab-scene">
 						<div class="grab-glow"></div>

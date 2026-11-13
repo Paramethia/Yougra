@@ -1,5 +1,14 @@
 // Search types
 
+export interface SearchAuthor {
+    id: string,
+    name: string,
+    handle: string,
+    thumbnail: string,
+    url: string,
+    subscribers: string,
+}
+
 export interface SearchVideo {
     id: string,
     url: string,
@@ -21,6 +30,7 @@ export interface SearchPlaylist {
 }
 
 export interface SearchResponse {
+    authors: SearchAuthor[],
     videos: SearchVideo[],
     playlists: SearchPlaylist[],
     errorTitle?: string,

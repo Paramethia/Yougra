@@ -1,16 +1,20 @@
 import showError from '../overlays/error.ts';
 import { route } from '../components/sidebar.ts';
+import createNotification from '../components/notification.ts';
 import settings from '../overlays/settings.ts';
 import tooltipper from '../components/tooltip.ts';
-import type { SearchResponse, SearchVideo, SearchPlaylist} from '../types.ts';
+import type { SearchResponse, SearchAuthor, SearchVideo, SearchPlaylist} from '../types.ts';
+
+const apiHost = location.hostname === "localhost" ? "localhost:4480" : "api.yougra.site";
 
 const searchI = document.getElementById("search-query") as HTMLInputElement | null;
 const loader = document.getElementById("search-loader");
-const searchErr = document.getElementById("search-err-msg");
 const searchResults = document.getElementById("search-results");
 
+const aorc = document.getElementById("a/c");
 const vors = document.getElementById("v/s");
 const pora = document.getElementById("p/a");
+const auths = document.getElementById("auths");
 const vids = document.getElementById("vids");
 const plists = document.getElementById("plists");
 
@@ -55,12 +59,23 @@ export default {
             this.fetch();
         }
 
-        if (vors && pora && vids && plists) {
+        if (aorc && vors && pora && auths && vids && plists) {
+            aorc.onmouseover = () => { aorc.style.backgroundColor = "rgba(150, 150, 150, 0.3)" }
             vors.onmouseover = () => { vors.style.backgroundColor = "rgba(150, 150, 150, 0.3)" }
             pora.onmouseover = () => { pora.style.backgroundColor = "rgba(150, 150, 150, 0.3)" }
+            aorc.onmouseout = () => { if (auths.style.display === "none") aorc.style.backgroundColor = "rgba(150, 150, 150, 0.1)" }
             vors.onmouseout = () => { if (vids.style.display === "none") vors.style.backgroundColor = "rgba(150, 150, 150, 0.1)" }
             pora.onmouseout = () => { if (plists.style.display === "none") pora.style.backgroundColor = "rgba(150, 150, 150, 0.1)" }
 
+            aorc.onclick = () => { 
+                if (auths.style.display === "none") {
+                    auths.style.display = "flex";
+                    aorc.innerHTML = aorc.innerHTML.replace("▽", "△");
+                } else {
+                    auths.style.display = "none";
+                    aorc.innerHTML = aorc.innerHTML.replace("△", "▽");
+                }
+            }
             vors.onclick = () => { 
                 if (vids.style.display === "none") {
                     vids.style.display = "flex";
@@ -83,21 +98,14 @@ export default {
     },
     tries: 0,
     async fetch() {
-        if (!searchI || !loader || !searchErr || !searchResults || !vors || !pora || !vids || !plists) {
+        if (!searchI || !loader || !searchResults || !aorc || !vors || !pora || !auths || !vids || !plists) {
             showError("Failed to render search results", "1 or more search element(s) missing")
             return;
         }
         const searchInput: string = searchI.value;
 
-        if (!searchInput) {
-            searchErr.innerText = "Type something!!";
-            setTimeout(() => { searchErr.innerText = "" }, 3400 );
-            return
-        }
-
         if (searchInput.includes("https://") && !/youtube\.com|youtu\.be/.test(searchInput)) {
-            searchErr.innerText = "Only YouTube links, pal";
-            setTimeout(() => { searchErr.innerText = "" }, 4400 );
+            createNotification("Invalid YT link", "Only YouTube links work here, pal", "info")
             return
         }
 
@@ -110,7 +118,7 @@ export default {
 
         loader.style.display = "inline-flex";
 
-        const response = await fetch(`https://api.yougra.site/search`, {
+        const response = await fetch(`${location.protocol}//${apiHost}/search`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ input: searchInput })
@@ -118,13 +126,12 @@ export default {
             loader.style.display = "none";
             this.tries++;
             switch (this.tries) {
-                case 1: searchErr.innerText = "Could not search. Try again?"; break;
-                case 2: searchErr.innerText = "Maybe it's your internet?"; break;
-                case 3: searchErr.innerText = "There might be something wrong going on with the app"; break;
-                case 4: searchErr.innerText = "Did you even try to reload?"; break;
-                default: searchErr.innerText = "Just try again later, man"; break;
+                case 1: createNotification("Search error", "Could not search. Try again?", "error"); break;
+                case 2: createNotification("Searche rror", "Maybe it's your internet?", "error"); break;
+                case 3: createNotification("Search error", "There might be something wrong with the server", "error"); break;
+                case 4: createNotification("Search error", "Did you even try to reload?", "error"); break;
+                default: createNotification("Search error", "Just try again later, man", "error"); break;
             }
-            setTimeout(() => { searchErr.innerText = "" }, this.tries === 3 ? 5000 : 4000);
             return
         });
 
@@ -134,29 +141,52 @@ export default {
         const resData: SearchResponse = await response.json();
         if (resData.errorTitle && resData.errorMessage) showError(resData.errorTitle, resData.errorMessage);
 
+        const authors: SearchAuthor[] = resData.authors;
         const videos: SearchVideo[] = resData.videos;
         const playlists: SearchPlaylist[] = resData.playlists;
 
-        if (!videos.length && !playlists.length) {
-            searchErr.innerText = "Could not find anything. Check if you have no typo";
-            setTimeout(() => { searchErr.innerText = "" }, 5200 );
+        if (!authors.length && !videos.length && !playlists.length) {
+            createNotification("Search error", "Could not find anything. Check if you have no typo", "error");;
             return
         }
 
-        vids.innerHTML = videos.map((video) => {
-            return `
-                <div class="video">
-                    <div style="min-height: 150px; min-width: 200px; position: relative; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
-                        <img src="${video.thumbnail}" loading="lazy" />
-                        <span id="duration">${video.duration}</span>
-                    </div>
-                    <h4 class="v-title">${video.title.length < 29 ? video.title : video.title.slice(0, 28).trimEnd() + "..."}</h4>
-                    <h6>${video.author}</h6> <font color="#909090">|</font> <span id="views">${video.views}</span>
-                    <span class="v-share"><svg width="17" height="17" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="#aaa"><g id="Layer_2" data-name="Layer 2"><g id="invisible_box" data-name="invisible box"><rect width="48" height="48" fill="none"/></g><g id="Q3_icons" data-name="Q3 icons"><path d="M31.2,14.2,41,24.1l-9.8,9.8V26.8L27,27c-6.8.3-12,1-16.1,2.4,3.6-3.8,9.3-6.8,16.7-7.5l3.6-.3V14.2M28.3,6a1.2,1.2,0,0,0-1.1,1.3V17.9C12,19.4,2.2,29.8,2,40.3c0,.6.2,1,.6,1s.7-.3,1.1-1.1c2.4-5.4,7.8-8.5,23.5-9.2v9.7A1.2,1.2,0,0,0,28.3,42a.9.9,0,0,0,.8-.4L45.6,25.1a1.5,1.5,0,0,0,0-2L29.1,6.4a.9.9,0,0,0-.8-.4Z"/></g></g></svg></span>
-                </div>
-            `;
-        }).join(""); 
+        const totalResults = authors.length + videos.length + playlists.length;
+        createNotification("Search successful", `Found ${totalResults} results`, "success");
 
+        if (authors.length && auths) {
+            auths.innerHTML = authors.map(author => {
+                return `
+                    <div class="author">
+                        <div style="min-height: 107px; min-width: 200px; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
+                            <center><img src="${author.thumbnail}" loading="lazy" /></center>
+                        </div>
+                        <h4 class="a-name" title="${author.name}"> ${author.name} </h4>
+                        <h6> ${author.handle || 'YouTube channel'}</h6><font color="#909090">|</font> <span id="subs">${author.subscribers}</span>
+
+                        <span class="a-share">
+                            <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="#aaa">
+                                <path d="M31.2,14.2,41,24.1l-9.8,9.8V26.8L27,27c-6.8.3-12,1-16.1,2.4,3.6-3.8,9.3-6.8,16.7-7.5l3.6-.3V14.2M28.3,6a1.2,1.2,0,0,0-1.1,1.3V17.9C12,19.4,2.2,29.8,2,40.3c0,.6.2,1,.6,1s.7-.3,1.1-1.1c2.4-5.4,7.8-8.5,23.5-9.2v9.7A1.2,1.2,0,0,0,28.3,42a.9.9,0,0,0,.8-.4L45.6,25.1a1.5,1.5,0,0,0,0-2L29.1,6.4a.9.9,0,0,0-.8-.4Z"/>
+                            </svg>
+                        </span>
+                    </div>
+                `;
+            }).join("");
+        }
+        if (videos.length && vids) {
+            vids.innerHTML = videos.map((video) => {
+                return `
+                    <div class="video">
+                        <div style="min-height: 150px; min-width: 200px; position: relative; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
+                            <img src="${video.thumbnail}" loading="lazy" />
+                            <span id="duration">${video.duration}</span>
+                        </div>
+                        <h4 class="v-title">${video.title.length < 29 ? video.title : video.title.slice(0, 28).trimEnd() + "..."}</h4>
+                        <h6>${video.author}</h6> <font color="#909090">|</font> <span id="views">${video.views}</span>
+                        <span class="v-share"><svg width="17" height="17" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="#aaa"><g id="Layer_2" data-name="Layer 2"><g id="invisible_box" data-name="invisible box"><rect width="48" height="48" fill="none"/></g><g id="Q3_icons" data-name="Q3 icons"><path d="M31.2,14.2,41,24.1l-9.8,9.8V26.8L27,27c-6.8.3-12,1-16.1,2.4,3.6-3.8,9.3-6.8,16.7-7.5l3.6-.3V14.2M28.3,6a1.2,1.2,0,0,0-1.1,1.3V17.9C12,19.4,2.2,29.8,2,40.3c0,.6.2,1,.6,1s.7-.3,1.1-1.1c2.4-5.4,7.8-8.5,23.5-9.2v9.7A1.2,1.2,0,0,0,28.3,42a.9.9,0,0,0,.8-.4L45.6,25.1a1.5,1.5,0,0,0,0-2L29.1,6.4a.9.9,0,0,0-.8-.4Z"/></g></g></svg></span>
+                    </div>
+                `;
+            }).join(""); 
+        }
         if (playlists.length && plists) {
             plists.innerHTML = playlists.map((playlist) => {
                 return `
@@ -174,39 +204,51 @@ export default {
         }
 
         searchResults.style.display = "block";
-        vors.innerHTML = vors.innerHTML.replace("△", "▽");  
-        vors.style.backgroundColor = "rgba(150, 150, 150, 0.1)";
+        const [aCount, vCount, pCount] = [document.getElementById("a-count"), document.getElementById("v-count"), document.getElementById("p-count")]
+        if (aCount) aCount.innerText = String(authors.length)
+        if (vCount) vCount.innerText = String(videos.length)
+        if (pCount) pCount.innerText = String(playlists.length)
 
-        if (!playlists.length) {
-            [vors, pora].forEach(element => element.style.display = "none");
-            vids.style.display = "flex";
-            plists.style.display = "none";
+        aorc.style.display = authors.length ? "block" : "none";
+        vors.style.display = videos.length ? "block" : "none";
+        pora.style.display = playlists.length ? "block" : "none";
+
+        if (settings.allResults) {
+            auths.style.display = authors.length ? "flex" : "none";
+            vids.style.display = videos.length ? "flex" : "none";
+            plists.style.display = playlists.length ? "flex" : "none";
+            [aorc, vors, pora].forEach(expand => expand.innerHTML = expand.innerHTML.replace("▽", "△"))
         } else {
-            [vors, pora].forEach(element => {
-                element.style.display = "block";
-                if (settings.allResults) {
-                    if (element.id === "v/s" && vids.style.display === "none") element.click();
-                    if (element.id === "p/a" && plists.style.display === "none") element.click();
-                }
-            });
-            const [vCount, pCount] = [document.getElementById("v-count"), document.getElementById("p-count")]
-            if (vCount) vCount.innerText = String(videos.length);
-            if (pCount) pCount.innerText = String(playlists.length);
-            if (!settings.allResults) vids.style.display = "none";
+            [aorc, vors, pora].forEach(expand => expand.innerHTML = expand.innerHTML.replace("△", "▽"))
         }
 
+        const authCons: NodeListOf<HTMLElement> = document.querySelectorAll(".author");
         const vidCons: NodeListOf<HTMLElement> = document.querySelectorAll(".video");
         const plistCons: NodeListOf<HTMLElement> = document.querySelectorAll(".playlist");
 
-        vidCons.forEach((vidCon, index) => {
-            const video = videos[index];
-            if (!video) return
-            vidCon.onclick = (e) => {
-                e.stopPropagation();
-                history.pushState({}, "", `/grab?v=${video.id}`);
-                route.grab();
-            }
-        });
+        if (authors.length && authCons) {
+            authCons.forEach((authCon, index) => {
+                const author = authors[index];
+                if (!author) return 
+                authCon.onclick = (e) => {
+                    e.stopPropagation();
+                    createNotification("Not available yet", "Authors section coming soon...", "info");
+                    //history.pushState({}, "", `/authors?id=${author.id}`);
+                    //route.grab();
+                }
+            });
+        }
+        if (videos.length && vidCons) {
+            vidCons.forEach((vidCon, index) => {
+                const video = videos[index];
+                if (!video) return
+                vidCon.onclick = (e) => {
+                    e.stopPropagation();
+                    history.pushState({}, "", `/grab?v=${video.id}`);
+                    route.grab();
+                }
+            });
+        }
         if (playlists.length && plistCons) {
             plistCons.forEach((plistCon, index) => { 
                 const playlist = playlists[index];
@@ -225,22 +267,37 @@ export default {
         tooltipper(vTitles, videos);
         if (playlists.length) tooltipper(pTitles, playlists);
 
+        const authShares: NodeListOf<HTMLElement> = document.querySelectorAll(".a-share");
         const videoShares: NodeListOf<HTMLElement> = document.querySelectorAll(".v-share");
         const playlistShares: NodeListOf<HTMLElement> = document.querySelectorAll(".p-share");
 
         const urlSep = window.location.href.split("/");
         const domain = urlSep[2];
 
-        videoShares.forEach((shareB, index) => {
-           const video = videos[index];
-            if (!video) return
-            shareB.onclick = (e: MouseEvent) => {
-                e.stopPropagation();
-                shareB.style.animation = 'border-light-up 0.4s ease';
-                setTimeout(() => { shareB.style.animation = 'none' }, 400 );
-                navigator.clipboard.writeText(`${domain}/grab?v=${video.id}`);
-            }
-        });
+        if (authShares) {
+            authShares.forEach((shareB, index) => {
+                const author = authors[index];
+                if (!author) return
+                shareB.onclick = (e: MouseEvent) => {
+                    e.stopPropagation();
+                    shareB.style.animation = 'border-light-up 0.4s ease';
+                    setTimeout(() => { shareB.style.animation = 'none' }, 400 );
+                    navigator.clipboard.writeText(`${domain}/authors?id=${author.id}`);
+                }
+            });
+        }
+        if (videoShares) {
+            videoShares.forEach((shareB, index) => {
+            const video = videos[index];
+                if (!video) return
+                shareB.onclick = (e: MouseEvent) => {
+                    e.stopPropagation();
+                    shareB.style.animation = 'border-light-up 0.4s ease';
+                    setTimeout(() => { shareB.style.animation = 'none' }, 400 );
+                    navigator.clipboard.writeText(`${domain}/grab?v=${video.id}`);
+                }
+            });
+        }
         if (playlistShares) {
             playlistShares.forEach((shareB, index) => {
                 const playlist = playlists[index];

@@ -1,12 +1,13 @@
+import createNotification from '../components/notification.ts';
 import showError from '../overlays/error.ts';
 import settings from '../overlays/settings.ts';
 import tooltipper from '../components/tooltip.ts';
 import type { Video, Playlist, Media } from '../types.ts';
 
-const prodAPI = "api.yougra.site";
+const apiHost = location.hostname === "localhost" ? "localhost:4480" : "api.yougra.site";
+const wsProtocol = location.protocol === "https:" ? "wss:" : "ws:";
 
 // Video elements
-const videoErr = document.getElementById("video-err-msg");
 const watch = document.getElementById("watch");
 const selection = document.getElementById("selection-msg");
 const vidCon = document.getElementById("video-info");
@@ -27,7 +28,6 @@ let qualities: HTMLSelectElement;
 let metadataT: HTMLElement;
 let m4aT: HTMLElement;
 // Playlist elements
-const playlistErr = document.getElementById("playlist-err-msg");
 const playCon = document.getElementById("playlist-info");
 const pdob = document.getElementById("pdob");
 const pdOptionsB = document.getElementById("p-d-options-b") as HTMLButtonElement;
@@ -150,15 +150,14 @@ export default {
         id: "",
         tries: 0,
         async fetch() {
-            if (!videoErr || !vidCon || !watch || !loaders[0] || !selection || !vOp || !aOp) {
+            if (!vidCon || !watch || !loaders[0] || !selection || !vOp || !aOp) {
                 showError("Failed to render video", "1 or more video element(s) missing")
                 return
             }
             const id = this.id;
 
-            if (!id && videoErr) {
-                videoErr.innerText = "Where the video ID, dawg?";
-                setTimeout(() => { videoErr.innerText = "" }, 3000 );
+            if (!id) {
+                createNotification("Cannot grab video", "No video ID given from URL", "error");
                 return
             }
 
@@ -176,7 +175,7 @@ export default {
             }
 
             try {
-                const response = await fetch(`https://${prodAPI}/video`, {
+                const response = await fetch(`${location.protocol}//${apiHost}/video`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id })
@@ -221,7 +220,7 @@ export default {
 
                 watch.innerHTML = `
                     <img id="v-thumbnail" src="${video.thumbnail}" alt="Youtube video thumbnail" />
-                    <span id="play"><i class="fa-solid fa-play"></i> watch</span>
+                    <span id="play"><i class="fa-solid fa-play"></i> Play</span>
                     <span id="length">${formatTime(video.lengthSeconds)}</span>
                 `;
 
@@ -343,97 +342,89 @@ export default {
         
                     try {
                         if (this.format === "audio") {
-                            progressText.innerText = "Wait for it...";
-                            const res = await fetch(`https://${prodAPI}/download-a?id=${id}&metadata=${metadata}`);
+                            progressText.innerText = "Preparing audio...";
+                            progressBar.style.display = "block";
 
-                            if (!res.ok) {
-                                const resJ = await res.json();
-                                downloadBtn.disabled = false;
-                                downloadBtn.style.filter = "brightness(100%)";
-                                progressText.innerText = "";
-                                showError(resJ.errorTitle, resJ.errorMessage);
-                                return
-                            }
+                            const ws = new WebSocket(`${wsProtocol}//${apiHost}/audio`);
 
-                            const contentLength = res.headers.get("content-length");
-                            const total = contentLength ? parseInt(contentLength) : 0;
+                            ws.onopen = () => {
+                                ws.send(JSON.stringify({ id, metadata, }));
+                            };
 
-                            if (!res.body) throw new Error("The resonse has no readable body")
-                            
-                            const reader = res.body.getReader();
-                            let received = 0;
-                            let chunks: BlobPart[] = [];
+                            ws.onmessage = event => {
+                                const res = JSON.parse(event.data);
 
-                            progressText.innerText = "Downloading...";
-                            if (contentLength) progressBar.style.display = "block";
+                                switch (res.status) {
+                                    case "":
+                                        progressText.innerText = "Hmm...";
+                                        break;
 
-                            while (true) {
-                                const { done, value } = await reader.read();
+                                    case "writing": {
+                                        const received = res.downloaded / 1024 / 1024;
 
-                                if (done) break;
+                                        if (res.total) {
+                                            const total = res.total / 1024 / 1024;
+                                            const percent = res.progress;
 
-                                chunks.push(value);
-                                received += value.byteLength;
+                                            progress.style.backgroundColor = '#f5353c';
+                                            progress.style.width = `${percent}%`;
+                                            downloadBtn.innerText = `${Math.floor(percent)}%`;
 
+                                            progressText.innerText = `Writing audio - ${received.toFixed(2)}mb / ${total.toFixed(2)}mb`;
+                                        } else {
+                                            progressText.innerText = `Writing audio - ${received.toFixed(2)}mb`;
+                                        }
 
-                                if (total) {
-                                    const percent = (received / total) * 100;
+                                        break;
+                                    }
 
-                                    progress.style.width = `${percent}%`;
-                                    downloadBtn.innerText = `${Math.floor(percent)}%`;
-                                    progressText.innerText = `Downloading - ${(received / 1024 / 1024).toFixed(2)}MB / ${(total / 1024 / 1024).toFixed(2)}MB`;
-                                } else {
-                                    // fallback if no content-length
-                                    progressText.innerText = `Downloading - ${(received / 1024 / 1024).toFixed(2)}MB / ${parseFloat(String(selectedAudio.size)) + 1.4}MB`; // Approximate total size
+                                    case "encoding": {
+                                        const percent = res.progress;
+
+                                        progress.style.backgroundColor = '#e55';
+                                        progress.style.width = `${percent}%`;
+                                        downloadBtn.innerText = `${Math.floor(percent)}%`;
+                                        progressText.innerText =`Encoding to MP3...`;
+
+                                        break;
+                                    }
+
+                                    case "complete":
+                                        progressText.innerText = "Preparing download...";
+                                        break;
+
+                                    case "path": {
+                                        // Trigger native browser download
+                                        window.location.href = `${location.protocol}//${apiHost}${res.path}`;
+                                        createNotification("Audio download started", "Your audio is done processing", "success");
+                                        ws.close();
+                                        break;
+                                    }
+
+                                    case "error":
+                                        ws.close();
+                                        showError("Failed to download audio", res.message);
+                                    break;
                                 }
-                            }
+                            };
 
-                            function cleanAudioTitle(title: string) {
-                                const promoKeywords = /(official|video|visualizer|lyrics?|lyric\s*video|audio|hd|4k|mv|performance|live|remaster(ed)?)/i;
-                                const featureKeywords = /(feat\.?|ft\.?|featuring)/i;
-
-                                return title
-                                .replace(/[^\w\s\-\(\)\[\]\&\.\+\!\%\#\$\@\_\=\'\,\;]/g, "")
-                                .replace(/\(([^)]*)\)/g, (match, inner) => {
-                                    if (featureKeywords.test(inner)) return match
-                                    return promoKeywords.test(inner) ? "" : match
-                                })
-                                .replace(/\[([^\]]*)\]/g, (match, inner) => {
-                                    if (featureKeywords.test(inner)) return match
-                                    return promoKeywords.test(inner) ? "" : match
-                                })
-                                .replace(/\s*[-–|]\s*(official.*|lyrics.*|audio.*|video.*)$/i, "")
-                                .replace(/\s+/g, " ")
-                                .trim()
-                            }
-
-                            // combine into blob AFTER download completes
-                            const blob = new Blob(chunks);
-                            const downloadURL = window.URL.createObjectURL(blob);
-
-                            const a = document.createElement("a");
-                            a.href = downloadURL;
-                            a.download = `${cleanAudioTitle(data.title)}.${extension}`;
-                            document.body.appendChild(a);
-                            a.click();
-                            a.remove();
-
-                            setTimeout(() => window.URL.revokeObjectURL(downloadURL), 800);
-
-                            // Finish writing file
-                            // await writable.close(); (Beta 2)
-
-                            // reset UI
-                            setTimeout(() => {
+                            ws.onclose = () => {
                                 downloadBtn.innerText = "Download";
                                 downloadBtn.disabled = false;
                                 downloadBtn.style.filter = "brightness(100%)";
                                 progressText.innerText = "";
                                 progressBar.style.display = "none";
-                            }, 500);
+                                progress.style.backgroundColor = '#f5353c';
+                            };
+
+                            ws.onerror = error => {
+                                console.error("Audio WebSocket error:", error);
+                                ws.close();
+                                showError("Connection error", "Could not connect to the audio download server.");
+                            };
                         } else if (this.format === "video") {
                             if (settings.method === "immediate") {
-                                window.location.href = `https://${prodAPI}/immediate-download?id=${id}&itag=${itag}`;
+                                window.location.href = `${location.protocol}//${apiHost}/immediate-download?id=${id}&itag=${itag}`;
                                 setTimeout(() => {
                                     downloadBtn.disabled = false;
                                     downloadBtn.style.filter = "brightness(100%)";
@@ -449,22 +440,22 @@ export default {
                                 return
                             }
 
-                            const ws = new WebSocket(`wss://${prodAPI}`);
+                            const ws = new WebSocket(`${wsProtocol}//${apiHost}/video`);
                             let downloaded = false;
 
                             ws.onopen = () => {
                                 ws.send(JSON.stringify({ id, itag }));
                                 downloadBtn.innerText = "0%";
-                                progressText.innerText = "Wait for it...";
+                                progressText.innerText = "Preparing video...";
                                 progressBar.style.display = "block";
                             };
 
                             ws.onmessage = (event) => {
-                                const message = JSON.parse(event.data);
+                                const res = JSON.parse(event.data);
                                 
-                                if (message.errorTitle && message.errorMessage) {
-                                    showError(message.errorTitle, message.errorMessage);
-                                    progressText.innerText = message.error;
+                                if (res.errorTitle && res.errorMessage) {
+                                    showError(res.errorTitle, res.errorMessage);
+                                    progressText.innerText = res.error;
                                     downloadBtn.disabled = false; 
                                     downloadBtn.style.filter = "brightness(100%)";
                                     setTimeout(() => { progressText.innerText = "" }, 4000);
@@ -472,25 +463,25 @@ export default {
                                     return;
                                 }
 
-                                if (message.status === "downloading") {
-                                    downloadBtn.innerText = `${Math.floor(message.progress) || 0}%`;
+                                if (res.status === "downloading") {
+                                    downloadBtn.innerText = `${Math.floor(res.progress) || 0}%`;
                                     progress.style.backgroundColor = '#f5353c';
-                                    progress.style.width = `${message.progress}%`;
-                                    progressText.innerText = message.downloaded !== message.total ? `Collecting ${message.fType} - ${message.downloaded || 0}mb / ${message.total}mb` : "Merging... (progress may not show at times)";
+                                    progress.style.width = `${res.progress}%`;
+                                    progressText.innerText = res.downloaded !==res.total ? `Writing ${res.fType} - ${res.downloaded || 0}mb / ${res.total}mb` : "Merging... (progress may not show at times)";
                                 }
 
-                                if (message.status === "merging") {
-                                    downloadBtn.innerText = `${Math.round(message.progress) || 0}%`;
+                                if (res.status === "merging") {
+                                    downloadBtn.innerText = `${Math.round(res.progress) || 0}%`;
                                     progressText.innerText = `Merging...`;
                                     progress.style.backgroundColor = '#e55';
-                                    progress.style.width = `${Math.round(message.progress) || 0}%`;
+                                    progress.style.width = `${Math.round(res.progress) || 0}%`;
                                 }
 
-                                if (message.status === 'complete') {
+                                if (res.status === 'complete') {
                                     downloaded = true;
 
                                     // Trigger the file download via a new request
-                                    window.location.href = `https://${prodAPI}${message.path}`;
+                                    window.location.href = `${location.protocol}://${apiHost}${res.path}`;
                                     
                                     // Reset UI after a short delay
                                     setTimeout(() => {
@@ -501,6 +492,7 @@ export default {
                                         progressText.innerText = "";
                                         progress.style.backgroundColor = '#f5353c';
                                     }, 500);
+                                    createNotification("Video download started", "Your video is done processing", "success");
                                     ws.close();
                                 }
                             }
@@ -527,13 +519,12 @@ export default {
                 vidCon.style.display = "none";
                 this.tries++;
                 switch (this.tries) {
-                    case 1: videoErr.innerText = "Could not fetch video. Try again?"; break;
-                    case 2: videoErr.innerText = "Maybe it's your internet?"; break;
-                    case 3: videoErr.innerText = "There might be something wrong going on with the app"; break;
-                    case 4: videoErr.innerText = "Did you even try to reload?"; break;
-                    default: videoErr.innerText = "Just try again later, man"; break;
+                    case 1: createNotification("Grabbing error", "Could not fetch video. Try again?", "error"); break;
+                    case 2: createNotification("Grab error", "Maybe it's your internet?", "error"); break;
+                    case 3: createNotification("Grab error", "There might be something wrong wit the server", "error"); break;
+                    case 4: createNotification("Grabbing error", "Did you even try to reload?", "error"); break;
+                    default: createNotification("Grabbing error", "Just try again later, man", "error"); break;
                 }
-                setTimeout(() => { videoErr.innerText = "" }, this.tries === 3 ? 5000 : 4000);
                 console.error("Error occured while fetching video: \n", err);
             }
         }
@@ -544,22 +535,20 @@ export default {
         downloading: false,
         tries: 0,
         async fetch() {
-            if (!playlistErr || !playCon || !loaders[1] || !pImg || !pTitle || !pAuthor || !pMediaCount || !pSongs || !pVideos) {
+            if (!playCon || !loaders[1] || !pImg || !pTitle || !pAuthor || !pMediaCount || !pSongs || !pVideos) {
                 showError("Failed to render playlist", "1 or more video element(s) missing")
                 return
             }
 
             if (this.downloading) {
-                playlistErr.innerText = "Can't fetch while already downloading";
-                setTimeout(() => { playlistErr.innerText = "" }, 3400 );
+                createNotification("Not allowed!!", "Can't grab while already downloading", "info");
                 return
             }
 
             const id = this.id;
 
             if (!id) {
-                playlistErr.innerText = "Where's the collection ID, dawg?";
-                setTimeout(() => { playlistErr.innerText = "" }, 3400 );
+                createNotification("Cannot grab collection", "No collection ID given from the URL", "error");
                 return
             }
 
@@ -567,7 +556,7 @@ export default {
             playCon.style.display = "none";
 
             try {
-                const response = await fetch(`https://${prodAPI}/playlist`, { 
+                const response = await fetch(`${location.protocol}//${apiHost}/playlist`, { 
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id }) 
@@ -616,7 +605,7 @@ export default {
 
                     if (!mbRes.ok) {
                         console.warn("MusicBrainz lookup failed:", mbRes.status);
-                        return;
+                        createNotification("No extra data", "Could not retrieve more data for metadata 🥲", "warn");
                     }
 
                     const data = await mbRes.json();
@@ -666,7 +655,7 @@ export default {
                     if (album.tags) {
                         genre = album.tags[0].name ?? [];
                         console.log("Found genre:", genre);
-                    }
+                    } else createNotification("No genre detected", "Could not find genre for metadata", "warn")
                 }
 
                 loaders[1].style.display = "none";
@@ -852,77 +841,133 @@ export default {
 
                 let downloading: boolean = this.downloading;
                 async function downloadSong(song: Media, index: number, playlist: Playlist, songProgress: HTMLElement, songIndex: HTMLElement) {
-                    try {
+                    return new Promise<void>((resolve, reject) => {
                         downloading = true;
-                        mediaDownloading = true;
+                        mediaDownloading;
                         songProgress.style.display = "block";
+                        songProgress.style.width = "0%";
                         songIndex.style.color = "#e55";
 
+                        // Prepare collection metadata
                         const collection = {
-                            title: encodeURIComponent(playlist.title),
-                            artist: removeAuthor ? "" : encodeURIComponent(playlist.author),
-                            coverImage: encodeURIComponent(artwork ? artwork : playlist.thumbnail),
-                            release: year ? year : "",
-                            genre: genre ? genre : "",
+                            title: playlist.title,
+                            artist: removeAuthor ? "" : playlist.author,
+                            coverImage: artwork || playlist.thumbnail,
+                            release: year || "",
+                            genre: genre || "",
                             type: playlist.type,
-                            tracks: { index: index + 1, total: playlist.media.length }
+                            tracks: {
+                                index: index + 1,
+                                total: playlist.media.length
+                            }
                         };
 
-                        if (song.author.toLowerCase().includes(collection.artist.toLowerCase())) song.author = collection.artist
-                        
-                        const res = await fetch(`https://${prodAPI}/download-a?id=${song.id}&sArtist=${encodeURIComponent(song.author)}&sTitle=${encodeURIComponent(song.title)}&playlist=${JSON.stringify(collection)}`);
+                        // Determine the individual song's artist
+                        let songArtist = song.author;
 
-                        if (!res.ok) {
-                            const resJ = await res.json();
+                        if (collection.artist && songArtist.toLowerCase().includes(collection.artist.toLowerCase())) songArtist = collection.artist
+
+                        const ws = new WebSocket(`${wsProtocol}//${apiHost}/audio`);
+
+                        let finished = false;
+
+                        const resetUI = () => {
                             downloading = false;
-                            mediaDownloading = false;
-                            showError(resJ.errorTitle, resJ.errorMessage);
-                            songIndex.style.color = "lightgray";
+                            mediaDownloading;
                             songProgress.style.display = "none";
-                            return;
-                        }
+                            songProgress.style.width = "0%";
+                            songIndex.style.color = "lightgray";
+                            songIndex.innerText = String(index + 1);
+                        };
 
-                        const contentLength = res.headers.get("content-length");
-                        const total = contentLength ? parseInt(contentLength) : 0;
+                        const fail = (title: string, message: string) => {
+                            if (finished) return;
 
-                        if (!res.body) throw new Error("No response body received");
-                        const reader = res.body.getReader();
-                        let received = 0;
-                        const chunks: BlobPart[] = [];
+                            finished = true;
+                            ws.close();
 
-                        while (true) {
-                            const { done, value } = await reader.read();
-                            if (done) break;
+                            resetUI();
+                            showError(title, message);
 
-                            chunks.push(value);
-                            received += value.length;
+                            reject(new Error(message));
+                        };
 
-                            if (total) {
-                                const percent = (received / total) * 100;
-                                songProgress.style.width = `${percent}%`;
+                        ws.onopen = () => {
+                            ws.send(JSON.stringify({
+                                id: song.id,
+                                sArtist: songArtist,
+                                sTitle: song.title,
+                                playlist: JSON.stringify(collection)
+                            }));
+                        };
+
+                        ws.onmessage = event => {
+                            const res = JSON.parse(event.data);
+
+                            switch (res.status) {
+                                case "preparing":
+                                    songProgress.style.width = "0%";
+                                    break;
+
+                                case "writing": {
+                                    const received = res.downloaded / 1024 / 1024;
+
+                                    if (res.total) {
+                                        const total = res.total / 1024 / 1024;
+                                        const percent = res.progress;
+
+                                        songProgress.style.width = `${percent}%`;
+
+                                        //console.log(`Downloading ${song.title}: ${received.toFixed(2)}MB / ${total.toFixed(2)}MB`);
+                                    }
+
+                                    break;
+                                }
+
+                                case "encoding": {
+                                    const percent = res.progress;
+
+                                    songIndex.innerText = `${Math.floor(percent)}%`;
+
+                                    break;
+                                }
+
+                                case "complete":
+                                    songProgress.style.width = "100%";
+                                    break;
+
+                                case "path": {
+                                    if (finished) break;
+
+                                    finished = true;
+                                    window.location.href = `${location.protocol}//${apiHost}${res.path}`;
+
+                                    createNotification(`Audio ${index} download started`, "Your audio is done processing", "success");
+                                    ws.close();
+
+                                    resetUI();
+                                    resolve();
+                                    break;
+                                }
+
+                                case "error": 
+                                    fail("Failed to download song", res.message || "An unexpected error occurred.");
+                                    break;
                             }
                         }
-                        songProgress.style.width = "100%";
 
-                        const blob = new Blob(chunks);
-                        const downloadUrl = URL.createObjectURL(blob);
+                        ws.onerror = error => {
+                            console.error("Audio WebSocket error:", error);
 
-                        const a = document.createElement("a");
-                        a.href = downloadUrl;
-                        a.download = `${song.title}.mp3`;
-                        document.body.appendChild(a);
-                        a.click();
-                        a.remove();
+                            fail("Connection error", "Could not connect to the audio download server.");
+                        };
 
-                        URL.revokeObjectURL(downloadUrl);
-                    } catch (err) {
-                        console.error("Song download failed:", err);
-                        downloading = false;
-                        mediaDownloading = false;
-                        showError("Failed to download song", String(err));
-                        songIndex.style.color = "lightgray";
-                        songProgress.style.display = "none";
-                    }
+                        ws.onclose = () => {
+                            if (!finished) {
+                                fail("Connection lost", "The audio download connection was unexpectedly closed.");
+                            }
+                        };
+                    });
                 }
 
                 async function downloadVideo(video: Media, vidProgBar: HTMLElement, vidProgress: HTMLElement, vidIndex: HTMLElement, vidProgTxt: HTMLElement): Promise<void> {
@@ -933,7 +978,7 @@ export default {
                             vidProgBar.style.display = "block";
                             vidIndex.style.color = "#e55";
 
-                            const ws = new WebSocket(`wss://${prodAPI}`);
+                            const ws = new WebSocket(`${wsProtocol}//${apiHost}/video`);
                             let downloaded = false;
 
                             const qualityEl = document.querySelector("#vid-op select") as HTMLSelectElement;
@@ -944,45 +989,45 @@ export default {
                             };
 
                             ws.onmessage = (event) => {
-                                const message = JSON.parse(event.data);
+                                const res = JSON.parse(event.data);
                                 
-                                if (message.errorTitle && message.errorMessage) {
-                                    showError(message.errorTitle, message.errorMessage);
+                                if (res.errorTitle && res.errorMessage) {
+                                    showError(res.errorTitle, res.errorMessage);
                                     downloading = false;
                                     mediaDownloading = false;
                                     vidIndex.style.color = "lightgray";
                                     vidProgBar.style.display = "none";
                                     ws.close();
-                                    reject(new Error(message.errorMessage || message.error));
+                                    reject(new Error(res.errorMessage || res.error));
                                     return;
                                 }
 
-                                if (message.status === "downloading") {
-                                    const [downloaded, total] = [Math.round(message.downloaded || 0), Math.round(message.total)];
+                                if (res.status === "downloading") {
+                                    const [downloaded, total] = [Math.round(res.downloaded || 0), Math.round(res.total)];
                                     vidProgress.style.backgroundColor = 'rgba(238, 55, 55, 0.4)';
-                                    vidProgress.style.width = `${message.progress}%`;
+                                    vidProgress.style.width = `${res.progress}%`;
                                     vidProgTxt.innerText = `${downloaded}mb / ${total}mb`;
                                 }
 
-                                if (message.status === "merging") {
+                                if (res.status === "merging") {
                                     vidProgress.style.backgroundColor = 'rgba(238, 85, 85, 0.4)';
-                                    vidProgress.style.width = `${Math.round(message.progress) || 0}%`;
-                                    vidProgTxt.innerText = `Merging (${Math.round(message.progress)}%)`;
+                                    vidProgress.style.width = `${Math.round(res.progress) || 0}%`;
+                                    vidProgTxt.innerText = `Merging (${Math.round(res.progress)}%)`;
                                 }
 
-                                if (message.status === 'complete') {
+                                if (res.status === 'complete') {
                                     downloading = false;
                                     mediaDownloading = false;
                                     downloaded = true;
 
-                                    window.location.href = `https://${prodAPI}${message.path}`;
+                                    window.location.href = `${location.protocol}//${apiHost}${res.path}`;
 
                                     setTimeout(() => {
                                         vidProgBar.style.display = "none";
                                         vidProgress.style.backgroundColor = 'rgba(238, 85, 85, 0.4)';
                                         vidProgTxt.innerText = "";
                                     }, 500);
-
+                                    createNotification(`Video ${vidIndex.innerText} download started`, "Your video is done processing", "success");
                                     ws.close();
                                     resolve();
                                 }
@@ -1058,14 +1103,12 @@ export default {
                 playCon.style.display = "none";
                 this.tries++;
                 switch (this.tries) {
-                    case 1: playlistErr.innerText = "Could not fetch playlist. Try again?"; break;
-                    case 2: playlistErr.innerText = "Maybe it's your internet?"; break;
-                    case 3: playlistErr.innerText = "Make sure the playlist is not private"; break;
-                    case 4: playlistErr.innerText = "There might be something wrong going on with the app"; break;
-                    case 5: playlistErr.innerText = "Did you even try to reload?"; break;
-                    default: playlistErr.innerText = "Just try again later, man"; break;
+                    case 1: createNotification("Grabbing error", "Could not fetch playlist. Try again?", "error"); break;
+                    case 2: createNotification("Grab error", "Maybe it's your internet?", "error"); break;
+                    case 3: createNotification("Grab error", "There might be something wrong wit the server", "error"); break;
+                    case 4: createNotification("Grabbing error", "Did you even try to reload?", "error"); break;
+                    default: createNotification("Grabbing error", "Just try again later, man", "error"); break;
                 }
-                setTimeout(() => { playlistErr.innerText = "" }, this.tries === 3 ? 5000 : 4000);
                 console.error("Error occured while fetching playlist:", error);
             }
         }

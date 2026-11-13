@@ -230,6 +230,8 @@ aside #settings-o { border-bottom: none }
 #update div, #error div {
     min-width: 300px;
     max-width: 420px;
+    max-height: 70%;
+    overflow-y: auto;
     margin: 0 20px;
     border-radius: 12px;
     padding: 12px 17px;
@@ -380,6 +382,158 @@ aside #settings-o { border-bottom: none }
     color: #aaa;
 }
 #error a:hover { text-decoration: underline dotted }
+
+/* Notification styling */
+
+.notification-container {
+    position: fixed;
+    top: 3cm;
+    right: 10px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    z-index: 9999;
+
+    width: 340px;
+    max-width: calc(100vw - 20px);
+
+    pointer-events: none;
+}
+
+.yougra-notification {
+    --accent: #f05260;
+    --accent-glow: rgba(240, 82, 96, 0.25);
+    max-width: 280px;
+    max-width: calc(100vw - 32px);
+    pointer-events: auto;
+    padding: 16px;
+    background: rgba(38, 32, 34, 0.7);
+    border: 1px solid var(--accent-glow);
+    border-radius: 16px;
+    box-shadow: 0 0 15px rgba(240, 82, 96, 0.12), 0 8px 30px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    text-align: left;
+    color: #e6dadd;
+    font-family: inherit;
+    overflow: hidden;
+}
+
+.notification-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+
+    color: var(--accent);
+    background: rgba(240, 82, 96, 0.15);
+
+    border-radius: 10px;
+}
+
+.notification-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 650;
+    color: #ffffff;
+}
+
+.notification-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+
+    color: #999;
+    background: transparent;
+    border: none;
+
+    font-size: 16px;
+    cursor: pointer;
+
+    transition: color 0.2s;
+}
+
+.notification-close:hover {
+    color: #ddd;
+}
+
+.notification-body {
+    margin-top: 12px;
+
+    color: #d1c5c8;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.notification-progress {
+    width: 100%;
+    height: 4px;
+
+    margin-top: 16px;
+
+    background: rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+.notification-progress-bar {
+    width: 100%;
+    height: 100%;
+
+    background: var(--accent);
+    border-radius: inherit;
+
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.notification-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-top: 9px;
+
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+
+    color: #a99da0;
+}
+
+.notification-percentage {
+    color: var(--accent);
+}
+.yougra-notification.success {
+    --accent: #ff626b;
+    --accent-glow: rgba(255, 98, 107, 0.3);
+}
+.yougra-notification.warn {
+    --accent: #e9a04f;
+    --accent-glow: rgba(233, 160, 79, 0.4);
+}
+.yougra-notification.error {
+    --accent: #d1343c;
+    --accent-glow: rgba(209, 52, 52, 0.5);
+}
+.yougra-notification.info {
+    --accent: #62b8e8;
+    --accent-glow: rgba(98, 184, 232, 0.3);
+}
 
 /* Home section styling */
 
@@ -1237,6 +1391,39 @@ h4 { color: lightgray }
     from { max-height: 22vh } to { max-height: 57px }
 }
 
+@keyframes slide-in-up {
+    from {
+        opacity: 0;
+        transform: translate(300px, 40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes glow-pulse {
+    0% {
+        box-shadow:
+            0 0 5px rgba(240, 82, 96, 0.2),
+            0 0 10px rgba(240, 82, 96, 0.1);
+    }
+
+    50% {
+        box-shadow:
+            0 0 12px rgba(240, 82, 96, 0.7),
+            0 0 25px rgba(240, 82, 96, 0.4),
+            0 0 40px rgba(240, 82, 96, 0.2);
+    }
+
+    100% {
+        box-shadow:
+            0 0 5px rgba(240, 82, 96, 0.2),
+            0 0 10px rgba(240, 82, 96, 0.1);
+    }
+}
+
 @keyframes search-scan {
     0%, 100% {
         transform: translate(0, 0) rotate(-12deg);
@@ -1484,10 +1671,6 @@ h4 { color: lightgray }
 @media only screen and (max-width: 450px) {
     body { min-height: 94vh }
 
-    #update div {
-        max-height: 520px;
-        overflow-y: auto;
-    }
     #update div::-webkit-scrollbar {
         background: transparent;
         width: 4px;
