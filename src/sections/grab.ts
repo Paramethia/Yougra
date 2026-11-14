@@ -481,7 +481,7 @@ export default {
                                     downloaded = true;
 
                                     // Trigger the file download via a new request
-                                    window.location.href = `${location.protocol}://${apiHost}${res.path}`;
+                                    window.location.href = `${location.protocol}//${apiHost}${res.path}`;
                                     
                                     // Reset UI after a short delay
                                     setTimeout(() => {
