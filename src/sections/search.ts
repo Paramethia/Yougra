@@ -160,8 +160,8 @@ export default {
                         <div style="min-height: 107px; min-width: 200px; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
                             <center><img src="${author.thumbnail}" loading="lazy" /></center>
                         </div>
-                        <h4 class="a-name" title="${author.name}"> ${author.name} </h4>
-                        <h6> ${author.handle || 'YouTube channel'}</h6><font color="#909090">|</font> <span id="subs">${author.subscribers}</span>
+                        <h4 class="a-name" title="${author.name}"> ${author.name.length > 20 ? author.name.slice(0, 20).trimEnd() + "..." : author.name} </h4>
+                        <h6> ${author.handle || 'YouTube channel'}</h6><font color="#909090"> |</font> <span id="subs">${author.subscribers.replace("cribers", "")}</span>
 
                         <span class="a-share">
                             <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="#aaa">

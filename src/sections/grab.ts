@@ -876,7 +876,6 @@ export default {
                             mediaDownloading;
                             songProgress.style.display = "none";
                             songProgress.style.width = "0%";
-                            songIndex.style.color = "lightgray";
                             songIndex.innerText = String(index + 1);
                         };
 
@@ -887,6 +886,7 @@ export default {
                             ws.close();
 
                             resetUI();
+                            songIndex.style.color = "lightgray";
                             showError(title, message);
 
                             reject(new Error(message));
@@ -917,8 +917,6 @@ export default {
                                         const percent = res.progress;
 
                                         songProgress.style.width = `${percent}%`;
-
-                                        //console.log(`Downloading ${song.title}: ${received.toFixed(2)}MB / ${total.toFixed(2)}MB`);
                                     }
 
                                     break;
@@ -926,7 +924,6 @@ export default {
 
                                 case "encoding": {
                                     const percent = res.progress;
-
                                     songIndex.innerText = `${Math.floor(percent)}%`;
 
                                     break;
@@ -942,7 +939,7 @@ export default {
                                     finished = true;
                                     window.location.href = `${location.protocol}//${apiHost}${res.path}`;
 
-                                    createNotification(`Audio ${index} download started`, "Your audio is done processing", "success");
+                                    createNotification(`Audio ${index + 1} download started`, "Your audio is done processing", "success");
                                     ws.close();
 
                                     resetUI();

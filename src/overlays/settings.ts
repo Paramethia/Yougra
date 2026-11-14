@@ -18,7 +18,7 @@ export default {
             function closeSet() {
                 if (!settingsOverlay || !settingsO) return
                 settingsOverlay.style.visibility = 'hidden';
-                settingsO.style.color = 'white';
+                settingsO.style.color = 'lightgray';
                 document.body.style.overflow = 'auto';
             }
 
