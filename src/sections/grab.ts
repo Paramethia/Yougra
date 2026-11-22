@@ -1,9 +1,12 @@
+import recents from '../components/recents.ts';
 import createNotification from '../components/notification.ts';
 import showError from '../overlays/error.ts';
 import settings from '../overlays/settings.ts';
 import tooltipper from '../components/tooltip.ts';
-import type { Video, Playlist, Media } from '../types.ts';
+import { route } from '../components/sidebar.ts';
+import type { SearchVideo, SearchPlaylist, Video, Playlist, Media } from '../types.ts';
 
+const domain = window.location.href.split("/")[2];
 const apiHost = location.hostname === "localhost" ? "localhost:4480" : "api.yougra.site";
 const wsProtocol = location.protocol === "https:" ? "wss:" : "ws:";
 
@@ -16,6 +19,7 @@ const vdOptionsB = document.getElementById("v-d-options-b") as HTMLButtonElement
 const vdOptions = document.getElementById("v-d-options");
 const vSelect: NodeListOf<HTMLElement> = document.querySelectorAll(".v-select");
 const aSelect: NodeListOf<HTMLElement> = document.querySelectorAll(".a-select");
+const doTT: NodeListOf<HTMLElement> = document.querySelectorAll(".do-tt");
 const [vOp, aOp, vTitle, vAuthor, vViews, vLikes, vPosted] = [
     document.getElementById("vid-o"), document.getElementById("aud-o"), 
     document.getElementById("v-title"), document.getElementById("v-author"),
@@ -36,7 +40,7 @@ const [vOpt, aOpt, pImg, pTitle, pAuthor, pMediaCount, pSongs, pVideos] = [
     document.getElementById("vid-op"), document.getElementById("aud-op"),
     document.getElementById("p-thumbnail"), document.getElementById("p-title"), 
     document.getElementById("p-author"), document.getElementById("m-amount"), 
-    document.getElementById("songs"), document.getElementById("videos")
+    document.getElementById("songs"), document.querySelector("#playlist-info #videos")
 ] as [HTMLElement, HTMLElement, HTMLImageElement, HTMLElement, HTMLElement, HTMLElement, HTMLElement, HTMLElement];
 
 const loaders: NodeListOf<HTMLElement> = document.querySelectorAll(".grab-loader");
@@ -57,7 +61,101 @@ export default {
             }
         }
 
-        if (vdob && vdOptions && pdob && pdOptions) {
+        if (recents.video.stored && recents.video.element) {
+            const recentVideos: SearchVideo[] = JSON.parse(recents.video.stored).reverse();
+            if(!grabQ) recents.video.element.style.display = "block";
+            recents.video.element.innerHTML = `
+                <h3>Recently grabbed videos</h3>
+                <div style="display:flex">
+                ${recentVideos.map((video) => { 
+                    return `
+                    <div class="video">
+                        <div style="min-height: 150px; min-width: 250px; position: relative; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
+                            <img src="${video.thumbnail}" loading="lazy" />
+                            <span id="duration">${video.duration}</span>
+                        </div>
+                        <h4 class="v-title" title="${video.title}">${video.title.length < 25 ? video.title : video.title.slice(0, 24).trimEnd() + "..."}</h4>
+                        <h6 class="v-author">${video.author.name}</h6>
+                        <span class="v-share"><svg width="17" height="17" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="#aaa"><g id="Layer_2" data-name="Layer 2"><g id="invisible_box" data-name="invisible box"><rect width="48" height="48" fill="none"/></g><g id="Q3_icons" data-name="Q3 icons"><path d="M31.2,14.2,41,24.1l-9.8,9.8V26.8L27,27c-6.8.3-12,1-16.1,2.4,3.6-3.8,9.3-6.8,16.7-7.5l3.6-.3V14.2M28.3,6a1.2,1.2,0,0,0-1.1,1.3V17.9C12,19.4,2.2,29.8,2,40.3c0,.6.2,1,.6,1s.7-.3,1.1-1.1c2.4-5.4,7.8-8.5,23.5-9.2v9.7A1.2,1.2,0,0,0,28.3,42a.9.9,0,0,0,.8-.4L45.6,25.1a1.5,1.5,0,0,0,0-2L29.1,6.4a.9.9,0,0,0-.8-.4Z"/></g></g></svg></span>
+                    </div>
+                `}).join("")}
+                </div>
+            `;
+            const videos: NodeListOf<HTMLElement> = document.querySelectorAll("#recent-videos .video");
+
+            videos.forEach((author, index) => {
+                author.onclick = () => {
+                    history.pushState({}, "", `/grab?v=${recentVideos[index]?.id}`);
+                    this.video.id = recentVideos[index]!.id;
+                    this.video.fetch();
+                }
+            })
+
+            const vidShares: NodeListOf<HTMLElement> = document.querySelectorAll("#recent-videos .v-share");
+
+            vidShares.forEach((shareB, index) => {
+                const video = recentVideos[index];
+                if (!video) return
+                shareB.onclick = (e: MouseEvent) => {
+                    e.stopPropagation();
+                    shareB.style.animation = 'border-light-up 0.4s ease';
+                    setTimeout(() => { shareB.style.animation = 'none' }, 400 );
+                    navigator.clipboard.writeText(`${domain}/grab?v=${video.id}`);
+                }
+            });
+        }
+        if (recents.collection.stored && recents.collection.element) {
+            const recentCollections: SearchPlaylist[] = JSON.parse(recents.collection.stored).reverse();
+            if(!grabQ) recents.collection.element.style.display = "block";
+            recents.collection.element.innerHTML = `
+                <h3>Recently grabbed collections</h3>
+                <div style="display:flex">
+                ${recentCollections.map((collection) => { 
+                    return `
+                    <div class="playlist">
+                        <div style="min-height: 150px; min-width: 200px; position: relative; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
+                            <center><img src="${collection.thumbnail}" loading="lazy" ${collection.type !== "Playlist"? 'style="width: 55%"' : ""}/></center>
+                            <svg id="plist-icon" fill="rgba(235, 74, 74, 0.6)" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="28px" height="28px" viewBox="0 0 476.91 476.909" xml:space="preserve" stroke="#aaa">
+                                <g>
+                                    <g>
+                                    <path d="M62.802,142.287h121.682c4.45,0,10.95-3.805,13.32-7.999l24.816-41.066H62.802C28.12,93.222,0,121.342,0,156.026v20.779 C13.266,156.086,36.425,142.287,62.802,142.287z" />
+                                    <path d="M414.105,67.708H266.913c-8.681,0-19.151,6.125-23.399,13.685l-7.147,11.828l-28.489,47.157 c-4.246,7.558-14.719,13.684-23.393,13.684H62.802C28.12,154.062,0,182.183,0,216.865v115.794v13.737 c0,34.685,28.12,62.805,62.802,62.805h351.303c34.685,0,62.805-28.12,62.805-62.805v-13.737V156.026v-25.515 C476.91,95.829,448.79,67.708,414.105,67.708z M208.372,335.332h163.952c4.34,0,7.851,3.515,7.851,7.851 c0,4.349-3.511,7.851-7.851,7.851H208.372c-4.332,0-7.851-3.502-7.851-7.851C200.521,338.847,204.04,335.332,208.372,335.332zM200.521,301.762c0-4.344,3.519-7.851,7.851-7.851h163.952c4.34,0,7.851,3.507,7.851,7.851c0,4.341-3.511,7.851-7.851,7.851 H208.372C204.04,309.612,200.521,306.103,200.521,301.762z M380.19,216.52c0,4.332-3.526,7.851-7.85,7.851H250.659 c-4.332,0-7.847-3.519-7.847-7.851c0-4.334,3.515-7.851,7.847-7.851H372.34C376.664,208.669,380.19,212.186,380.19,216.52z M372.34,252.491c4.323,0,7.85,3.502,7.85,7.85c0,4.341-3.526,7.852-7.85,7.852H208.372c-4.332,0-7.851-3.511-7.851-7.852 c0-4.348,3.519-7.85,7.851-7.85H372.34z M128.618,305.337c10.395-6.052,21.512-8.007,30.413-6.288v-67.912V208.82v-6.899h6.904 h10.047h35.53c3.817,0,6.899,3.092,6.899,6.899v15.409c0,3.815-3.09,6.901-6.899,6.901h-35.53v87.636h-0.088 c-0.571,10.552-8.752,22.466-21.919,30.132c-17.829,10.379-37.956,9.028-44.955-2.989 C102.017,333.878,110.791,315.716,128.618,305.337z"/>
+                                    </g>
+                                </g> 
+                            </svg>
+                        </div>
+                        <h4 class="p-title" title="${collection.title}">${collection.title.length < 29 ? collection.title : collection.title.slice(0, 28).trimEnd() + "..."}</h4>
+                        <h6>${collection.type}</h6> <font color="#909090">|</font> <span id="items">${collection.itemCount}</span>
+                        <span class="p-share"><svg width="17" height="17" viewBox="0 0 48 48" fill="#aaa" xmlns="http://www.w3.org/2000/svg"><g id="Layer_2" data-name="Layer 2"><g id="invisible_box" data-name="invisible box"><rect width="48" height="48" fill="none"/></g><g id="Q3_icons" data-name="Q3 icons"><path d="M31.2,14.2,41,24.1l-9.8,9.8V26.8L27,27c-6.8.3-12,1-16.1,2.4,3.6-3.8,9.3-6.8,16.7-7.5l3.6-.3V14.2M28.3,6a1.2,1.2,0,0,0-1.1,1.3V17.9C12,19.4,2.2,29.8,2,40.3c0,.6.2,1,.6,1s.7-.3,1.1-1.1c2.4-5.4,7.8-8.5,23.5-9.2v9.7A1.2,1.2,0,0,0,28.3,42a.9.9,0,0,0,.8-.4L45.6,25.1a1.5,1.5,0,0,0,0-2L29.1,6.4a.9.9,0,0,0-.8-.4Z"/></g></g></svg></span>
+                    </div>
+                `}).join("")}
+                </div>
+            `;
+            const collections: NodeListOf<HTMLElement> = document.querySelectorAll("#recent-collections .playlist");
+
+            collections.forEach((author, index) => {
+                author.onclick = () => {
+                    history.pushState({}, "", `/grab?c=${recentCollections[index]?.id}`);
+                    this.playlist.id = recentCollections[index]!.id;
+                    this.playlist.fetch();
+                }
+            })
+
+            const collShares: NodeListOf<HTMLElement> = document.querySelectorAll("#recent-collections .p-share");
+
+            collShares.forEach((shareB, index) => {
+                const collection = recentCollections[index];
+                if (!collection) return
+                shareB.onclick = (e: MouseEvent) => {
+                    e.stopPropagation();
+                    shareB.style.animation = 'border-light-up 0.4s ease';
+                    setTimeout(() => { shareB.style.animation = 'none' }, 400 );
+                    navigator.clipboard.writeText(`${domain}/grab?c=${collection.id}`);
+                }
+            });
+        }
+
+        if (vdob && vdOptions && pdob && pdOptions && doTT[0]) {
             vdOptions.style.display = "none";
             pdOptions.style.display = "none";
 
@@ -72,8 +170,14 @@ export default {
                 }
             });
 
-            vdob.onmouseover = () => { vdOptionsB.style.background = '#3f3f3f' }
-            vdob.onmouseout = () => { if (vdOptions.style.display !== "block") vdOptionsB.style.background = '#2a2a2a' }
+            vdob.onmouseover = () => { 
+                vdOptionsB.style.background = '#3f3f3f';
+                doTT[0]!.style.animation = 'appear 0.3s ease forwards';
+            }
+            vdob.onmouseout = () => { 
+                if (vdOptions.style.display !== "block") vdOptionsB.style.background = '#2a2a2a'
+                doTT[0]!.style.animation = 'disappear 0.2s ease forwards';
+            }
             vdob.onclick = () => {
                 if (!vdOptions) return
                 if (vdOptions.style.display === "none") {
@@ -84,8 +188,14 @@ export default {
                     vdOptions.style.display = 'none';
                 }
             }
-            pdob.onmouseover = () => { pdOptionsB.style.background = '#3f3f3f' }
-            pdob.onmouseout = () => { if (pdOptions.style.display !== "block") pdOptionsB.style.background = '#2a2a2a' }
+            pdob.onmouseover = () => { 
+                pdOptionsB.style.background = '#3f3f3f';
+                doTT[1]!.style.animation = 'appear 0.3s ease forwards';
+            }
+            pdob.onmouseout = () => { 
+                if (pdOptions.style.display !== "block") pdOptionsB.style.background = '#2a2a2a'
+                doTT[1]!.style.animation = 'disappear 0.2s ease forwards';
+            }
             pdob.onclick = () => {
                 if (!pdOptions) return
                 if (pdOptions.style.display === "none") {
@@ -150,7 +260,7 @@ export default {
         id: "",
         tries: 0,
         async fetch() {
-            if (!vidCon || !watch || !loaders[0] || !selection || !vOp || !aOp) {
+            if (!vidCon || !watch || !loaders[1] || !selection || !vOp || !aOp) {
                 showError("Failed to render video", "1 or more video element(s) missing")
                 return
             }
@@ -161,7 +271,8 @@ export default {
                 return
             }
 
-            loaders[0].style.display = "flex";
+            if (recents.video.element) recents.video.element.style.display = "none";
+            loaders[1].style.display = "flex";
             vidCon.style.display = "none";
 
             function formatTime(seconds: number) {
@@ -182,13 +293,25 @@ export default {
                 });
 
                 if (!response) throw new Error("No response recieved")
-                const data = await response.json();
-                if (!response.ok && data.errorTitle && data.errorMessage) {
-                    showError(data.errorTitle, data.errorMessage)
+
+                const rData = await response.json();
+
+                if (!response.ok && rData.errorTitle && rData.errorMessage) {
+                    if (recents.video.element && recents.video.stored) recents.video.element.style.display = "block";
+                    loaders[1].style.display = "none";
+                    showError(rData.errorTitle, rData.errorMessage);
                     return
                 }
 
-                const video: Video = data;
+                const video: Video = rData;
+
+                recents.video.set({
+                    id: video.id,
+                    title: video.title,
+                    author: video.author,
+                    thumbnail: video.thumbnail,
+                    duration: `${formatTime(video.lengthSeconds)}`,
+                })
 
                 const numFormat = window.innerWidth > 355 || screen.width > 355 ? new Intl.NumberFormat('fr-FR') : new Intl.NumberFormat('en', { notation: 'compact' });
 
@@ -212,11 +335,16 @@ export default {
                     return
                 }
 
-                loaders[0].style.display = "none";
+                loaders[1].style.display = "none";
                 vidCon.style.display = "block";
 
                 let metadata = video.song && video.lengthSeconds < 900 ? true : false;
                 let extension = "mp3";
+
+                function goToAuthor(authorID: string) {
+                    history.pushState({}, "", `/author?id=${authorID}`);
+                    route.author();
+                }
 
                 watch.innerHTML = `
                     <img id="v-thumbnail" src="${video.thumbnail}" alt="Youtube video thumbnail" />
@@ -239,8 +367,8 @@ export default {
                 }
                 
                 vTitle.innerText = video.title;
-                vAuthor.innerHTML = `<strong>@${video.author.name}</strong> `;
-                vAuthor.onclick = () => { window.open(video.author.url, '_blank') };
+                vAuthor.innerHTML = `<strong><i class="fa-solid fa-user"></i>${video.author.name}</strong> `;
+                vAuthor.onclick = () => { goToAuthor(video.author.id) };
                 vViews.innerHTML = `<i class="fa-regular fa-eye"></i> ${video.views}`;
                 vLikes.innerHTML = `<i class="fa-regular fa-thumbs-up"></i> ${video.likes}`;
                 vPosted.innerHTML = `<i class="fa-regular fa-calendar"></i> ${window.innerWidth > 355 || screen.width > 355 ? video.pDate.exact : video.pDate.relative}`;
@@ -251,7 +379,7 @@ export default {
 
                     const iframe = document.createElement("iframe");
                     iframe.src = `https://www.youtube.com/embed/${video.id}`;
-                    iframe.title = data.title || "YouTube video player";
+                    iframe.title = video.title || "YouTube video player";
                     iframe.frameBorder = "0";
                     iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share");
                     iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
@@ -265,7 +393,7 @@ export default {
                 selection.style.visibility = "visible";
                 selection.style.animation = "appear 2s linear";
 
-                this.format = data.song ? "audio" : "video";
+                this.format = video.song ? "audio" : "video";
                 selection.innerText = `Selected ${this.format}`;
 
                 [vSize, aSize, qualities, metadataT, m4aT] = [
@@ -467,7 +595,7 @@ export default {
                                     downloadBtn.innerText = `${Math.floor(res.progress) || 0}%`;
                                     progress.style.backgroundColor = '#f5353c';
                                     progress.style.width = `${res.progress}%`;
-                                    progressText.innerText = res.downloaded !==res.total ? `Writing ${res.fType} - ${res.downloaded || 0}mb / ${res.total}mb` : "Merging... (progress may not show at times)";
+                                    progressText.innerText = res.downloaded !== res.total ? `Writing ${res.fType} - ${res.downloaded || 0}mb / ${res.total}mb` : "Merging... (progress may not show at times)";
                                 }
 
                                 if (res.status === "merging") {
@@ -515,7 +643,8 @@ export default {
                     }
                 }
             } catch (err) {
-                loaders[0].style.display = "none";
+                if (recents.video.element && recents.video.stored) recents.video.element.style.display = "block";
+                loaders[1].style.display = "none";
                 vidCon.style.display = "none";
                 this.tries++;
                 switch (this.tries) {
@@ -535,7 +664,7 @@ export default {
         downloading: false,
         tries: 0,
         async fetch() {
-            if (!playCon || !loaders[1] || !pImg || !pTitle || !pAuthor || !pMediaCount || !pSongs || !pVideos) {
+            if (!playCon || !loaders[2] || !pImg || !pTitle || !pAuthor || !pMediaCount || !pSongs || !pVideos) {
                 showError("Failed to render playlist", "1 or more video element(s) missing")
                 return
             }
@@ -552,7 +681,8 @@ export default {
                 return
             }
 
-            loaders[1].style.display = "flex";
+            if (recents.collection.element) recents.collection.element.style.display = "none"
+            loaders[2].style.display = "flex";
             playCon.style.display = "none";
 
             try {
@@ -564,14 +694,18 @@ export default {
 
                 const rData = await response.json();
                 if (rData.errorTitle && rData.errorMessage) {
+                    if (recents.collection.element && recents.collection.stored) recents.collection.element.style.display = "block"
+                    loaders[2].style.display = "none";
                     showError(rData.errorTitle, rData.errorMessage);
                     return
                 }
 
                 if (!rData.media.length) {
+                    if (recents.collection.element && recents.collection.stored) recents.collection.element.style.display = "block"
+                    loaders[2].style.display = "none";
                     console.warn(`No media was served for ${rData.title} ${rData.type.toLowerCase()}...`);
-                    showError("Empty data", `No media was served for this ${rData.type.toLowerCase()}. Retry or try a different one?`);   
-                    return  
+                    showError("Empty data", `No media was served for this ${rData.type.toLowerCase()}. Retry or try a different one?`);
+                    return
                 }
 
                 const playlist: Playlist = rData;
@@ -613,52 +747,32 @@ export default {
                     album = data["release-groups"]?.[0];
                 } else if (playlist.type === "Playlist" && aRemove) { aRemove.style.display = "block" }
 
-                let artwork: string | null | undefined = null;
                 let year = "";
                 let genre = "";
 
-                interface CoverArtImage {
-                    front?: boolean;
-                    approved?: boolean;
-                    types?: string[];
-                    image: string;
-                    thumbnails?: {
-                        small: string;
-                        large: string;
-                    };
-                }
-
                 if (album) {
-                    const artRes = await fetch(`https://coverartarchive.org/release-group/${album.id}`);
-
-                    if (artRes.ok) {
-                        const artData: { images?: CoverArtImage[];} = await artRes.json();
-
-                        const images = artData.images ?? [];
-
-                        // Prefer the designated front cover.
-                        const cover = images.find(image => image.front) ?? images.find(image => image.types?.includes("Front"));
-
-                        if (cover) {
-                            // Prefer the 500px || 250px thumbnail; otherwise use the original.
-                            artwork = cover.thumbnails?.large || cover.thumbnails?.small || cover.image;
-
-                            // Avoid mixed-content problems on HTTPS websites.
-                            if (artwork) artwork = artwork.replace(/^http:/, "https:");
-                            console.log("Found higher quality cover art:", artwork);
-                        }
-                    } else if (artRes.status !== 404) {
-                        console.warn("Cover Art Archive request failed:", artRes.status);
-                    }
                     year = album["first-release-date"]?.slice(0, 4);
                     console.log("Found release year:", year);
                     if (album.tags) {
-                        genre = album.tags[0].name ?? [];
-                        console.log("Found genre:", genre);
+                        interface Tag {
+                            name: string,
+                            count?: number
+                        }
+                        const tags: Tag[] = album.tags;
+                        genre = Array.isArray(album?.tags) ? tags.map(tag => (typeof tag === 'object' ? tag?.name : tag)).filter(Boolean).join('; ') : (album?.tags || "");
+                        console.log("Found genre(s):", genre);
                     } else createNotification("No genre detected", "Could not find genre for metadata", "warn")
                 }
 
-                loaders[1].style.display = "none";
+                recents.collection.set({
+                    id: this.id,
+                    title: playlist.title,
+                    thumbnail: playlist.thumbnail,
+                    type: playlist.type,
+                    itemCount: `${playlist.media.length} ${playlist.type === "Playlist" ? "videos" : "songs"}`
+                });
+
+                loaders[2].style.display = "none";
                 playCon.style.display = "block";
                 
                 function cleanSongTitle(title: string | undefined) {
@@ -754,7 +868,7 @@ export default {
                     }
                 }
 
-                pImg.src = artwork ? artwork : playlist.thumbnail;
+                pImg.src = playlist.thumbnail;
                 pTitle.innerText = playlist.title.length > maxCtitle ? playlist.title.slice(0, maxCtitle).trimEnd() + "..." : playlist.title;
                 pAuthor.innerHTML = `<i class="fa-regular fa-user"></i>${playlist.author.length > maxCauthor ? playlist.author.slice(0, maxCauthor).trimEnd() + "..." : playlist.author}`;
                 pMediaCount.innerHTML = `<strong>Audio ~</strong> ${playlist.media.length}`;
@@ -782,7 +896,7 @@ export default {
 
                             <div id="v-info">
                                 <p id="v-name" class="v-name" title="${video.title}">${video.title.length > maxMtitle ? video.title.slice(0, maxMtitle).trimEnd() + "..." : video.title}</p>
-                                <p id="v-author" class="v-author">@${video.author.length > maxMauthor ? video.author.slice(0, maxMauthor).trimEnd() + "+" : video.author}</p>
+                                <p id="v-author" class="v-author">${video.author.length > maxMauthor ? video.author.slice(0, maxMauthor).trimEnd() + "+" : video.author}</p>
                             </div>
 
                             <div class="v-d-prog-bar"><div class="v-d-progress"></div></div>
@@ -852,7 +966,7 @@ export default {
                         const collection = {
                             title: playlist.title,
                             artist: removeAuthor ? "" : playlist.author,
-                            coverImage: artwork || playlist.thumbnail,
+                            coverImage: playlist.thumbnail,
                             release: year || "",
                             genre: genre || "",
                             type: playlist.type,
@@ -1096,7 +1210,8 @@ export default {
                     downloadBtn.style.filter = "brightness(100%)";
                 }
             } catch (error) {
-                loaders[1].style.display = "none";
+                if (recents.collection.element && recents.collection.stored) recents.collection.element.style.display = "block"
+                loaders[2].style.display = "none";
                 playCon.style.display = "none";
                 this.tries++;
                 switch (this.tries) {

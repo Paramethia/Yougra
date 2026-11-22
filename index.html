@@ -37,39 +37,45 @@
 		<div class="route" id="home-r">Home <i class="fa-solid fa-house"></i></div>
 		<div class="route" id="info-r">Info <i class="fa-solid fa-question"></i></div>
 		<div class="route" id="search-r">Search <i class="fa-solid fa-magnifying-glass"></i></div>
+		<div class="route" id="author-r">Authors <i class="fa-solid fa-people-group"></i></i></div>
 		<div class="route" id="grab-r">Grab <i class="fa-solid fa-circle-down"></i></div>
 		<div id="settings-o">Settings <i class="fa-solid fa-gear"></i></div>
 	</aside>
 	<span id="version">Beta 2</span>
 	<div id="update">
 		<div>
-			<h3>Beta 2 - preview &#8547;</h3>
+			<h3>Beta 2 - preview Ⅴ</h3>
 			<dl>
-				<dt>⟬ <strong>Rebuild</strong> ⟭</dt>
-				<dd>⌊ Rebuilt the whole website for SPA routing. This means you will be able to share pages with friends to share content they can download</dd>
-				<dd>⌊ Added different routes for home <strong>(new)</strong>, info, search, grab, and more to come</dd>
-				<dt>⟬ <strong>UI & UX improvements</strong> ⟭</dt>
-				<dd>⌊ Updated layout for top bar</dd>
+				<dt>⟬ <strong>Major Rebuild</strong> ⟭</dt>
+				<dd>⌊ Rebuilt the website around SPA routing for an easier & smoother browsing experience without full page reloads.</dd>
+            	<dd>⌊ Included dedicated routes for Home <strong>(new)</strong>, Info, Search, Grab, Author <strong>(new)</strong>, and Saves <strong>(coming soon)</strong>.</dd>
+            	<dd>⌊ Shareable links make it easier to send specific pages and content directly to friends.</dd>
+				<dt>⟬ <strong>UI & UX Improvements</strong> ⟭</dt>
+				<dd>⌊ Re-layout for the top bar to include the search bar</dd>
 				<dd>⌊ New background design</dd>
-				<dd>⌊ Only one search bar at the top to use both for links and searching</dd>
-				<dd>⌊ Added sidebar navigation</dd>
-				<dd>⌊ Re-designed loaders</dd>
-				<dd>⌊ Search results' share buttons now copy with website link to grab route</dd>
-				<dd>⌊ Moved and improved video download button (next to download options icon)</dd>
+				<dd>⌊ Combined link grabbing and content searching into a single search bar at the top.</dd>
+            	<dd>⌊ Added sidebar navigation for easier access to different routes/pages.</dd>
+				<dd>⌊ Redesigned loading animations for a more polished experience.</dd>
+            	<dd>⌊ Improved the video download button placement, moving it alongside the download options.</dd>
+				<dd>⌊ Share buttons now copy links that lead directly to Yogura with the corresponding route instead of YouTube.</dd>
+				<dt>⟬ <strong>Auther Route</strong> ⟭</dt>
+				<dd>⌊ A new author route that will display the fetched authors content</dd>
+				<dt>⟬ <strong>Recent Activity</strong> ⟭</dt>
+            	<dd>⌊ Recently searched content, grabbed media, and visited authors are now saved and displayed for quick access.</dd>
 				<dt>⟬ <strong>Notifications</strong> ⟭</dt>
-				<dd>⌊ You will now be notified of certain actions that occur as you use the web app</dd>
-				<dt>⟬ <strong>Better download options</strong> ⟭</dt>
-				<dd>⌊ Improved UI for download options</dd>
-				<dd>⌊ Added metadata & .mp4 toggle for audio download options</dd>
+				<dd>⌊ You will now be notified of certain actions/errors that occur as you use Yougra</dd>
+				<dt>⟬ <strong>Improved Download Options</strong> ⟭</dt>
+				<dd>⌊ Redesigned the download options interface.</dd>
+				<dd>⌊ Added metadata & .m4a toggle for audio download options</dd>
 				<dd>⌊ Added playlist author removal option for playlists' options</dd>
 				<dd>⌊ You can now download playlists as videos instead of only audio</dd>
-				<dt>⟬ <strong>Improved audio downloads</strong> ⟭</dt>
-				<dd>⌊ Audio downloads will now display more detailed progress of the server writing and encoding</dd>
-				<dd>⌊ Audio downloads now download <em>directly</em> after processing instead of through the website</dd>
-				<dt>⟬ <strong>More settings</strong> ⟭</dt>
+				<dt>⟬ <strong>Improved Audio Downloads</strong> ⟭</dt>
+				<dd>⌊ More detailed download progress, including server-side writing and audio encoding.</dd>
+            	<dd>⌊ Audio files are now delivered directly after processing, improving the download experience.</dd>
+				<dt>⟬ <strong>More Settings</strong> ⟭</dt>
 				<dd>⌊ Search results options</dd>
 				<dd>⌊ Album metadata options</dd>
-				<font color="#aaa" size="2">More features coming soon for beta 2</font>
+				<font color="#aaa" size="2">More features coming soon for Beta 2</font>
 			</dl>
 			<center><button id="close-update" aria-label="Close update overlay">Cool</button></center>
 		</div>
@@ -112,7 +118,7 @@
 				<div class="option-con">
 					<i class="fa-solid fa-toggle-off fa-xl"></i>
 					<h5>More metadata</h5>
-					<p>Get HD cover art, release year & genre (usually)</p>
+					<p>Get release year & genre (most times)</p>
 					<p style="font-size:12px; color:#F9BB62;">⚠️ It will slightly slow down album fetching</p>
 				</div>
 			</div>
@@ -194,8 +200,12 @@
 				<li>Download stats <strong>(coming eventually)</strong></li>
 			</ul>
 		</div>
+		<div id="title-tp"></div>
 		<div id="search">
 			<h4>Search for a <span class="switch">song or video</span>👆</h4>
+			<div id="recent-searches" class="recents">
+				<!-- recents will be here -->
+			</div>
 			<div id="search-loader" aria-label="Searching" role="status">
 				<svg id="search-glass" viewBox="0 0 48 48" aria-hidden="true">
 					<circle cx="20" cy="20" r="13"></circle>
@@ -213,11 +223,78 @@
 				<div id="plists" style="display: none"></div>
 			</div>
 		</div>
-		<div id="title-tp"></div>
+
+		<div id="author">
+			<h4 id="nothing">Nothing to see here... yet 😉</h4>
+			<div id="recent-authors" class="recents"></div>
+			<div class="grab-loader" id="grab-author" role="status" aria-label="Grabbing content">
+				<div class="grab-scene">
+					<div class="grab-glow"></div>
+					<div class="grab-content">
+						<div id="grab-avatar" class="grab-thumbnail">
+							<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+								<circle cx="12" cy="8" r="4" fill="currentColor"/>
+								<path d="M4 21C4 16.8 7.6 13.5 12 13.5S20 16.8 20 21" fill="currentColor" />
+							</svg>
+						</div>
+
+						<div class="grab-content-info">
+							<span class="grab-content-title">YouTube Creator</span>
+							<span class="grab-content-subtitle">@author</span>
+						</div>
+
+						<span class="grab-content-icon">↓</span>
+					</div>
+
+					<div class="grab-hand" aria-hidden="true">
+						<svg viewBox="0 0 100 100" fill="none">
+							<path
+								d="M31 49V25 C31 16 44 16 44 25V43 V18 C44 9 57 9 57 18V42 V23 C57 14 70 14 70 23V47 V35 C70 26 83 28 83 37V61 C83 81 70 91 51 91 C35 91 26 81 22 69 L12 51 C8 43 19 36 25 44Z"
+								fill="#292929"
+								stroke="#f6363c"
+								stroke-width="3.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+							<path d="M44 43V55 M57 42V53 M70 47V55" stroke="#f6363c" stroke-width="3" stroke-linecap="round" />
+						</svg>
+					</div>
+
+					<span class="grab-particle particle-one"></span>
+					<span class="grab-particle particle-two"></span>
+					<span class="grab-particle particle-three"></span>
+				</div>
+
+				<div class="grab-loader-text">
+					<h3>Grabbing author<span class="grab-dots"></span></h3>
+					<p>Fetching author info...</p>
+				</div>
+			</div>
+			<div id="author-con">
+				<div id="tings">
+					<img id="a-avatar" src="/images/Author.svg" />
+					<div id="info">
+						<h2 id="a-title">Author</h2>
+						<p id="a-handle">@Athor</p>
+						<span id="a-subs">407 subscribers</span>
+					</div>
+				</div>
+				<hr color="#999" />
+				<div id="content">
+					<div id="tabs">
+						<span class="tab">35 Videos</span><span class="tab">16 Collections</span><span class="tab">67 Shorts</span>
+					</div>
+				</div>
+				<div id="videos"></div>
+				<div id="shorts" style="display:none"></div>
+				<div id="collections" style="display:none"></div>
+			</div>
+		</div>
 
 		<div id="grab">
 			<div id="v-info">
 				<h4>Enter YouTube video/song link 👆</h4>
+				<div id="recent-videos" class="recents"></div>
 				<div class="grab-loader" role="status" aria-label="Grabbing content">
 					<div class="grab-scene">
 						<div class="grab-glow"></div>
@@ -225,13 +302,13 @@
 						<div class="grab-content">
 							<div class="grab-thumbnail">
 								<svg viewBox="0 0 24 24" aria-hidden="true">
-									<path d="M8 5v14l11-7z" fill="currentColor"/>
+									<path d="M8 5v14l11-7z" fill="currentColor" />
 								</svg>
 							</div>
 
 							<div class="grab-content-info">
 								<span class="grab-content-title">YouTube Content</span>
-								<span class="grab-content-subtitle">Retrieving media...</span>
+								<span class="grab-content-subtitle">Grabbing video...</span>
 							</div>
 
 							<span class="grab-content-icon">↓</span>
@@ -247,30 +324,25 @@
 									stroke-linecap="round"
 									stroke-linejoin="round"
 								/>
-								<path
-									d="M44 43V55 M57 42V53 M70 47V55"
-									stroke="#f6363c"
-									stroke-width="3"
-									stroke-linecap="round"
-								/>
+								<path d="M44 43V55 M57 42V53 M70 47V55" stroke="#f6363c" stroke-width="3" stroke-linecap="round" />
 							</svg>
 						</div>
 
 						<span class="grab-particle particle-one"></span>
 						<span class="grab-particle particle-two"></span>
 						<span class="grab-particle particle-three"></span>
-
 					</div>
 
 					<div class="grab-loader-text">
 						<h3>Grabbing content<span class="grab-dots"></span></h3>
-						<p>Reaching out to retrieve your media...</p>
+						<p>Fetching video info...</p>
 					</div>
 				</div>
 				<div id="video-info">
 					<div id="watch"></div>
 					<button id="download">Download</button>
 					<span id="vdob"></span>
+					<span id="vdo-tt" class="do-tt">Download options</span>
 					<svg id="v-d-options-b" fill="#e66" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
 						<path d="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256S397.391,0,256,0z M256,472 c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z" />
 						<g>
@@ -305,6 +377,7 @@
 			<hr id ="hl" color="#e55" />
 			<div id="playlist">
 				<h4>Enter a YouTube <span class="switch">playlist</span> link 👆</h4>
+				<div id="recent-collections" class="recents"></div>
 				<div class="grab-loader" role="status" aria-label="Grabbing content">
 					<div class="grab-scene">
 						<div class="grab-glow"></div>
@@ -318,7 +391,7 @@
 
 							<div class="grab-content-info">
 								<span class="grab-content-title">YouTube Content</span>
-								<span class="grab-content-subtitle">Retrieving media...</span>
+								<span class="grab-content-subtitle">Grabbing collection...</span>
 							</div>
 
 							<span class="grab-content-icon">↓</span>
@@ -334,28 +407,23 @@
 									stroke-linecap="round"
 									stroke-linejoin="round"
 								/>
-								<path
-									d="M44 43V55 M57 42V53 M70 47V55"
-									stroke="#f6363c"
-									stroke-width="3"
-									stroke-linecap="round"
-								/>
+								<path d="M44 43V55 M57 42V53 M70 47V55" stroke="#f6363c" stroke-width="3" stroke-linecap="round" />
 							</svg>
 						</div>
 
 						<span class="grab-particle particle-one"></span>
 						<span class="grab-particle particle-two"></span>
 						<span class="grab-particle particle-three"></span>
-
 					</div>
 
 					<div class="grab-loader-text">
 						<h3>Grabbing content<span class="grab-dots"></span></h3>
-						<p>Reaching out to retrieve your media...</p>
+						<p>Fetching playlist/album info...</p>
 					</div>
 				</div>
 				<div id="playlist-info">
 					<span id="pdob"></span>
+					<span id="pdo-tt" class="do-tt">Download options</span>
 					<svg id="p-d-options-b" fill="#e66" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="25px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
 						<path d="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256S397.391,0,256,0z M256,472 c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z" />
 						<g>

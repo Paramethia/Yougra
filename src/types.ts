@@ -5,34 +5,73 @@ export interface SearchAuthor {
     name: string,
     handle: string,
     thumbnail: string,
-    url: string,
     subscribers: string,
 }
 
 export interface SearchVideo {
     id: string,
-    url: string,
     title: string,
-    author: string,
+    author: {
+        id: string,
+        name: string,
+        handle: string
+    },
     thumbnail: string,
     duration: string,
-    views: string,
+    views?: string
 }
 
 export interface SearchPlaylist {
     id: string,
     title: string,
-    author: string,
     thumbnail: string,
     type: string,
-    itemCount: number,
-    url: string,
+    itemCount: string,
 }
 
 export interface SearchResponse {
     authors: SearchAuthor[],
     videos: SearchVideo[],
     playlists: SearchPlaylist[],
+    errorTitle?: string,
+    errorMessage?: string,
+}
+
+// Author types 
+
+export interface AuthorVideo {
+    id: string,
+    thumbnail: string,
+    title: string,
+    duration: string,
+    views: string,
+    lastTime: string
+}
+
+export interface AuthorShort {
+    id: string,
+    thumbnail: string,
+    title: string,
+    views: string
+}
+
+export interface AuthorCollection {
+    id: string,
+    thumbnail: string,
+    title: string,
+    type: string,
+    itemCount: string
+}
+
+export interface AuthorResponse {
+    avatar: string,
+    banner: string,
+    title: string,
+    handle: string,
+    subscribers: string,
+    videos: AuthorVideo[],
+    shorts: AuthorShort[],
+    collections: AuthorCollection[],
     errorTitle?: string,
     errorMessage?: string,
 }
@@ -54,7 +93,7 @@ export interface Video {
     author: {
         id: string,
         name: string,
-        url: string
+        handle: string,
     },
     thumbnail: string,
     lengthSeconds: number,
@@ -85,4 +124,3 @@ export interface Playlist {
     type: string,
     media: Media[]
 }
-

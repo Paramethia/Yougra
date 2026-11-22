@@ -7,6 +7,7 @@ export default {
         home: document.getElementById("home"),
         info: document.getElementById("info"),
         search: document.getElementById("search"),
+        author: document.getElementById("author"),
         grab: document.getElementById("grab"),
     },
     route() {
@@ -15,15 +16,16 @@ export default {
         const homeR = document.getElementById("home-r");
         const infoR = document.getElementById("info-r");
         const searchR = document.getElementById("search-r");
+        const authorR = document.getElementById("author-r");
         const grabR = document.getElementById("grab-r");
 
-        if (!homeR || !infoR || !searchR || !grabR) {
+        if (!homeR || !infoR || !searchR || !authorR || !grabR) {
             error("Failed to render route", "Sidebar navigation element(s) not found");
             return
         }
         // Reset all sidebar navigations
         routes.forEach(route => route.style.backgroundColor = "transparent")
-        if (!this.sections.home || !this.sections.info || !this.sections.search || !this.sections.grab) {
+        if (!this.sections.home || !this.sections.info || !this.sections.search || !this.sections.author || !this.sections.grab) {
             error("Failed to render section", "Section element(s) not found");
             return
         }
@@ -39,6 +41,10 @@ export default {
                 searchR.style.backgroundColor = "rgba(238, 119, 119, 0.2)";
                 this.sections.search.style.display = "block";
             break;
+            case "/author": 
+                authorR.style.backgroundColor = "rgba(238, 119, 119, 0.2)";
+                this.sections.author.style.display = "block";
+            break;
             case "/grab":
                 grabR.style.backgroundColor = "rgba(238, 119, 119, 0.2)";
                 this.sections.grab.style.display = "block";
@@ -48,6 +54,8 @@ export default {
                 this.sections.home.style.display = "block";
             break;
             default:
+                history.pushState({}, "", "/");
+                homeR.style.backgroundColor = "rgba(238, 119, 119, 0.2)";
                 this.sections.home.style.display = "block";
             break;
         }

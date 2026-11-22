@@ -1,10 +1,13 @@
+import recents from '../components/recents.ts';
 import showError from '../overlays/error.ts';
-import { route } from '../components/sidebar.ts';
 import createNotification from '../components/notification.ts';
 import settings from '../overlays/settings.ts';
 import tooltipper from '../components/tooltip.ts';
+import author from './author.ts';
+import { route } from '../components/sidebar.ts';
 import type { SearchResponse, SearchAuthor, SearchVideo, SearchPlaylist} from '../types.ts';
 
+const domain = window.location.href.split("/");
 const apiHost = location.hostname === "localhost" ? "localhost:4480" : "api.yougra.site";
 
 const searchI = document.getElementById("search-query") as HTMLInputElement | null;
@@ -57,6 +60,24 @@ export default {
         if (searchQ && searchI) {
             searchI.value = searchQ;
             this.fetch();
+        }
+
+        if (recents.search.stored && recents.search.element) {
+            const recentSearches: string[] = JSON.parse(recents.search.stored).reverse();
+            if (!searchQ) recents.search.element.style.display = "block";
+            recents.search.element.innerHTML = `
+                <h3>Recent searches</h3>
+                ${recentSearches.map((search) => { return `<p>${search}</p>`}).join("")}
+            `;
+            const searches: NodeListOf<HTMLElement> = document.querySelectorAll("#recent-searches > p");
+
+            searches.forEach(search => {
+                search.onclick = () => {
+                    history.pushState({}, "", `/search?q=${search.innerText}`);
+                    if (searchI) searchI.value = search.innerText;
+                    this.fetch();
+                }
+            })
         }
 
         if (aorc && vors && pora && auths && vids && plists) {
@@ -116,6 +137,7 @@ export default {
             return
         }
 
+        if (recents.search.element) recents.search.element.style.display = "none";
         loader.style.display = "inline-flex";
 
         const response = await fetch(`${location.protocol}//${apiHost}/search`, {
@@ -123,6 +145,7 @@ export default {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ input: searchInput })
         }).catch((err) => {
+            if (recents.search.element && recents.search.stored) recents.search.element.style.display = "block";
             loader.style.display = "none";
             this.tries++;
             switch (this.tries) {
@@ -135,26 +158,42 @@ export default {
             return
         });
 
-        loader.style.display = "none";
-
         if (!response) throw new Error("No response recieved")
         const resData: SearchResponse = await response.json();
-        if (resData.errorTitle && resData.errorMessage) showError(resData.errorTitle, resData.errorMessage);
+        if (resData.errorTitle && resData.errorMessage) {
+            if (recents.search.element && recents.search.stored) recents.search.element.style.display = "block";
+            loader.style.display = "none";
+            showError(resData.errorTitle, resData.errorMessage);
+            return
+        }
 
         const authors: SearchAuthor[] = resData.authors;
         const videos: SearchVideo[] = resData.videos;
         const playlists: SearchPlaylist[] = resData.playlists;
 
         if (!authors.length && !videos.length && !playlists.length) {
-            createNotification("Search error", "Could not find anything. Check if you have no typo", "error");;
+            createNotification("Search error", "Could not find anything. Check if you have no typo", "error");
+            if (recents.search.element && recents.search.stored) recents.search.element.style.display = "block";
+            loader.style.display = "none";
             return
         }
+
+        loader.style.display = "none";
+
+        recents.search.set(searchInput);
 
         const totalResults = authors.length + videos.length + playlists.length;
         createNotification("Search successful", `Found ${totalResults} results`, "success");
 
         if (authors.length && auths) {
             auths.innerHTML = authors.map(author => {
+                const avatarImg = new Image();
+                avatarImg.src = author.thumbnail;
+
+                avatarImg.onerror = () => {
+                    console.warn("Failed to load author image. Replacing with default...");
+                    author.thumbnail = "./images/Author.svg";
+                }
                 return `
                     <div class="author">
                         <div style="min-height: 107px; min-width: 200px; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
@@ -181,11 +220,26 @@ export default {
                             <span id="duration">${video.duration}</span>
                         </div>
                         <h4 class="v-title">${video.title.length < 29 ? video.title : video.title.slice(0, 28).trimEnd() + "..."}</h4>
-                        <h6>${video.author}</h6> <font color="#909090">|</font> <span id="views">${video.views}</span>
+                        <h6 class="v-author">${video.author.name}</h6> <font color="#909090">|</font> <span id="views">${video.views}</span>
                         <span class="v-share"><svg width="17" height="17" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="#aaa"><g id="Layer_2" data-name="Layer 2"><g id="invisible_box" data-name="invisible box"><rect width="48" height="48" fill="none"/></g><g id="Q3_icons" data-name="Q3 icons"><path d="M31.2,14.2,41,24.1l-9.8,9.8V26.8L27,27c-6.8.3-12,1-16.1,2.4,3.6-3.8,9.3-6.8,16.7-7.5l3.6-.3V14.2M28.3,6a1.2,1.2,0,0,0-1.1,1.3V17.9C12,19.4,2.2,29.8,2,40.3c0,.6.2,1,.6,1s.7-.3,1.1-1.1c2.4-5.4,7.8-8.5,23.5-9.2v9.7A1.2,1.2,0,0,0,28.3,42a.9.9,0,0,0,.8-.4L45.6,25.1a1.5,1.5,0,0,0,0-2L29.1,6.4a.9.9,0,0,0-.8-.4Z"/></g></g></svg></span>
                     </div>
                 `;
             }).join(""); 
+
+            const vAuthors: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .video .v-author");
+
+            function goToAuthor(authorID: string) {
+                history.pushState({}, "", `/author?id=${authorID}`);
+                route.author();
+            }
+
+            vAuthors.forEach((vAuthor, index) => {
+                const authorID = videos[index]?.author?.id || "";
+                vAuthor.onclick = (e) => { 
+                    e.stopPropagation();
+                    goToAuthor(authorID);
+                }
+            });
         }
         if (playlists.length && plists) {
             plists.innerHTML = playlists.map((playlist) => {
@@ -193,7 +247,14 @@ export default {
                     <div class="playlist">
                         <div style="min-height: 150px; min-width: 200px; position: relative; border: 1px dashed #303030; border-radius: 5px; background: radial-gradient(#e55, #202020)">
                             <center><img src="${playlist.thumbnail}" loading="lazy" ${playlist.type !== "Playlist"? 'style="width: 55%"' : ""}/></center>
-                            <svg id="plist-icon" fill="rgba(235, 74, 74, 0.6)" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="28px" height="28px" viewBox="0 0 476.91 476.909" xml:space="preserve" stroke="#aaa"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M62.802,142.287h121.682c4.45,0,10.95-3.805,13.32-7.999l24.816-41.066H62.802C28.12,93.222,0,121.342,0,156.026v20.779 C13.266,156.086,36.425,142.287,62.802,142.287z"></path> <path d="M414.105,67.708H266.913c-8.681,0-19.151,6.125-23.399,13.685l-7.147,1228l-28.489,47.157 c-4.246,7.558-14.719,13.684-23.393,13.684H62.802C28.12,154.062,0,182.183,0,216.865v115.794v13.737 c0,34.685,28.12,62.805,62.802,62.805h351.303c34.685,0,62.805-28.12,62.805-62.805v-13.737V156.026v-25.515 C476.91,95.829,448.79,67.708,414.105,67.708z M208.372,335.332h163.952c4.34,0,7.851,3.515,7.851,7.851 c0,4.349-3.511,7.851-7.851,7.851H208.372c-4.332,0-7.851-3.502-7.851-7.851C200.521,338.847,204.04,335.332,208.372,335.332z M200.521,301.762c0-4.344,3.519-7.851,7.851-7.851h163.952c4.34,0,7.851,3.507,7.851,7.851c0,4.341-3.511,7.851-7.851,7.851 H208.372C204.04,309.612,200.521,306.103,200.521,301.762z M380.19,216.52c0,4.332-3.526,7.851-7.85,7.851H250.659 c-4.332,0-7.847-3.519-7.847-7.851c0-4.334,3.515-7.851,7.847-7.851H372.34C376.664,208.669,380.19,212.186,380.19,216.52z M372.34,252.491c4.323,0,7.85,3.502,7.85,7.85c0,4.341-3.526,7.852-7.85,7.852H208.372c-4.332,0-7.851-3.511-7.851-7.852 c0-4.348,3.519-7.85,7.851-7.85H372.34z M128.618,305.337c10.395-6.052,21.512-8.007,30.413-6.288v-67.912V208.82v-6.899h6.904 h10.047h35.53c3.817,0,6.899,3.092,6.899,6.899v15.409c0,3.815-3.09,6.901-6.899,6.901h-35.53v87.636h-0.088 c-0.571,10.552-8.752,22.466-21.919,30.132c-17.829,10.379-37.956,9.028-44.955-2.989 C102.017,333.878,110.791,315.716,128.618,305.337z"></path> </g> </g> </g></svg>
+                            <svg id="plist-icon" fill="rgba(235, 74, 74, 0.6)" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="28px" height="28px" viewBox="0 0 476.91 476.909" xml:space="preserve" stroke="#aaa">
+                                <g>
+                                    <g>
+                                    <path d="M62.802,142.287h121.682c4.45,0,10.95-3.805,13.32-7.999l24.816-41.066H62.802C28.12,93.222,0,121.342,0,156.026v20.779 C13.266,156.086,36.425,142.287,62.802,142.287z" />
+                                    <path d="M414.105,67.708H266.913c-8.681,0-19.151,6.125-23.399,13.685l-7.147,11.828l-28.489,47.157 c-4.246,7.558-14.719,13.684-23.393,13.684H62.802C28.12,154.062,0,182.183,0,216.865v115.794v13.737 c0,34.685,28.12,62.805,62.802,62.805h351.303c34.685,0,62.805-28.12,62.805-62.805v-13.737V156.026v-25.515 C476.91,95.829,448.79,67.708,414.105,67.708z M208.372,335.332h163.952c4.34,0,7.851,3.515,7.851,7.851 c0,4.349-3.511,7.851-7.851,7.851H208.372c-4.332,0-7.851-3.502-7.851-7.851C200.521,338.847,204.04,335.332,208.372,335.332zM200.521,301.762c0-4.344,3.519-7.851,7.851-7.851h163.952c4.34,0,7.851,3.507,7.851,7.851c0,4.341-3.511,7.851-7.851,7.851 H208.372C204.04,309.612,200.521,306.103,200.521,301.762z M380.19,216.52c0,4.332-3.526,7.851-7.85,7.851H250.659 c-4.332,0-7.847-3.519-7.847-7.851c0-4.334,3.515-7.851,7.847-7.851H372.34C376.664,208.669,380.19,212.186,380.19,216.52z M372.34,252.491c4.323,0,7.85,3.502,7.85,7.85c0,4.341-3.526,7.852-7.85,7.852H208.372c-4.332,0-7.851-3.511-7.851-7.852 c0-4.348,3.519-7.85,7.851-7.85H372.34z M128.618,305.337c10.395-6.052,21.512-8.007,30.413-6.288v-67.912V208.82v-6.899h6.904 h10.047h35.53c3.817,0,6.899,3.092,6.899,6.899v15.409c0,3.815-3.09,6.901-6.899,6.901h-35.53v87.636h-0.088 c-0.571,10.552-8.752,22.466-21.919,30.132c-17.829,10.379-37.956,9.028-44.955-2.989 C102.017,333.878,110.791,315.716,128.618,305.337z"/>
+                                    </g>
+                                </g> 
+                            </svg>
                         </div>
                         <h4 class="p-title">${playlist.title.length < 29 ? playlist.title : playlist.title.slice(0, 28).trimEnd() + "..."}</h4>
                         <h6>${playlist.type}</h6> <font color="#909090">|</font> <span id="items">${playlist.itemCount}</span>
@@ -219,12 +280,15 @@ export default {
             plists.style.display = playlists.length ? "flex" : "none";
             [aorc, vors, pora].forEach(expand => expand.innerHTML = expand.innerHTML.replace("▽", "△"))
         } else {
+            auths.style.display = "none";
+            vids.style.display = "none";
+            plists.style.display = "none";
             [aorc, vors, pora].forEach(expand => expand.innerHTML = expand.innerHTML.replace("△", "▽"))
         }
 
-        const authCons: NodeListOf<HTMLElement> = document.querySelectorAll(".author");
-        const vidCons: NodeListOf<HTMLElement> = document.querySelectorAll(".video");
-        const plistCons: NodeListOf<HTMLElement> = document.querySelectorAll(".playlist");
+        const authCons: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .author");
+        const vidCons: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .video");
+        const plistCons: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .playlist");
 
         if (authors.length && authCons) {
             authCons.forEach((authCon, index) => {
@@ -232,9 +296,8 @@ export default {
                 if (!author) return 
                 authCon.onclick = (e) => {
                     e.stopPropagation();
-                    createNotification("Not available yet", "Authors section coming soon...", "info");
-                    //history.pushState({}, "", `/authors?id=${author.id}`);
-                    //route.grab();
+                    history.pushState({}, "", `/author?id=${author.id}`);
+                    route.author();
                 }
             });
         }
@@ -261,18 +324,15 @@ export default {
             });
         }
 
-        const vTitles: NodeListOf<HTMLElement> = document.querySelectorAll(".v-title");
-        const pTitles: NodeListOf<HTMLElement> = document.querySelectorAll(".p-title");
+        const vTitles: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .v-title");
+        const pTitles: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .p-title");
 
         tooltipper(vTitles, videos);
         if (playlists.length) tooltipper(pTitles, playlists);
 
-        const authShares: NodeListOf<HTMLElement> = document.querySelectorAll(".a-share");
-        const videoShares: NodeListOf<HTMLElement> = document.querySelectorAll(".v-share");
-        const playlistShares: NodeListOf<HTMLElement> = document.querySelectorAll(".p-share");
-
-        const urlSep = window.location.href.split("/");
-        const domain = urlSep[2];
+        const authShares: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .a-share");
+        const videoShares: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .v-share");
+        const playlistShares: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .p-share");
 
         if (authShares) {
             authShares.forEach((shareB, index) => {
