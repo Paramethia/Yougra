@@ -361,8 +361,8 @@ export default {
                     `;
                     aOp.innerHTML = `
                         <p style="font-size: 14px;">File size ~ <span id="a-size">${(parseFloat(String(selectedAudio.size)) + 1.4).toFixed(2)}mb</span></p>
-                        <p id="metadata" style="font-size: 14px;">Metadata <i class="fa-solid fa-toggle-${metadata ? 'on' : 'off'}"></i>
-                        <p id="m4a" style="font-size: 14px;">.m4a <i class="fa-solid fa-toggle-${extension !== "mp3" ? 'on' : 'off'}"></i>
+                        <p id="metadata" style="font-size: 14px;">Metadata <i class="fa-solid fa-toggle-${metadata ? 'on' : 'off'}"></i></p>
+                        <p id="m4a" style="font-size: 14px;">.m4a <i class="fa-solid fa-toggle-${extension !== "mp3" ? 'on' : 'off'}"></i></p>
                     `;
                 }
                 
@@ -476,7 +476,7 @@ export default {
                             const ws = new WebSocket(`${wsProtocol}//${apiHost}/audio`);
 
                             ws.onopen = () => {
-                                ws.send(JSON.stringify({ id, metadata, }));
+                                ws.send(JSON.stringify({ id, metadata, extension}));
                             };
 
                             ws.onmessage = event => {
@@ -564,7 +564,8 @@ export default {
                             if (size > 5000) {
                                 downloadBtn.disabled = false;
                                 downloadBtn.style.filter = "brightness(100%)";
-                                progressText.innerText = "You can't download a video larger than 5GB with processing.";
+                                progressText.innerText = "";
+                                createNotification("Video too large", "You can't download a video larger than 5GB with processing mode", "info");
                                 return
                             }
 

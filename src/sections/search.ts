@@ -327,7 +327,7 @@ export default {
         const vTitles: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .v-title");
         const pTitles: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .p-title");
 
-        tooltipper(vTitles, videos);
+        if (videos.length) tooltipper(vTitles, videos);
         if (playlists.length) tooltipper(pTitles, playlists);
 
         const authShares: NodeListOf<HTMLElement> = document.querySelectorAll("#search-results .a-share");

@@ -5,6 +5,7 @@ import updateCheck from './overlays/update.ts';
 import info from './sections/info.ts';
 import settings from './overlays/settings.ts';
 import search from './sections/search.ts';
+import author from './sections/author.ts';
 import grab from './sections/grab.ts';
 
 topbar();
@@ -13,6 +14,7 @@ updateCheck();
 info();
 settings.init();
 search.init();
+author.init();
 grab.init();
 router.listen();
 router.route();

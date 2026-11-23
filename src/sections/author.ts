@@ -167,7 +167,7 @@ export default {
                         </div>
                     `;
                 }).join("");
-                const vTitles: NodeListOf<HTMLElement> = document.querySelectorAll(".v-title");
+                const vTitles: NodeListOf<HTMLElement> = document.querySelectorAll("#author .v-title");
                 tooltipper(vTitles, author.videos);
                 const videos: NodeListOf<HTMLElement> = document.querySelectorAll("#author .video");
 
@@ -186,7 +186,7 @@ export default {
                         </div>
                     `;
                 }).join("");
-                const sTitles: NodeListOf<HTMLElement> = document.querySelectorAll(".s-title");
+                const sTitles: NodeListOf<HTMLElement> = document.querySelectorAll("#author .s-title");
                 tooltipper(sTitles, author.shorts);
 
                 const shorts: NodeListOf<HTMLElement> = document.querySelectorAll("#author .short");
@@ -209,7 +209,7 @@ export default {
                         </div>
                     `;
                 }).join("");
-                const pTitles: NodeListOf<HTMLElement> = document.querySelectorAll(".p-title");
+                const pTitles: NodeListOf<HTMLElement> = document.querySelectorAll("#author .p-title");
                 tooltipper(pTitles, author.collections);
 
                 const collections: NodeListOf<HTMLElement> = document.querySelectorAll("#author .playlist");
