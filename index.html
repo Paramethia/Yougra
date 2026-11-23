@@ -10,17 +10,17 @@
 	<meta name="robots" content="index, follow" />
 	<title>Yougra - YouTube Media Grabber</title>
 	<meta property="og:title" content="Yougra – YouTube Media Downloader" />
-	<meta property="og:description" content="Download YouTube videos/music + playlists/albums as MP4 or MP3 for free in any quality." />
-	<meta property="og:image" content="https://yougra.site/images/Yougra_logo_192x192.png" />
+	<meta property="og:description" content="Download YouTube videos/music + playlists/albums as mp4 or mp3/m4a for free in any quality." />
+	<meta property="og:image" content="https://yougra.site/images/Yougra OG image.png" />
 	<meta property="og:url" content="https://yougra.site" />
 	<meta property="og:type" content="website" />
 	<link rel="icon" href="Yougra.ico" />
 	<link rel="manifest" href="/manifest.json">
-	<link rel="apple-touch-icon" href="/images/Yougra_logo_192x192.png">
+	<link rel="apple-touch-icon" href="./images/Yougra_logo_192x192.png">
 	<link rel="canonical" href="https://yougra.site/" />
 	<link rel="stylesheet"  type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 	<link rel="stylesheet" type="text/css" href="./styles.css" />
-	<!--<script defer src="/_vercel/insights/script.js"></script>-->
+	<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 	<header>
@@ -44,11 +44,11 @@
 	<span id="version">Beta 2</span>
 	<div id="update">
 		<div>
-			<h3>Beta 2 - preview Ⅴ</h3>
+			<h3>Beta 2</h3>
 			<dl>
 				<dt>⟬ <strong>Major Rebuild</strong> ⟭</dt>
 				<dd>⌊ Rebuilt the website around SPA routing for an easier & smoother browsing experience without full page reloads.</dd>
-            	<dd>⌊ Included dedicated routes for Home <strong>(new)</strong>, Info, Search, Grab, Author <strong>(new)</strong>, and Saves <strong>(coming soon)</strong>.</dd>
+            	<dd>⌊ Included dedicated routes for Home <strong>(new)</strong>, Info, Search, Grab, and Author <strong>(new)</strong>.</dd>
             	<dd>⌊ Shareable links make it easier to send specific pages and content directly to friends.</dd>
 				<dt>⟬ <strong>UI & UX Improvements</strong> ⟭</dt>
 				<dd>⌊ Re-layout for the top bar to include the search bar</dd>
@@ -75,7 +75,6 @@
 				<dt>⟬ <strong>More Settings</strong> ⟭</dt>
 				<dd>⌊ Search results options</dd>
 				<dd>⌊ Album metadata options</dd>
-				<font color="#aaa" size="2">More features coming soon for Beta 2</font>
 			</dl>
 			<center><button id="close-update" aria-label="Close update overlay">Cool</button></center>
 		</div>
@@ -470,8 +469,8 @@
 		</div>
 	</main>
 	<script> window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); } </script>
-	<script type="module" src="src/home.ts"></script>
-	<!--<script type="application/ld+json">
+	<script type="module" src="./src/home.ts"></script>
+	<script type="application/ld+json">
 		{
 			"@context": "https://schema.org",
 			"@type": "WebApplication",
@@ -481,6 +480,6 @@
 			"applicationCategory": "Multimedia",
 			"operatingSystem": "All"
 		}
-	</script>-->
+	</script>
 </body>
 </html>
