@@ -7,12 +7,12 @@
   "theme_color": "#181818",  
   "icons": [
     {
-      "src": "./images/Yougra_logo_192x192.png",
+      "src": "https://Yougra.site/images/Yougra_logo_192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "./images/Yougra_logo_512x512.png",
+      "src": "https://Yougra.site/images/Yougra_logo_512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
