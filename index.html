@@ -4,18 +4,19 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta name="description" content="Yougra is a free YouTube media downloader that lets you download videos, music, or even playlists/albums as either MP3 or MP4 straight to your device." />
-	<meta name="keywords" content="youtube downloader, youtube to mp3, youtube to mp4, free youtube downloader, youtube music downloader, video downloader" />
+	<meta name="description" content="Download YouTube videos, music, playlists and albums for free with Yougra. Choose your preferred video quality or download audio in MP3 or M4A formats along with optional metadata. Straight to your device." />
 	<meta name="author" content="Kyrin" />
 	<meta name="robots" content="index, follow" />
 	<title>Yougra - YouTube Media Grabber</title>
 	<meta property="og:title" content="Yougra – YouTube Media Downloader" />
 	<meta property="og:description" content="Download YouTube videos/music + playlists/albums as mp4 or mp3/m4a for free in any quality." />
-	<meta property="og:image" content="https://yougra.site/images/Yougra OG image.png" />
+	<meta property="og:image" content="https://yougra.site/images/Yougra%20OG%20image.png" />
+	<meta property="og:image:alt" content="Yougra - YouTube Media Downloader" />
 	<meta property="og:url" content="https://yougra.site" />
 	<meta property="og:type" content="website" />
-	<link rel="icon" href="Yougra.ico" />
-	<link rel="manifest" href="/manifest.json">
+	<meta property="og:site_name" content="Yougra" />
+	<link rel="icon" href="./Yougra.ico" />
+	<link rel="manifest" href="./manifest.json">
 	<link rel="apple-touch-icon" href="./images/Yougra_logo_192x192.png">
 	<link rel="canonical" href="https://yougra.site/" />
 	<link rel="stylesheet"  type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
@@ -37,7 +38,7 @@
 		<div class="route" id="home-r">Home <i class="fa-solid fa-house"></i></div>
 		<div class="route" id="info-r">Info <i class="fa-solid fa-question"></i></div>
 		<div class="route" id="search-r">Search <i class="fa-solid fa-magnifying-glass"></i></div>
-		<div class="route" id="author-r">Authors <i class="fa-solid fa-people-group"></i></i></div>
+		<div class="route" id="author-r">Authors <i class="fa-solid fa-people-group"></i></div>
 		<div class="route" id="grab-r">Grab <i class="fa-solid fa-circle-down"></i></div>
 		<div id="settings-o">Settings <i class="fa-solid fa-gear"></i></div>
 	</aside>
@@ -57,8 +58,8 @@
             	<dd>⌊ Added sidebar navigation for easier access to different routes/pages.</dd>
 				<dd>⌊ Redesigned loading animations for a more polished experience.</dd>
             	<dd>⌊ Improved the video download button placement, moving it alongside the download options.</dd>
-				<dd>⌊ Share buttons now copy links that lead directly to Yogura with the corresponding route instead of YouTube.</dd>
-				<dt>⟬ <strong>Auther Route</strong> ⟭</dt>
+				<dd>⌊ Share buttons now copy links that lead directly to Yougra with the corresponding route instead of YouTube.</dd>
+				<dt>⟬ <strong>Author Route</strong> ⟭</dt>
 				<dd>⌊ A new author route that will display the fetched authors content</dd>
 				<dt>⟬ <strong>Recent Activity</strong> ⟭</dt>
             	<dd>⌊ Recently searched content, grabbed media, and visited authors are now saved and displayed for quick access.</dd>
@@ -106,10 +107,10 @@
 				<h3>Video download method</h3>
 
 				<h4 id="immediate">Immediate</h4>
-				<p>This ensures that every <strong>video</strong> you download always start immediatly without processing. Keep in mind that the file may be corrupted for some devices.</p>
+				<p>This ensures that every <strong>video</strong> you download always start immediately without processing. Keep in mind that the file may be corrupted for some devices.</p>
 
 				<h4 id="process">Process</h4>
-				<p>This ensures that the <strong>video</strong> works on any device by having a process of downloading and merging on the server, then the download will start. Not recommended for long videos if you are inpatient, as it will take a long time before it starts the download. There is also a max file size requirement (5GB) for downloading videos for this option.</p>
+				<p>This ensures that the <strong>video</strong> works on any device by having a process of downloading and merging on the server, then the download will start. Not recommended for long videos if you're impatient, as it will take a long time before it starts the download. There is also a max file size requirement (5GB) for downloading videos for this option.</p>
 			</div>
 			<div class="sets">
 				<h3>Album metadata</h3>
@@ -191,7 +192,7 @@
 				<li>Audio/Music detection system (auto selects fitting format to download)</li>
 				<li>Multiple video quality options.</li>
 				<li>Download audio as m4a or mp3</li>
-				<li>Audio extraction from YouTube videos.</li>li>
+				<li>Audio extraction from YouTube videos.</li>
 				<li>Custom download methods</li>
 				<li>Content sharing – share direct links to videos, songs, playlists, and albums with friends.</li>
     			<li>Content saving – save content <em>locally</em> within Yougra for playback and downloads later. <strong>(Coming soon)</strong></li>
@@ -275,14 +276,14 @@
 					<img id="a-avatar" src="/images/Author.svg" />
 					<div id="info">
 						<h2 id="a-title">Author</h2>
-						<p id="a-handle">@Athor</p>
+						<p id="a-handle">@Author</p>
 						<span id="a-subs">407 subscribers</span>
 					</div>
 				</div>
 				<hr color="#999" />
 				<div id="content">
 					<div id="tabs">
-						<span class="tab">35 Videos</span><span class="tab">16 Collections</span><span class="tab">67 Shorts</span>
+						<span class="tab">0 Videos</span><span class="tab">0 Collections</span><span class="tab">0 Shorts</span>
 					</div>
 				</div>
 				<div id="videos"></div>
@@ -475,10 +476,16 @@
 			"@context": "https://schema.org",
 			"@type": "WebApplication",
 			"name": "Yougra",
-			"url": "https://yougra.site",
-			"description": "Free YouTube media downloader for MP3 and MP4.",
-			"applicationCategory": "Multimedia",
-			"operatingSystem": "All"
+			"url": "https://yougra.site/",
+			"description": "Free YouTube media downloader for videos, music, playlists and albums.",
+			"applicationCategory": "MultimediaApplication",
+			"operatingSystem": "Any",
+			"browserRequirements": "Requires JavaScript and a modern web browser",
+			"offers": {
+				"@type": "Offer",
+				"price": "0",
+				"priceCurrency": "USD"
+			}
 		}
 	</script>
 </body>

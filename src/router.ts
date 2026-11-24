@@ -2,6 +2,41 @@ import error from './overlays/error.ts';
 
 const routes: NodeListOf<HTMLElement> =  document.querySelectorAll(".route");
 
+interface SEOData {
+    title: string;
+    description: string;
+    url: string;
+}
+
+function updateSEO({ title, description, url }: SEOData): void {
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", url);
+}
+
+const seoData: Record<string, Omit<SEOData, "url">> = {
+    "/": {
+        title: "Yougra - YouTube Media Grabber",
+        description: "Download YouTube videos, music, playlists and albums for free with Yougra. Choose your preferred video quality or download audio in MP3 or M4A formats along with optional metadata. Straight to your device."
+    },
+    "/info": {
+        title: "Yougra - Info",
+        description: "Learn more about Yougra, its features, supported formats and how to download YouTube content."
+    },
+    "/search": {
+        title: "YouTube - Search YouTube",
+        description: "Search YouTube for videos, music, playlists and other content using Yougra."
+    },
+    "/author": {
+        title: "Yougra - YouTube Authors",
+        description: "Explore YouTube authors and browse their videos, shorts and playlists with Yougra."
+    },
+    "/grab": {
+        title: "Yougra - Download YouTube Content",
+        description: "Download YouTube videos and audio with your preferred format and quality using Yougra."
+    }
+};
+
 export default {
     sections: {
         home: document.getElementById("home"),
@@ -11,7 +46,7 @@ export default {
         grab: document.getElementById("grab"),
     },
     route() {
-        const path = new URL(window.location.href).pathname;
+        let path = new URL(window.location.href).pathname;
 
         const homeR = document.getElementById("home-r");
         const infoR = document.getElementById("info-r");
@@ -32,6 +67,26 @@ export default {
         // Hide all sections
         Object.values(this.sections).forEach(section => { if (section) section.style.display = "none"})
 
+        // Handle unknown routes
+        if (!seoData[path]) {
+            history.pushState({}, "", "/");
+            path = "/";
+        }
+
+        // Get SEO data for the current route
+        const currentSEO = seoData[path];
+
+        if (!currentSEO) {
+            error("Failed to update SEO", "SEO data not found for route");
+            return;
+        }
+
+        // Update SEO metadata
+        updateSEO({
+            ...currentSEO,
+            url: new URL(path, window.location.origin).href
+        });
+
         switch (path) {
             case "/info": 
                 infoR.style.backgroundColor = "rgba(238, 119, 119, 0.2)";
@@ -50,11 +105,6 @@ export default {
                 this.sections.grab.style.display = "block";
             break;
             case "/":
-                homeR.style.backgroundColor = "rgba(238, 119, 119, 0.2)";
-                this.sections.home.style.display = "block";
-            break;
-            default:
-                history.pushState({}, "", "/");
                 homeR.style.backgroundColor = "rgba(238, 119, 119, 0.2)";
                 this.sections.home.style.display = "block";
             break;
